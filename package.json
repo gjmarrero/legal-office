@@ -1,0 +1,40 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-basic-ssl": "^1.0.1",
+        "axios": "^1.1.2",
+        "laravel-vite-plugin": "^0.7.5",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.4.2",
+        "@fortawesome/free-brands-svg-icons": "^6.4.2",
+        "@fortawesome/free-regular-svg-icons": "^6.4.2",
+        "@fortawesome/free-solid-svg-icons": "^6.4.2",
+        "@fortawesome/vue-fontawesome": "^3.0.3",
+        "@tato30/vue-pdf": "^1.7.4",
+        "@vitejs/plugin-vue": "^4.2.3",
+        "@vueuse/core": "^10.4.1",
+        "admin-lte": "3.2",
+        "bootstrap-icons": "^1.10.5",
+        "filepond": "^4.30.4",
+        "flatpickr": "^4.6.13",
+        "jquery": "^3.7.0",
+        "laravel-vue-pagination": "^4.1.0",
+        "lodash": "^4.17.21",
+        "pinia": "^2.1.6",
+        "sweetalert2": "^11.7.5",
+        "vee-validate": "^4.9.3",
+        "vue": "^3.3.2",
+        "vue-filepond": "^7.0.3",
+        "vue-pdf-embed": "^1.2.1",
+        "vue-router": "^4.2.0",
+        "vue3-pdf-app": "^1.0.3",
+        "yup": "^1.1.1"
+    }
+}
