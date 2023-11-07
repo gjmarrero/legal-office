@@ -86,54 +86,54 @@ class DashboardStatController extends Controller
         ]);
     }
 
-    // public function getReferralNearDueCount(){
-    //     $document_reset = Document::active()->withResetNearDueReferrals();
+    public function getReferralNearDueCount(){
+        $document_reset = Document::active()->withResetNearDueReferrals();
 
-    //     $document_no_reset = Document::active()->withoutResetNearDueReferrals();
+        $document_no_reset = Document::active()->withoutResetNearDueReferrals();
 
-    //     $totalReferralNearDueCount = $document_reset->unionAll($document_no_reset)->count();            
+        $totalReferralNearDueCount = $document_reset->unionAll($document_no_reset)->count();            
 
-    //     return response() -> json ([
-    //         'totalReferralNearDueCount' => $totalReferralNearDueCount,
-    //     ]);
+        return response() -> json ([
+            'totalReferralNearDueCount' => $totalReferralNearDueCount,
+        ]);
 
-    // }
+    }
 
-    // public function getCaseNearDueCount(){
-    //     $document_reset = Document::active()->withResetNearDueCases();
+    public function getCaseNearDueCount(){
+        $document_reset = Document::active()->withResetNearDueCases();
         
-    //     $document_no_reset = Document::active()->withoutResetNearDueCases();
+        $document_no_reset = Document::active()->withoutResetNearDueCases();
 
-    //     $totalCaseNearDueCount = $document_reset->unionAll($document_no_reset)->count();           
+        $totalCaseNearDueCount = $document_reset->unionAll($document_no_reset)->count();           
         
-    //     return response() -> json ([
-    //         'totalCaseNearDueCount' => $totalCaseNearDueCount,
-    //     ]);
-    // }
+        return response() -> json ([
+            'totalCaseNearDueCount' => $totalCaseNearDueCount,
+        ]);
+    }
 
-    // public function getReferralPastDueCount(){
-    //     $document_reset = Document::active()->withResetPastDueReferrals();
+    public function getReferralPastDueCount(){
+        $document_reset = Document::active()->withResetPastDueReferrals();
 
-    //     $document_no_reset = Document::active()->withoutResetPastDueReferrals();
+        $document_no_reset = Document::active()->withoutResetPastDueReferrals();
 
-    //     $totalReferralPastDueCount = $document_reset->unionAll($document_no_reset)->count();
+        $totalReferralPastDueCount = $document_reset->unionAll($document_no_reset)->count();
         
-    //     return response() -> json ([
-    //         'totalReferralPastDueCount' => $totalReferralPastDueCount,
-    //     ]);
-    // }
+        return response() -> json ([
+            'totalReferralPastDueCount' => $totalReferralPastDueCount,
+        ]);
+    }
 
-    // public function getCasePastDueCount(){
-    //     $document_reset = Document::active()->withResetPastDueCases();
+    public function getCasePastDueCount(){
+        $document_reset = Document::active()->withResetPastDueCases();
 
-    //     $document_no_reset = Document::active()->withoutResetPastDueCases();
+        $document_no_reset = Document::active()->withoutResetPastDueCases();
 
-    //     $totalCasePastDueCount = $document_reset->unionAll($document_no_reset)->count();
+        $totalCasePastDueCount = $document_reset->unionAll($document_no_reset)->count();
         
-    //     return response() -> json ([
-    //         'totalCasePastDueCount' => $totalCasePastDueCount,
-    //     ]);
-    // }
+        return response() -> json ([
+            'totalCasePastDueCount' => $totalCasePastDueCount,
+        ]);
+    }
 
     public function getFilteredDocuments(){
         $document_reset = Document::whereHas('document_resets', function($query){
