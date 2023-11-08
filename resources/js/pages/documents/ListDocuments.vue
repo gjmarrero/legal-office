@@ -251,7 +251,7 @@
         formData.append('action', form.action);
         formData.append('document_file', form.file);
 
-        axios.post(`/api/documents/route/`, formData)
+        axios.post(`/api/documents/route`, formData)
             .then((response) => {
                 toastr.success('Document routed successfully');
                 $('#moveDocumentModal').modal('hide');

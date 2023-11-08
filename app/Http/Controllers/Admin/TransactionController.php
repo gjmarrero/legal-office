@@ -66,7 +66,7 @@ class TransactionController extends Controller
             'user_id' => Auth::user()->id,
             'status' => TransactionStatus::PENDING,
         ]);
-
+        // dd($dd);
         $update_last_transaction = Transaction::where([['document_id',request('document_id')],['type',TransactionType::RECEIVED],['status',TransactionStatus::PENDING],['employee_id',Auth::user()->employee_id]]);
         $update_last_transaction->update([
             'status' => TransactionStatus::COMPLETED,

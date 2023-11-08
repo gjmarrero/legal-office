@@ -54,8 +54,6 @@ import VuePdfEmbed from 'vue-pdf-embed';
                 fileLink.click();
                 fileLink.remove();
                 toastr.success('File downloaded');
-                file_preview.value = response.data;
-                console.log(file_preview.value);
             });
     }
     // const preview_file = '/storage/uploads/documents/1693465980_document_file_keyboard-shortcuts-windows.pdf';
