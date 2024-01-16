@@ -13,6 +13,7 @@ use DB;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 // use Illuminate\Support\Carbon;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class Document extends Model
 {
@@ -386,6 +387,10 @@ class Document extends Model
         return $query->where('type', DocumentType::ADMIN_DOCS);
     }
 
+    public function scopeNotaries($query){
+        return $query->where('type', DocumentType::NOTARY);
+    }
+
     public function scopeMunicipalOrdinances($query){
         return $query->where('type', DocumentType::MUNICIPAL_ORDINANCE);
     }
@@ -408,6 +413,14 @@ class Document extends Model
 
     public function scopePastDueFifteenDays($query){
         return $query->whereRaw("DATEDIFF('".now()."',date_received) > 15");
+    }
+
+    public function scopeUserCount($query){
+        $current_user = Auth::user()->employee_id;
+
+        return $query->whereHas('transactions', function($query) use ($current_user){
+            $query->where('employee_id', $current_user);
+        });
     }
 
 

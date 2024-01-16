@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\Document;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class TransactionController extends Controller
 {
@@ -42,6 +43,7 @@ class TransactionController extends Controller
     }
 
     public function route(){
+        $routeOutside = request('routeOutside');
         $file_name = '';
         $validated = request()->validate([
             'document_id' => 'required',
@@ -57,6 +59,15 @@ class TransactionController extends Controller
             $path = 'public/uploads/transaction_documents/'.$file_name;
             Storage::disk('local')->put($path, file_get_contents($file));
         }
+        
+        if($routeOutside == 1){
+            $status = TransactionStatus::COMPLETED;
+            $type = TransactionType::RELEASED;
+        }else{
+            $status = TransactionStatus::PENDING;
+            $type = null;
+        }
+        
 
         Transaction::create([
             'employee_id' => $validated['employee_id'],
@@ -64,14 +75,38 @@ class TransactionController extends Controller
             'action' => $validated['action'],
             'document_file' => $file_name,            
             'user_id' => Auth::user()->id,
-            'status' => TransactionStatus::PENDING,
+            'status' => $status,
+            'type' => $type,
         ]);
-        // dd($dd);
+        
         $update_last_transaction = Transaction::where([['document_id',request('document_id')],['type',TransactionType::RECEIVED],['status',TransactionStatus::PENDING],['employee_id',Auth::user()->employee_id]]);
         $update_last_transaction->update([
             'status' => TransactionStatus::COMPLETED,
             'type' => TransactionType::RELEASED,
         ]);
+
+        // dd($routeOutside);
+    }
+
+    public function update(Transaction $transaction){
+        $file_name = '';
+        
+        $validated = request()->validate([
+            'employee_id' => 'required',
+            'action' => 'required',
+        ]);
+
+        if(request()->hasFile('document_file')){
+            $file = request()->file('document_file');
+            $file_name = time().'_'.'document_file'.''.$file->getClientOriginalName();
+            $path = 'public/uploads/transaction_documents/'.$file_name;
+            Storage::disk('local')->put($path, file_get_contents($file));
+        }
+
+        $validated['document_file'] = $file_name;
+        $validated['user_id'] = Auth::user()->id;
+        $transaction->update($validated);
+        return response()->json(['success' => true]);
     }
 
     public function receive($document_id){

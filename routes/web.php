@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function() {
 
     Route::get('/api/dashboard/stats/totals', [DashboardStatController::class,'totals']);
 
-    
+    Route::get('/api/profile/employee_counter', [ProfileController::class, 'getEmployeeCounters']);
 
     Route::get('/api/documents', [DocumentController::class, 'index']);
 
@@ -98,6 +98,8 @@ Route::middleware('auth')->group(function() {
     Route::get('/api/documents/document/{document}', [DocumentController::class, 'getDocument']);
     Route::post('/api/documents/archive/{document}', [DocumentController::class, 'archive']);
     Route::get('/api/documents/transactions/{document}', [TransactionController::class, 'transactions']);
+    Route::get('/api/documents/{transaction}/edit', [TransactionController::class, 'edit']);
+    Route::post('/api/documents/transaction/{transaction}/edit', [TransactionController::class, 'update']);
     Route::post('/api/documents/reset/{document}', [DocumentController::class, 'reset']);
     Route::post('/api/documents/receive/{document}', [TransactionController::class, 'receive']);
 

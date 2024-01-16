@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\Transaction;
+use App\Models\Document;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -51,5 +54,23 @@ class ProfileController extends Controller
         );
 
         return response()->json(['message' => 'Password changed successfully']);
+    }
+
+    public function getEmployeeCounters()
+    {        
+        $totalCases = Document::case()->userCount()->count();
+        
+        $totalReferrals = Document::referral()->userCount()->count();
+
+        $totalAdminDocs = Document::adminDocs()->userCount()->count();
+
+        $totalNotaries = Document::notaries()->userCount()->count();
+
+        return response() -> json([
+            'totalCases' => $totalCases,
+            'totalReferrals' => $totalReferrals,
+            'totalAdminDocs' => $totalAdminDocs,
+            'totalNotaries' => $totalNotaries,
+        ]);
     }
 }

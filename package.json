@@ -27,6 +27,7 @@
         "jquery": "^3.7.0",
         "laravel-vue-pagination": "^4.1.0",
         "lodash": "^4.17.21",
+        "mammoth": "^1.6.0",
         "pinia": "^2.1.6",
         "sweetalert2": "^11.7.5",
         "vee-validate": "^4.9.3",
