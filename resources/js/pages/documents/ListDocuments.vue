@@ -215,6 +215,7 @@ const deleteDocument = (id) => {
 //     })
 // }
 const routeOutside = ref(false);
+
 const archiveDocument = (id) => {
     Swal.fire({
         title: 'End this document?',

@@ -436,6 +436,19 @@ class DocumentController extends Controller
 
         $document->update($setStatus);
 
+        $setTransactionStatus = ([
+            'status' => TransactionStatus::COMPLETED,
+        ]);
+
+        $update_last_transaction = Transaction::where('document_id',$document->id)->orderBy('id','desc')->first();
+        
+        $update_last_transaction->update([
+            'status' => TransactionStatus::COMPLETED,
+        ]);
+        
+        
+
+        //DB::table('shortcontacts')->where('mobile',($data->mobile))->orderBy('id','desc')->first()->update(['otp_stts'=>'Verified']);
         // return Document::with('client:id,name,office')
         //     ->where('id',$document->id)
         //     ->latest()->paginate()
