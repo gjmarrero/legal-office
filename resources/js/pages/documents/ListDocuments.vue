@@ -254,7 +254,7 @@ const archiveDocument = (id) => {
         }
     })
 }
-
+const reOpen = ref(false);
 const reopenDocument = (id) => {
     Swal.fire({
         title: 'Reopen this document?',
@@ -269,8 +269,9 @@ const reopenDocument = (id) => {
                 .then((response) => {
                     Swal.fire(
                         'Document reopened',
-                        'succes'
+                        'success'
                     )
+                    reOpen.value = true;
                     routeDocument(id);
                 })
         }
@@ -301,8 +302,13 @@ const createRouteDocument = () => {
         .then((response) => {
             toastr.success('Document routed successfully');
             $('#moveDocumentModal').modal('hide');
-            documents.value.data = documents.value.data.filter(document => document.id !== docIdBeingRouted.value);
-            documentsCount.value = documents.value.data.length;
+            if(!reOpen.value){
+                documents.value.data = documents.value.data.filter(document => document.id !== docIdBeingRouted.value);
+                documentsCount.value = documents.value.data.length;
+            }else{
+                getDocuments();
+            }
+            console.log(reOpen.value);
         });
 }
 
