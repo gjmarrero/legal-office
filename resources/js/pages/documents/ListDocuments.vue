@@ -155,6 +155,7 @@ const updateDocumentStatusDeleteCount = (id) => {
 }
 
 const updateDocumentStatusCount = (id) => {
+    console.log("UpdateStatCount:" + id);
     const updatedDocumentStatus = documents.value.data.find(document => document.id === id).status.name;
     const statusToUpdate = documentStatus.value.find(status => status.name === updatedDocumentStatus);
     if (statusToUpdate.name === 'ACTIVE') {
@@ -216,6 +217,17 @@ const deleteDocument = (id) => {
 // }
 const routeOutside = ref(false);
 
+const reOpen = ref(false);
+
+const filterCheck = () => {
+    if (!reOpen.value) {
+        documents.value.data = documents.value.data.filter(document => document.id !== docIdBeingRouted.value);
+        documentsCount.value = documents.value.data.length;
+    } else {
+        getDocuments();
+    }
+}
+
 const archiveDocument = (id) => {
     Swal.fire({
         title: 'End this document?',
@@ -248,13 +260,14 @@ const archiveDocument = (id) => {
                     const index = documents.value.data.findIndex(document => document.id === id);
                     documents.value.data[index].status.name = 'ARCHIVED';
                     documents.value.data[index].status.color = 'success';
-                    documents.value.data = documents.value.data.filter(document => document.id !== id);
+                    //documents.value.data = documents.value.data.filter(document => document.id !== id);
+                    filterCheck();
                     updateDocumentStatusCount(id);
                 });
         }
     })
 }
-const reOpen = ref(false);
+
 const reopenDocument = (id) => {
     Swal.fire({
         title: 'Reopen this document?',
@@ -286,6 +299,7 @@ const routeDocument = (id) => {
     $('#moveDocumentModal').modal('show');
 }
 
+
 const createRouteDocument = () => {
     const formData = new FormData();
     formData.append('document_id', docIdBeingRouted.value);
@@ -293,22 +307,16 @@ const createRouteDocument = () => {
     formData.append('action', form.action);
     formData.append('document_file', form.file);
     console.log(routeOutside.value);
-    if(routeOutside.value){
-        formData.append('routeOutside',1);
-    }else{
-        formData.append('routeOutside',0);
+    if (routeOutside.value) {
+        formData.append('routeOutside', 1);
+    } else {
+        formData.append('routeOutside', 0);
     }
     axios.post(`/api/documents/route`, formData)
         .then((response) => {
             toastr.success('Document routed successfully');
             $('#moveDocumentModal').modal('hide');
-            if(!reOpen.value){
-                documents.value.data = documents.value.data.filter(document => document.id !== docIdBeingRouted.value);
-                documentsCount.value = documents.value.data.length;
-            }else{
-                getDocuments();
-            }
-            console.log(reOpen.value);
+            filterCheck();
         });
 }
 
