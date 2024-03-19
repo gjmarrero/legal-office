@@ -73,4 +73,56 @@ class ProfileController extends Controller
             'totalNotaries' => $totalNotaries,
         ]);
     }
+
+    public function getEmployeeCountCases()
+    {
+        $totalCases = Document::case()
+            ->when(request('selectedCaseType')==='cases', function($query){
+                $query->case();
+            })
+            ->when(request('selectedCaseType')==='administrative', function($query){
+                $query->administrativeCases();
+            })
+            ->when(request('selectedCaseType')==='judicial', function($query){
+                $query->judicialCases();
+            })
+            ->when(request('selectedCaseType')==='quasi', function($query){
+                $query->quasiCases();
+            })
+            ->userCount()->count();
+        
+        return response() -> json ([
+            'caseTypeCount' => $totalCases,
+        ]);
+    }
+
+    public function getEmployeeCountReferrals()
+    {
+        $totalReferrals = Document::referral()
+            ->when(request('selectedReferralType')==='referrals', function($query){
+                $query->referral();
+            })
+            ->when(request('selectedReferralType')==='municipal', function($query){
+                $query->municipalOrdinances();
+            })
+            ->when(request('selectedReferralType')==='provincial', function($query){
+                $query->provincialOrdinances();
+            })
+            ->when(request('selectedReferralType')==='other', function($query){
+                $query->otherReferrals();
+            })
+            ->when(request('selectedReferralType')==='admin_docs', function($query){
+                $query->adminDocs();
+            })
+            ->when(request('selectedReferralType')==='code', function($query){
+                $query->codes();
+            })
+            ->userCount()->count();
+
+        return response() -> json ([
+            'referralTypeCount' => $totalReferrals,
+        ]);
+
+        // dd($totalReferrals);
+    }
 }

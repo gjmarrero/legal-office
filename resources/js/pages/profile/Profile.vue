@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ref, onMounted, reactive } from 'vue';
 import { useToastr } from '@/toastr';
 import { useAuthUserStore } from '../../stores/AuthUserStore.js';
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 
 const authUserStore = useAuthUserStore();
 
@@ -70,7 +71,36 @@ const handleFileChange = (event) => {
 }
 
 const totalCases = ref(0);
+const selectedCaseType = ref('cases');
+const getSelectedCaseTypeCount = () => {
+    console.log(selectedCaseType.value);
+    axios.get('/api/profile/employee_counter_cases', {
+        params: {
+            selectedCaseType: selectedCaseType.value,
+        }
+    })
+        .then((response) => {
+            totalCases.value = response.data.caseTypeCount;
+        })
+}
+
 const totalReferrals = ref(0);
+const selectedReferralType = ref('referrals');
+const getSelectedReferralTypeCount = () => {
+    console.log(selectedReferralType.value);
+    axios.get('/api/profile/employee_counter_referrals', {
+        params: {
+            selectedReferralType: selectedReferralType.value,
+        }
+    })
+    .then((response) => {
+        totalReferrals.value = response.data.referralTypeCount;
+        console.log(totalReferrals.value);
+    })
+}
+
+
+
 const totalAdminDocs = ref(0);
 const totalNotaries = ref(0);
 
@@ -80,16 +110,18 @@ const getEmployeeCounts = () => {
             current_employee: authUserStore.user.employee_id,
         }
     })
-    .then((response) => {
-        totalCases.value = response.data.totalCases;
-        totalReferrals.value = response.data.totalReferrals;
-        totalAdminDocs.value = response.data.totalAdminDocs;
-        totalNotaries.value = response.data.totalNotaries;
-    })
+        .then((response) => {
+            //totalCases.value = response.data.totalCases;
+            //totalReferrals.value = response.data.totalReferrals;
+            totalAdminDocs.value = response.data.totalAdminDocs;
+            totalNotaries.value = response.data.totalNotaries;
+        })
 }
 
 onMounted(() => {
     getEmployeeCounts();
+    getSelectedCaseTypeCount();
+    getSelectedReferralTypeCount();
 })
 </script>
 
@@ -227,41 +259,88 @@ onMounted(() => {
                                 <div class="col">
                                     <div class="small-box bg-info">
                                         <div class="inner">
-                                            <p>Cases</p>
                                             <div class="d-flex justify-content-between">
-                                                <h3>{{ totalCases }}</h3>
+                                                <h3 class="mr-3">{{ totalCases }}</h3>
+                                                <select v-model="selectedCaseType" @change="getSelectedCaseTypeCount()"
+                                                    style="height: 2rem; outline: 2px solid transparent;"
+                                                    class="px-1 rounded border-0 form-control">
+                                                    <option value="cases">All</option>
+                                                    <option value="administrative">Administrative</option>
+                                                    <option value="judicial">Judicial</option>
+                                                    <option value="quasi">Quasi-Judicial</option>
+                                                </select>
                                             </div>
+                                            <p>Court Cases</p>
                                         </div>
+                                        <div class="icon">
+                                            <i class="ion ion-bag"></i>
+                                        </div>
+
+                                        <router-link class="small-box-footer" v-if="totalCases > 0" :to="{
+                                            name: 'admin.documents',
+                                            query: {
+                                                query_type: 'all',
+                                                doc_type: selectedCaseType
+                                            }
+                                        }">
+                                            View
+                                        </router-link>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="small-box bg-info">
                                         <div class="inner">
+                                            <div class="d-flex justify-content-between">
+                                                <h3 class="mr-3">{{ totalReferrals }}</h3>
+                                                <select v-model="selectedReferralType" @change="getSelectedReferralTypeCount()"
+                                                    style="height: 2rem; outline: 2px solid transparent;"
+                                                    class="px-1 rounded border-0 form-control">
+                                                    <option value="referrals">All</option>
+                                                    <option value="municipal">Municipal Ordinance</option>
+                                                    <option value="provincial">Provincial Ordinance</option>
+                                                    <option value="other">Other Referrals</option>
+                                                    <option value="admin_docs">Admin Documents</option>
+                                                    <option value="code">Code</option>
+                                                </select>
+                                            </div>
                                             <p>Referrals</p>
-                                            <div class="d-flex justify-content-between">
-                                                <h3>{{ totalReferrals }}</h3>
-                                            </div>
                                         </div>
+                                        <div class="icon">
+                                            <i class="ion ion-bag"></i>
+                                        </div>
+
+                                        <router-link class="small-box-footer" v-if="totalReferrals > 0" :to="{
+                                            name: 'admin.documents',
+                                            query: {
+                                                query_type: 'all',
+                                                doc_type: selectedReferralType
+                                            }
+                                        }">
+                                            View
+                                        </router-link>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="small-box bg-info">
                                         <div class="inner">
-                                            <p>Admin Docs</p>
                                             <div class="d-flex justify-content-between">
-                                                <h3>{{ totalAdminDocs }}</h3>
+                                                <h3 class="mr-3">{{ totalNotaries }}</h3>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="small-box bg-info">
-                                        <div class="inner">
                                             <p>Notaries</p>
-                                            <div class="d-flex justify-content-between">
-                                                <h3>{{ totalNotaries }}</h3>
-                                            </div>
                                         </div>
+                                        <div class="icon">
+                                            <i class="ion ion-bag"></i>
+                                        </div>
+
+                                        <router-link class="small-box-footer" v-if="totalNotaries > 0" :to="{
+                                            name: 'admin.documents',
+                                            query: {
+                                                query_type: 'all',
+                                                doc_type: 'notary'
+                                            }
+                                        }">
+                                            View
+                                        </router-link>
                                     </div>
                                 </div>
                             </div>

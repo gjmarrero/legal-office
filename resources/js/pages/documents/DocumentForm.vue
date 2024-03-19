@@ -23,7 +23,7 @@ const form = reactive({
     description: '',
     remarks: '',
     file: null,
-
+    status: '',
 });
 
 const document_types = ref();

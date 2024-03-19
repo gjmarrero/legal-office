@@ -252,6 +252,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'active',
                                                             to_do: 'to-receive'
                                                         }
                                                     }">
@@ -275,6 +276,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'active',
                                                             to_do: 'to-release',
                                                         }
                                                     }">
@@ -319,6 +321,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'active',
                                                             doc_type: selectedReferralNearDueType,
                                                             status: 'near_due'
                                                         }
@@ -396,6 +399,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'active',
                                                             doc_type: selectedReferralPastDueType,
                                                             status: 'past_due'
                                                         }
@@ -426,6 +430,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'active',
                                                             doc_type: selectedCasePastDueType,
                                                             status: 'past_due'
                                                         }
@@ -472,6 +477,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'all',
                                                             doc_type: 'referrals'
                                                         }
                                                     }">
@@ -502,6 +508,7 @@ onMounted(() => {
                                                     :to="{
                                                         name: 'admin.documents',
                                                         query: {
+                                                            query_type: 'all',
                                                             doc_type: 'cases',
                                                         }
                                                     }">

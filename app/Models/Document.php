@@ -11,7 +11,6 @@ use App\Enums\DocumentType;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use DB;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-// use Illuminate\Support\Carbon;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,24 +36,23 @@ class Document extends Model
         );
     }
 
-    // public function dateToCount(): Attribute{
-    //     return Attribute::make(
-    //         get: fn() => $this->date_received,
-    //     );
-    // }
+    public function lastAssignment(): Attribute{
+        return Attribute::make(
+            get: fn() => $this->transactions()->latest('id')->first()->employee_id,
+        );   
+    }
 
+    public function lastTransactionType(): Attribute{
+        return Attribute::make(
+            get: fn() => $this->transactions()->latest('id')->first()->type,
+        );
+    }
 
     public function formattedDateToCount(): Attribute{
         return Attribute::make(
             get: fn() => $this->date_to_count->format('Y-m-d'),
         );
     }
-
-    // public function daysActive(): Attribute{
-    //     return Attribute::make(
-    //         get: fn() => now()->diffInDays($this->date_to_count),
-    //     );
-    // }
 
     public function daysActive(): Attribute{
         $startDate = now();
@@ -421,15 +419,14 @@ class Document extends Model
         return $query->whereHas('transactions', function($query) use ($current_user){
             $query->where('employee_id', $current_user);
         });
-    }
-
+    }    
 
     protected $guarded = [];
-
-    protected $appends = ['days_active','date_to_count'];
+    protected $appends = ['days_active','date_to_count','last_assignment','last_transaction_type'];
 
     protected $casts = [
         'status' => DocumentStatus::class,
         'type' => DocumentType::class,
     ];
+
 }

@@ -23,160 +23,189 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $searchQuery = request('query_search');
         $searchbyQuery = request('query_searchby');
         $doc_type = request('query_doc_type');
         $to_do = request('query_to_do');
         $current_user = Auth::user()->employee_id;
+        $query_type = request('query_type');
 
         $docWithReset = Document::with('client:id,name,office')
-            ->whereHas('document_resets', function ($query) use($searchbyQuery,$searchQuery,$to_do,$current_user,$doc_type){
+            ->whereHas('document_resets', function ($query) use ($searchbyQuery, $searchQuery, $to_do, $current_user, $doc_type, $query_type) {
                 $query
-                ->when(request('query'), function($query, $selectedStatus){
-                    $query->where('status', $selectedStatus);
-                })
-                ->when(request('query_search'), function($query) use ($searchQuery,$searchbyQuery){
-                    $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery){
-                        $query->whereHas('client', function($query) use($searchQuery){
-                            $query->where('clients.name','like',"%{$searchQuery}%");
-                        });
-                    });
-                    $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function($query) use($searchQuery,$searchbyQuery){
-                        $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
-                    });
-                    $query->when($searchbyQuery === 'type', function ($query) use($searchQuery){
-                        $query->where('type', $searchQuery);
-                    });
-                })
-                ->when(request('query_to_do'), function($query) use($to_do,$current_user){
-                    $query->when($to_do === 'to-receive', function($query) use($current_user){
-                        $query->whereHas('transactions', function($query) use($current_user){
-                            $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',null]]);
-                        });
-                    });
-                    $query->when($to_do === 'to-release', function($query) use($current_user){
-                        $query->whereHas('transactions', function($query) use($current_user){
-                            $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',TransactionType::RECEIVED]]);
-                        });
-                    });
-                })
-                ->when($doc_type === 'cases', function ($query){
-                    $query->active()->case();
-                })
-                ->when($doc_type === 'administrative', function ($query){
-                    $query->active()->administrativeCases();
-                })
-                ->when($doc_type === 'judicial', function ($query) {
-                    $query->active()->judicialCases();
-                })
-                ->when($doc_type === 'quasi', function ($query) {
-                    $query->active()->quasiCases();
-                })
-                ->when($doc_type === 'referrals', function ($query){
-                    $query->active()->referral();
-                })
-                ->when($doc_type==='admin_docs', function ($query){
-                    $query->active()->adminDocs();
-                })
-                ->when($doc_type==='municipal', function ($query){
-                    $query->active()->municipalOrdinances();
-                })
-                ->when($doc_type==='other_referral', function ($query){
-                    $query->active()->otherReferrals();
-                })
-                ->when($doc_type=='provincial', function ($query){
-                    $query->active()->provincialOrdinances();
-                })
-                ->when($doc_type==='code', function ($query) {
-                    $query->active()->codes();
-                });
-            });
-
-            $docWithoutReset = Document::with('client:id,name,office','transactions')
-                ->whereDoesntHave('document_resets')
-                    ->when(request('query'), function($query, $selectedStatus){
+                    ->when(request('query'), function ($query, $selectedStatus) {
                         $query->where('status', $selectedStatus);
                     })
-                    ->when(request('query_search'), function($query) use ($searchQuery,$searchbyQuery){
-                        $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery){
-                            $query->whereHas('client', function($query) use($searchQuery){
-                                $query->where('name','like',"%{$searchQuery}%");
+                    ->when(request('query_search'), function ($query) use ($searchQuery, $searchbyQuery) {
+                        $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery) {
+                            $query->whereHas('client', function ($query) use ($searchQuery) {
+                                $query->where('clients.name', 'like', "%{$searchQuery}%");
                             });
                         });
-                        $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function($query) use($searchQuery,$searchbyQuery){
+                        $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function ($query) use ($searchQuery, $searchbyQuery) {
                             $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
                         });
-                        $query->when($searchbyQuery === 'type', function ($query) use($searchQuery){
+                        $query->when($searchbyQuery === 'type', function ($query) use ($searchQuery) {
                             $query->where('type', $searchQuery);
                         });
                     })
-                    ->when(request('query_to_do'), function($query) use($to_do,$current_user){
-                        $query->when($to_do === 'to-receive', function($query) use($current_user){
-                            $query->whereHas('transactions', function($query) use($current_user){
-                                $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',null]]);
+                    ->when(request('query_to_do'), function ($query) use ($to_do, $current_user) {
+                        $query->when($to_do === 'to-receive', function ($query) use ($current_user) {
+                            $query->whereHas('transactions', function ($query) use ($current_user) {
+                                $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', null]]);
                             });
                         });
-                        $query->when($to_do === 'to-release', function($query) use($current_user){
-                            $query->whereHas('transactions', function($query) use($current_user){
-                                $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',TransactionType::RECEIVED]]);
+                        $query->when($to_do === 'to-release', function ($query) use ($current_user) {
+                            $query->whereHas('transactions', function ($query) use ($current_user) {
+                                $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', TransactionType::RECEIVED]]);
                             });
                         });
                     })
-                    ->when($doc_type === 'cases', function ($query){
-                        $query->active()->case();
+                    ->when(request('query_type'), function($query) use ($doc_type,$query_type){
+                        $query
+                        ->when($query_type==='active', function($query){
+                            $query->active();
+                        })
+                        ->when($query_type==='all', function($query){
+                            $query->userCount();
+                        })
+                        ->when($doc_type === 'cases', function ($query){
+                            $query->case();
+                        })
+                        ->when($doc_type === 'administrative', function ($query) {
+                            $query->administrativeCases();
+                        })
+                        ->when($doc_type === 'judicial', function ($query) {
+                            $query->judicialCases();
+                        })
+                        ->when($doc_type === 'quasi', function ($query) {
+                            $query->quasiCases();
+                        })
+                        ->when($doc_type === 'referrals', function ($query) {
+                            $query->referral();
+                        })
+                        ->when($doc_type === 'admin_docs', function ($query) {
+                            $query->adminDocs();
+                        })
+                        ->when($doc_type === 'municipal', function ($query) {
+                            $query->municipalOrdinances();
+                        })
+                        ->when($doc_type === 'other_referral', function ($query) {
+                            $query->otherReferrals();
+                        })
+                        ->when($doc_type == 'provincial', function ($query) {
+                            $query->provincialOrdinances();
+                        })
+                        ->when($doc_type === 'code', function ($query) {
+                            $query->codes();
+                        })
+                        ->when($doc_type === 'notary', function ($query) {
+                            $query->notaries();
+                        });                        
+                    });                    
+            });
+        $docWithoutReset = Document::with('client:id,name,office', 'transactions')
+            ->whereDoesntHave('document_resets')
+            ->when(request('query'), function ($query, $selectedStatus) {
+                $query->where('status', $selectedStatus);
+            })
+            ->when(request('query_search'), function ($query) use ($searchQuery, $searchbyQuery) {
+                $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery) {
+                    $query->whereHas('client', function ($query) use ($searchQuery) {
+                        $query->where('name', 'like', "%{$searchQuery}%");
+                    });
+                });
+                $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function ($query) use ($searchQuery, $searchbyQuery) {
+                    $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
+                });
+                $query->when($searchbyQuery === 'type', function ($query) use ($searchQuery) {
+                    $query->where('type', $searchQuery);
+                });
+            })
+            ->when(request('query_to_do'), function ($query) use ($to_do, $current_user) {
+                $query->when($to_do === 'to-receive', function ($query) use ($current_user) {
+                    $query->whereHas('transactions', function ($query) use ($current_user) {
+                        $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', null]]);
+                    });
+                });
+                $query->when($to_do === 'to-release', function ($query) use ($current_user) {
+                    $query->whereHas('transactions', function ($query) use ($current_user) {
+                        $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', TransactionType::RECEIVED]]);
+                    });
+                });
+            })
+            ->when(request('query_type'), function ($query) use($doc_type, $query_type) {
+                $query
+                    ->when($query_type==='all', function($query){
+                        $query->userCount();
                     })
-                    ->when($doc_type === 'administrative', function ($query){
-                        $query->active()->administrativeCases();
+                    ->when($query_type==='active', function($query){
+                        $query->active();
+                    })
+                    ->when($doc_type === 'cases', function($query){
+                        $query->case();
+                    })
+                    ->when($doc_type === 'administrative', function ($query) {
+                        $query->administrativeCases();
                     })
                     ->when($doc_type === 'judicial', function ($query) {
-                        $query->active()->judicialCases();
+                        $query->judicialCases();
                     })
                     ->when($doc_type === 'quasi', function ($query) {
-                        $query->active()->case()->quasiCases();
+                        $query->quasiCases();
                     })
-                    ->when($doc_type === 'referrals', function ($query){
-                        $query->active()->referral();
+                    ->when($doc_type === 'referrals', function ($query) {
+                        $query->referral();
                     })
-                    ->when($doc_type==='admin_docs', function ($query){
-                        $query->active()->adminDocs();
+                    ->when($doc_type === 'admin_docs', function ($query) {
+                        $query->adminDocs();
                     })
-                    ->when($doc_type==='municipal', function ($query){
-                        $query->active()->municipalOrdinances();
+                    ->when($doc_type === 'municipal', function ($query) {
+                        $query->municipalOrdinances();
                     })
-                    ->when($doc_type==='other_referral', function ($query){
-                        $query->active()->otherReferrals();
+                    ->when($doc_type === 'other_referral', function ($query) {
+                        $query->otherReferrals();
                     })
-                    ->when($doc_type=='provincial', function ($query){
-                        $query->active()->provincialOrdinances();
+                    ->when($doc_type == 'provincial', function ($query) {
+                        $query->provincialOrdinances();
                     })
-                    ->when($doc_type==='code', function ($query) {
-                        $query->active()->codes();
+                    ->when($doc_type === 'code', function ($query) {
+                        $query->codes();
+                    })
+                    ->when($doc_type === 'notary', function ($query){
+                        $query->notaries();
                     });
+            });          
+            
+        $documents_union = $docWithReset->unionAll($docWithoutReset);
 
-                $documents_union = $docWithReset->unionAll($docWithoutReset);
+        $documents = $documents_union
+            ->latest()->paginate(setting('pagination_limit'))
+            ->through(fn($document) => [
+                'id' => $document->id,
+                'date_received' => $document->date_received,
+                'client' => $document->client,
+                'title' => $document->title,
+                'description' => $document->description,
+                'remarks' => $document->remarks,
+                'status' => [
+                    'name' => $document->status->name,
+                    'color' => $document->status->color(),
+                ],
+                'type' => [
+                    'name' => $document->type->name,
+                ],
+                'date_to_count' => $document->date_to_count,
+                'last_assigned' => $document->last_assignment,
+                'last_transaction_type' => $document->last_transaction_type,
+                'days_active' => $document->days_active,
+            ]);
 
-                $documents = $documents_union
-                    ->latest()->paginate(setting('pagination_limit'))
-                    ->through(fn ($document) => [
-                        'id' => $document->id,
-                        'date_received' => $document->date_received,
-                        'client' => $document->client,
-                        'title' => $document->title,
-                        'description' => $document->description,
-                        'remarks' => $document->remarks,
-                        'status' => [
-                            'name' => $document->status->name,
-                            'color' => $document->status->color(),
-                        ],
-                        'type' => [
-                            'name' => $document->type->name,
-                        ],
-                        'date_to_count' => $document->date_to_count,
-                        // 'last_assigned' => $document->last_transaction,
-                        'days_active' => $document->days_active,
-                    ]);
         
+        return $documents;
+
         // $documents = Document::query()
         //     ->with('client:id,name,office','transactions')
         //     ->when(request('query'), function($query, $selectedStatus){
@@ -294,7 +323,7 @@ class DocumentController extends Controller
         //                     });
         //                 });
         //             })->active();
-                    
+
         //     })
         //     ->latest()->paginate()
         //     ->through(fn ($document) => [
@@ -315,8 +344,8 @@ class DocumentController extends Controller
         //         // 'last_assigned' => $document->last_transaction,
         //         'days_active' => $document->days_active,
         //     ]);
-        
-        return $documents;
+
+
     }
 
     // public function getOverdueDocuments(){
@@ -350,7 +379,8 @@ class DocumentController extends Controller
     //         ]);
     // }
 
-    public function store(){
+    public function store()
+    {
         $file_name = '';
 
         $validated = request()->validate([
@@ -363,10 +393,10 @@ class DocumentController extends Controller
             'client_id.required' => "Client name is required",
         ]);
 
-        if(request()->hasFile('document_file')){
+        if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
-            $file_name = time().'_'.'document_file'.'_'.$file->getClientOriginalName();
-            $path = 'public/uploads/documents/'.$file_name;
+            $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
+            $path = 'public/uploads/documents/' . $file_name;
             Storage::disk('local')->put($path, file_get_contents($file));
         }
 
@@ -391,12 +421,14 @@ class DocumentController extends Controller
         ]);
     }
 
-    public function edit(Document $document){
+    public function edit(Document $document)
+    {
         return $document;
     }
 
-    public function update(Document $document){
-        
+    public function update(Document $document)
+    {
+
         $file_name = '';
 
         $validated = request()->validate([
@@ -409,10 +441,10 @@ class DocumentController extends Controller
             'client_id.required' => "Client name is required",
         ]);
 
-        if(request()->hasFile('document_file')){
+        if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
-            $file_name = time().'_'.'document_file'.'_'.$file->getClientOriginalName();
-            $path = 'public/uploads/documents/'.$file_name;
+            $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
+            $path = 'public/uploads/documents/' . $file_name;
             Storage::disk('local')->put($path, file_get_contents($file));
         }
 
@@ -420,16 +452,22 @@ class DocumentController extends Controller
 
         $document->update($validated);
 
-        return response() -> json(['success' => true]);
+        return response()->json(['success' => true]);
     }
 
-    public function destroy(Document $document){
+    public function destroy(Document $document)
+    {
         $document->delete();
 
-        return response() -> json(['success' => true], 200);
+        return response()->json(['success' => true], 200);
     }
 
-    public function archive(Document $document){
+    public function archive(Document $document)
+    {
+        $validated = request()->validate([
+            'remarks' => 'required',
+        ]);
+
         $setStatus = ([
             'status' => DocumentStatus::ARCHIVED,
         ]);
@@ -438,40 +476,38 @@ class DocumentController extends Controller
 
         $setTransactionStatus = ([
             'status' => TransactionStatus::COMPLETED,
+            'remarks' => $validated['remarks'],
         ]);
 
-        $update_last_transaction = Transaction::where('document_id',$document->id)->orderBy('id','desc')->first();
-        
-        $update_last_transaction->update([
-            'status' => TransactionStatus::COMPLETED,
-        ]);
-        
-        
+        $update_last_transaction = Transaction::where('document_id', $document->id)->orderBy('id', 'desc')->first();
 
-        //DB::table('shortcontacts')->where('mobile',($data->mobile))->orderBy('id','desc')->first()->update(['otp_stts'=>'Verified']);
-        // return Document::with('client:id,name,office')
-        //     ->where('id',$document->id)
-        //     ->latest()->paginate()
-        //     ->through(fn ($document) => [
-        //         'days_active' => $document->days_active,
-        //         'id' => $document->id,
-        //         'date_received' => $document->date_received->format('Y-m-d'),
-        //         // 'client' => $document->client,
-        //         'client' => [
-        //             'name' => $document->client->name,
-        //             'office' => $document->client->office,
-        //         ],
-        //         'title' => $document->title,
-        //         'description' => $document->description,
-        //         'remarks' => $document->remarks,
-        //         'status' => [
-        //             'name' => $document->status->name,
-        //             'color' => $document->status->color(),
-        //         ],
-        //     ]);
+        $update_last_transaction->update($setTransactionStatus);
+
+        return Document::with('client:id,name,office')->where('id',$document->id)->limit(1)->get()
+            ->map(fn($doc) => [
+                'id' => $doc->id,
+                'date_received' => $doc->date_received,
+                'client' => [
+                    'name' => $doc->client->name,
+                    'office' => $doc->client->office,
+                ],
+                'title' => $doc->title,
+                'description' => $doc->description,
+                'remarks' => $doc->remarks,
+                'status' => [
+                    'name'=>$doc->status->name,
+                    'color'=>$doc->status->color(),       
+                ],
+                'last_assigned' => $document->last_assignment,
+                'last_transaction_type' => $document->last_transaction_type,
+                'type' => $doc->type->name,
+                'days_active' => $doc->days_active,
+            ]);
+
     }
 
-    public function reset(Document $document){
+    public function reset(Document $document)
+    {
         DocumentReset::create([
             'date_received' => Carbon::now(),
             'document_id' => $document->id,
@@ -482,15 +518,38 @@ class DocumentController extends Controller
         ]);
 
         $document->update($setStatus);
-        
+
     }
 
-    public function getDocument(Document $document){
-        return Document::with('client:id,name,office')->find($document->id);
+    public function getDocument(Document $document)
+    {
+        $document = Document::with('client:id,name,office')->where('id',$document->id)->limit(1)->get()
+            ->map(fn($doc) => [
+                'id' => $doc->id,
+                'date_received' => $doc->date_received,
+                'client' => [
+                    'name' => $doc->client->name,
+                    'office' => $doc->client->office,
+                ],
+                'title' => $doc->title,
+                'description' => $doc->description,
+                'remarks' => $doc->remarks,
+                'status' => [
+                    'name'=>$doc->status->name,       
+                ],
+                'last_assigned' => $document->last_assignment,
+                'last_transaction_type' => $document->last_transaction_type,
+                'type' => $doc->type->name,
+                'days_active' => $doc->days_active,
+            ]);        
+
+        return $document;
+
     }
 
-    public function getDocumentFile(Document $document){
-        $downloadpath = Storage::disk('public')->path('uploads/documents/'.$document->document_file);
+    public function getDocumentFile(Document $document)
+    {
+        $downloadpath = Storage::disk('public')->path('uploads/documents/' . $document->document_file);
         return response()->download($downloadpath);
     }
 

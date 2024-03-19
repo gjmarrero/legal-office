@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Znck\Eloquent\Traits\BelongsToThrough;
-// use Znck\Eloquent\Relations\BelongsToThrough;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -103,6 +103,10 @@ class DocumentReset extends Model
     public function scopeOtherReferrals($query){
         return $query->where('type', DocumentType::OTHER_REFERRAL);
     }
+
+    public function scopeNotaries($query){
+        return $query->where('type', DocumentType::NOTARY);
+    }
     // public function scopeFifteenDays($query){
     //     return $query->whereIn('type',[DocumentType::JUDICIAL,DocumentType::ADMINISTRATIVE,DocumentType::QUASI_JUDICIAL]);
     // }
@@ -146,6 +150,17 @@ class DocumentReset extends Model
             })
             ->when(request('doc_type') === 'code', function ($query) {
                 $query->codes();
+            })
+            ->when(request('doc_type') === 'notary', function ($query) {
+                $query->notaries();
             });
+    }
+
+    public function scopeUserCount($query){
+        $current_user = Auth::user()->employee_id;
+
+        return $query->whereHas('transactions', function($query) use ($current_user){
+            $query->where('employee_id', $current_user);
+        });
     }
 }

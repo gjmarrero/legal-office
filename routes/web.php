@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function() {
     Route::get('/api/dashboard/stats/totals', [DashboardStatController::class,'totals']);
 
     Route::get('/api/profile/employee_counter', [ProfileController::class, 'getEmployeeCounters']);
+    Route::get('/api/profile/employee_counter_cases', [ProfileController::class, 'getEmployeeCountCases']);
+    Route::get('/api/profile/employee_counter_referrals', [ProfileController::class, 'getEmployeeCountReferrals']);
 
     Route::get('/api/documents', [DocumentController::class, 'index']);
 

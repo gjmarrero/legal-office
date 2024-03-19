@@ -21,6 +21,7 @@ class Transaction extends Model
         'status',
         'user_id',
         'type',
+        'remarks',
     ];
 
     public function employee(): BelongsTo{
@@ -31,11 +32,19 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function document(): BelongsTo{
+        return $this->belongsTo(Document::class);
+    }
+
     public function formattedDateAssigned(): Attribute{
         return Attribute::make(
             get: fn() => $this->created_at->format('Y-m-d H:i:s'),
         );
     }
+
+    // public function last_assignment(): Attribute{
+    //     return $this->las
+    // }
     protected $appends = ['formatted_date_assigned'];
 
     protected $casts = [
