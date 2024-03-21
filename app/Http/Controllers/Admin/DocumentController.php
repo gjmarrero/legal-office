@@ -541,6 +541,7 @@ class DocumentController extends Controller
                 'last_transaction_type' => $document->last_transaction_type,
                 'type' => $doc->type->name,
                 'days_active' => $doc->days_active,
+                'document_file' => $doc->document_file,
             ]);        
 
         return $document;

@@ -1,134 +1,147 @@
-<script setup>
+<script setup type>
 
-    import { onMounted, ref, computed, reactive, watch } from 'vue';
-    import Swal from 'sweetalert2';
-    import axios from 'axios';
-    import { useToastr } from '../../toastr';
-    import { Bootstrap4Pagination } from 'laravel-vue-pagination';
-    import {Form, Field } from 'vee-validate';
-    import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-    import {debounce} from 'lodash';
-    import { useAuthUserStore } from '../../stores/AuthUserStore.js';
+import { onMounted, ref, computed, reactive, watch } from 'vue';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { useToastr } from '../../toastr';
+import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+import { Form, Field } from 'vee-validate';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { debounce } from 'lodash';
+import { useAuthUserStore } from '../../stores/AuthUserStore.js';
+import VuePdfEmbed from 'vue-pdf-embed';
+import DocPreview from '../../components/DocPreview.vue';
 
-    const authUserStore = useAuthUserStore();
+const authUserStore = useAuthUserStore();
 
-    const toastr = useToastr();
+const toastr = useToastr();
 
-    const route = useRoute();
+const route = useRoute();
 
-    const router = useRouter();
+const router = useRouter();
 
-    const documents = ref({'data': []});
+const documents = ref({ 'data': [] });
 
-    const searchQuery = ref(null);
+const searchQuery = ref(null);
 
-    const searchbyQuery = ref('all');
+const searchbyQuery = ref('all');
 
-    const getFile = (event) => {
-        form.file = event.target.files[0];
-    }
+const document_path = ref('/storage/uploads/outgoing/');
 
-    const getDocuments = (page = 1) => {
-        axios.get(`/api/outgoing_documents?page=${page}`, {
-            params: {
-                query_searchby: searchbyQuery.value,
-                query_search: searchQuery.value,
-            }
-        })
+const document_source = ref(null);
+
+const show = ref(false);
+
+const handleValue = (value) => {
+    show.value = value;
+};
+
+const getFile = (document_attachment) => {
+    document_source.value = document_path.value + document_attachment;
+    show.value = true;
+}
+
+const getDocuments = (page = 1) => {
+    axios.get(`/api/outgoing_documents?page=${page}`, {
+        params: {
+            query_searchby: searchbyQuery.value,
+            query_search: searchQuery.value,
+        }
+    })
         .then((response) => {
             documents.value = response.data;
         });
-    }
+}
 
-    // const deleteDocument = (id) => {
-    //     Swal.fire({
-    //         title: 'Are you sure?',
-    //         text: "You won't be able to revert this!",
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#3085d6',
-    //         cancelButtonColor: '#d33',
-    //         confirmButtonText: 'Yes, delete it!'
-    //         }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             axios.delete(`/api/documents/${id}`)
-    //                 .then((response) => {
-    //                     updateDocumentStatusDeleteCount(id);
-    //                     documents.value.data = documents.value.data.filter(document => document.id !== id);
-    //                     Swal.fire(
-    //                     'Deleted!',
-    //                     'Your file has been deleted.',
-    //                     'success'
-    //                     )
-    //                 });
-    //         }
-    //     })
-    // }
+// const deleteDocument = (id) => {
+//     Swal.fire({
+//         title: 'Are you sure?',
+//         text: "You won't be able to revert this!",
+//         icon: 'warning',
+//         showCancelButton: true,
+//         confirmButtonColor: '#3085d6',
+//         cancelButtonColor: '#d33',
+//         confirmButtonText: 'Yes, delete it!'
+//         }).then((result) => {
+//         if (result.isConfirmed) {
+//             axios.delete(`/api/documents/${id}`)
+//                 .then((response) => {
+//                     updateDocumentStatusDeleteCount(id);
+//                     documents.value.data = documents.value.data.filter(document => document.id !== id);
+//                     Swal.fire(
+//                     'Deleted!',
+//                     'Your file has been deleted.',
+//                     'success'
+//                     )
+//                 });
+//         }
+//     })
+// }
 
-    // const archiveDocument = (id) => {
-    //     Swal.fire({
-    //         title: 'Archive this document?',
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#3085d6',
-    //         cancelButtonColor: '#d33',
-    //         confirmButtonText: 'Archive'
-    //     }).then((result) => {
-    //         if(result.isConfirmed){
-    //             axios.post(`/api/documents/archive/${id}`)
-    //                 .then((response) => {
-    //                     Swal.fire(
-    //                         'Archived',
-    //                         'success'
-    //                     )
-    //                     const index = documents.value.data.findIndex(document => document.id === id);
-    //                     documents.value.data[index].status.name = 'ARCHIVED';
-    //                     documents.value.data[index].status.color = 'success';
-    //                     documents.value.data = documents.value.data.filter(document => document.id !== id);
-    //                     updateDocumentStatusCount(id);
-    //                 });
-    //         }
-    //     })
-    // }
+// const archiveDocument = (id) => {
+//     Swal.fire({
+//         title: 'Archive this document?',
+//         icon: 'warning',
+//         showCancelButton: true,
+//         confirmButtonColor: '#3085d6',
+//         cancelButtonColor: '#d33',
+//         confirmButtonText: 'Archive'
+//     }).then((result) => {
+//         if(result.isConfirmed){
+//             axios.post(`/api/documents/archive/${id}`)
+//                 .then((response) => {
+//                     Swal.fire(
+//                         'Archived',
+//                         'success'
+//                     )
+//                     const index = documents.value.data.findIndex(document => document.id === id);
+//                     documents.value.data[index].status.name = 'ARCHIVED';
+//                     documents.value.data[index].status.color = 'success';
+//                     documents.value.data = documents.value.data.filter(document => document.id !== id);
+//                     updateDocumentStatusCount(id);
+//                 });
+//         }
+//     })
+// }
 
-    const employees = ref();
+const employees = ref();
 
-    const selectedSearchByQuery = ref('');
+const selectedSearchByQuery = ref('');
 
-    const setSearchByQuery = () => {
-        getDocuments();
-        searchQuery.value = '';
-        selectedSearchByQuery.value = searchbyQuery.value;
-    }
+const setSearchByQuery = () => {
+    getDocuments();
+    searchQuery.value = '';
+    selectedSearchByQuery.value = searchbyQuery.value;
+}
 
-    watch(searchQuery, debounce(() => {
-        getDocuments();
-    },300));
+watch(searchQuery, debounce(() => {
+    getDocuments();
+}, 300));
 
-    onMounted(() => {
-        getDocuments();
-    })
+onMounted(() => {
+    getDocuments();
+})
 </script>
 <template>
     <div class="content-header">
-               <div class="container-fluid">
-                   <div class="row mb-2">
-                       <div class="col-sm-6">
-                           <h1 class="m-0">Outgoing Documents</h1>
-                       </div>
-                       <div class="col-sm-6">
-                           <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item">
-                                    <router-link to="/admin/dashboard">Home</router-link>
-                                </li>
-                               <li class="breadcrumb-item active">Documents</li>
-                           </ol>
-                       </div>
-                   </div>
-               </div>
-           </div>
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Outgoing Documents</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <router-link to="/admin/dashboard">Home</router-link>
+                        </li>
+                        <li class="breadcrumb-item active">Documents</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 
-           <div class="content">
+    <div class="content">
         <div class="container-fluid">
 
             <div class="row">
@@ -142,21 +155,23 @@
                         </div>
                     </div>
                     <div class="row">
-                    <div class="col-lg-12">
-                        <div class="d-flex justify-content-md-center mb-2">
-                            <div class="col-lg-3">
-                                <select @change="setSearchByQuery" v-model="searchbyQuery" class="form-control px-1 rounded border-0">
-                                    <option value="all">Search by...</option>
-                                    <option value="subject">Subject</option>
-                                    <option value="content">Content</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <input type="text" v-model="searchQuery" class="form-control" placeholder="Search"/>
+                        <div class="col-lg-12">
+                            <div class="d-flex justify-content-md-center mb-2">
+                                <div class="col-lg-3">
+                                    <select @change="setSearchByQuery" v-model="searchbyQuery"
+                                        class="form-control px-1 rounded border-0">
+                                        <option value="all">Search by...</option>
+                                        <option value="subject">Subject</option>
+                                        <option value="content">Content</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <input type="text" v-model="searchQuery" class="form-control"
+                                        placeholder="Search" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                     <div class="card">
                         <div class="card-body">
                             <table v-if="documents.data.length > 0" class="table table-bordered">
@@ -167,6 +182,7 @@
                                         <th scope="col">Recipient</th>
                                         <th scope="col">Subject</th>
                                         <th scope="col">Content</th>
+                                        <th class="col-lg-3" scope="col">Attachment</th>
                                         <th scope="col">Remarks</th>
                                     </tr>
                                 </thead>
@@ -177,12 +193,19 @@
                                         <td>{{ document.recipient }}</td>
                                         <td>{{ document.subject }}</td>
                                         <td>{{ document.content }}</td>
-                                        <td>{{ document.remarks }}</td>
+                                        <td class="col-lg-3">
+                                            <a href="#" @click.prevent="getFile(document.attachment)">
+                                                {{ document.attachment }}
+                                            </a>
+                                        </td>
                                         <td>
+                                            {{ document.remarks }}
+                                        </td>
+                                        <!-- <td>
                                             <router-link :to="`/admin/documents/transactions/${document.id}`">
                                                 <i class="fa fa-eye mr-2"></i>
                                             </router-link>
-                                            <!-- <a v-if="route.query.to_do === 'to-receive' || document.last_assigned === authUserStore.user.employee_id" href="#" @click.prevent="receiveDocument(document.id)">
+                                            <a v-if="route.query.to_do === 'to-receive' || document.last_assigned === authUserStore.user.employee_id" href="#" @click.prevent="receiveDocument(document.id)">
                                                 <font-awesome-icon icon="fa fa-circle-down" class="mr-2" />
                                             </a>
                                             <a v-if="(document.status.name === 'ACTIVE' && authUserStore.user.role === 'ADMIN') || route.query.to_do === 'to-receive'" href="" @click.prevent="$event => archiveDocument(document.id)">
@@ -202,12 +225,14 @@
                                                 <a href="" @click.prevent="$event => deleteDocument(document.id)">
                                                     <i class="fa fa-trash text-danger mr-2"></i>
                                                 </a>
-                                            </span> -->
-                                        </td>
+                                            </span>
+                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>
-                            <span v-else><p class="text-center font-weight-bold text-monospace">No data found</p></span>
+                            <span v-else>
+                                <p class="text-center font-weight-bold text-monospace">No data found</p>
+                            </span>
                         </div>
                         <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" />
                     </div>
@@ -216,5 +241,26 @@
         </div>
     </div>
 
+    <div v-if="show">
+        <DocPreview 
+            v-bind:document_source="document_source"
+            @modal-stat="handleValue"
+        />
+    </div>
+    <!-- <div class="modal" tabindex="-1" id="myModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Document</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal">
+                <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <vue-pdf-embed :source="document_source" />
+          </div>
+        </div>
+      </div>
+    </div> -->
     
 </template>

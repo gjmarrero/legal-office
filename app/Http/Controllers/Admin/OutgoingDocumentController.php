@@ -34,6 +34,7 @@ class OutgoingDocumentController extends Controller
                 'recipient' => $document->recipient,
                 'subject' => $document->subject,
                 'content' => $document->content,
+                'attachment' => $document->document_file,
                 'remarks' => $document->remarks,
                 
             ]);
