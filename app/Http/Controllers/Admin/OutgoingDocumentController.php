@@ -59,7 +59,7 @@ class OutgoingDocumentController extends Controller
             Storage::disk('local')->put($path, file_get_contents($file));
         }
 
-        $created_document = OutgoingDocument::create([
+        OutgoingDocument::create([
             'recipient' => $validated['recipient'],
             'date_dispatched' => $validated['date_dispatched'],
             'subject' => $validated['subject'],
@@ -67,5 +67,33 @@ class OutgoingDocumentController extends Controller
             'remarks' => request('remarks'),
             'document_file' => $file_name,
         ]);
+    }
+
+    public function edit(OutgoingDocument $document){
+        return($document);
+    }
+
+    public function update(OutgoingDocument $document){
+        $file_name = '';
+
+        $validated = request()->validate([
+            'recipient' => 'required',
+            'subject' => 'required',
+            'content' => 'required',
+            'date_dispatched' => 'required'
+        ]);
+
+        if(request()->hasFile('document_file')){
+            $file = request()->file('document_file');
+            $file_name = time().'_'.$file->getClientOriginalName();
+            $path = 'public/uploads/outgoing/'.$file_name;
+            Storage::disk('local')->put($path, file_get_contents($file));
+        }
+
+        $validated['document_file'] = $file_name;
+
+        $document->update($validated);
+        
+        return response()->json(['success' => true]);
     }
 }

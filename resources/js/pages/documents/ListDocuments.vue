@@ -76,6 +76,13 @@ const archiveDocument = (id) => {
     })
 }
 
+const clearRouteForm = () => {
+    form.employee_id = '';
+    form.action = '';
+    form.file = null;
+    form.remarks = '';
+}
+
 const createRouteDocument = () => {
     const formData = new FormData();
     console.log(docIdBeingRouted);
@@ -96,6 +103,7 @@ const createRouteDocument = () => {
             const index = documents.value.data.findIndex(document => document.id === response.data[0].id);
             documents.value.data[index] = response.data[0];
             updateDocumentStatusCount(response.data[0].id);
+            clearRouteForm();
             toastr.success('Document routed successfully');
         });
 }
@@ -113,6 +121,7 @@ const createArchiveDocument = () => {
             const index = documents.value.data.findIndex(document => document.id === response.data[0].id);
             documents.value.data[index] = response.data[0];
             updateDocumentStatusCount(response.data[0].id);
+            clearRouteForm();
             toastr.success('Document archived');
         })
 }
@@ -392,9 +401,9 @@ onMounted(() => {
                             <table v-if="documentsCount > 0" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>D</th>
+                                        <!-- <th>D</th>
                                         <th>L</th>
-                                        <th>DA</th>
+                                        <th>DA</th> -->
                                         <th scope="col">#</th>
                                         <th scope="col">Type</th>
                                         <th scope="col">Date Received</th>
@@ -407,9 +416,9 @@ onMounted(() => {
                                 </thead>
                                 <tbody>
                                     <tr v-for="(document, index) in documents.data" :key="document.id">
-                                        <td>{{ document.date_to_count }}</td>
+                                        <!-- <td>{{ document.date_to_count }}</td>
                                         <td>{{ document.last_assigned }}</td>
-                                        <td>{{ document.days_active }}</td>
+                                        <td>{{ document.days_active }}</td> -->
                                         <td>{{ index + 1 }}</td>
                                         <td>{{ document.type.name }}</td>
                                         <td>{{ document.date_received }}</td>

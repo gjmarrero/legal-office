@@ -201,6 +201,11 @@ onMounted(() => {
                                         <td>
                                             {{ document.remarks }}
                                         </td>
+                                        <td>
+                                            <router-link :to="`/admin/outgoing/${document.id}/edit`">
+                                                <i class="fa fa-edit mr-2"></i>
+                                            </router-link>
+                                        </td>
                                         <!-- <td>
                                             <router-link :to="`/admin/documents/transactions/${document.id}`">
                                                 <i class="fa fa-eye mr-2"></i>
@@ -242,10 +247,7 @@ onMounted(() => {
     </div>
 
     <div v-if="show">
-        <DocPreview 
-            v-bind:document_source="document_source"
-            @modal-stat="handleValue"
-        />
+        <DocPreview v-bind:document_source="document_source" @modal-stat="handleValue" />
     </div>
     <!-- <div class="modal" tabindex="-1" id="myModal">
       <div class="modal-dialog modal-lg">
@@ -262,5 +264,5 @@ onMounted(() => {
         </div>
       </div>
     </div> -->
-    
+
 </template>

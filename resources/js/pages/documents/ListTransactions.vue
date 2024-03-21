@@ -188,9 +188,15 @@ const archiveDocument = (id) => {
     })
 }
 
+const clearRouteForm = () => {
+    form.employee_id = '';
+    form.action = '';
+    form.file = null;
+    form.remarks = '';
+}
+
 const createRouteDocument = () => {
     const formData = new FormData();
-    console.log(docIdBeingRouted);
     formData.append('document_id', docIdBeingRouted.value);
     formData.append('employee_id', form.employee_id);
     formData.append('action', form.action);
@@ -205,6 +211,7 @@ const createRouteDocument = () => {
     axios.post(`/api/documents/route`, formData)
         .then((response) => {
             $('#moveDocumentModal').modal('hide');
+            clearRouteForm();
             toastr.success('Document routed successfully');
             getDocument();
             getTransactions();
@@ -224,6 +231,7 @@ const createArchiveDocument = () => {
             // const index = documents.value.data.findIndex(document => document.id === response.data[0].id);
             // documents.value.data[index] = response.data[0];
             // updateDocumentStatusCount(response.data[0].id);
+            clearRouteForm();
             toastr.success('Document archived');
         })
 }
@@ -267,6 +275,13 @@ const deleteDocument = (id) => {
                 });
         }
     })
+}
+
+const receiveDocument = (value) => {
+    if(value){
+        getTransactions();
+        getDocument();
+    }
 }
 
 onMounted(() => {

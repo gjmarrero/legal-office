@@ -81,6 +81,11 @@ class TransactionController extends Controller
             $type = null;
         }
 
+        $update_last_transaction = Transaction::where('document_id',request('document_id'))->orderBy('id', 'desc')->first();
+        $update_last_transaction->update([
+            'status' => TransactionStatus::COMPLETED,
+            'type' => TransactionType::RELEASED,
+        ]);
 
         Transaction::create([
             'employee_id' => $validated['employee_id'],
@@ -92,11 +97,8 @@ class TransactionController extends Controller
             'type' => $type,
         ]);
 
-        $update_last_transaction = Transaction::where([['document_id', request('document_id')], ['type', TransactionType::RECEIVED], ['status', TransactionStatus::PENDING], ['employee_id', Auth::user()->employee_id]]);
-        $update_last_transaction->update([
-            'status' => TransactionStatus::COMPLETED,
-            'type' => TransactionType::RELEASED,
-        ]);
+        // $update_last_transaction = Transaction::where([['document_id', request('document_id')], ['type', TransactionType::RECEIVED], ['status', TransactionStatus::PENDING], ['employee_id', Auth::user()->employee_id]]);
+        
 
         // return Document::find($validated['document_id']);
 

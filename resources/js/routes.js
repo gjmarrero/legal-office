@@ -37,6 +37,11 @@ export default[
         component: OutgoingForm,
     },
     {
+        path:'/admin/outgoing/:id/edit',
+        name: 'admin.outgoing.edit',
+        component: OutgoingForm,
+    },
+    {
         path: '/admin/documents/:doc_status',
         name: 'admin.documents.filtered',
         component: Documents

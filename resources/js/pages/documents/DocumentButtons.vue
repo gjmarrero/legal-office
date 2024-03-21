@@ -15,22 +15,9 @@ const props = defineProps({
     document: Object,
 });
 
-const emits = defineEmits(['archiveDocument', 'routeDocument', 'reopenDocument', 'deleteDocument']);
+const emits = defineEmits(['receive-document', 'archiveDocument', 'routeDocument', 'reopenDocument', 'deleteDocument']);
 
-// const getFile = (event) => {
-//     form.file = event.target.files[0];
-// }
-
-// // const filterCheck = () => {
-// //     if (!reOpen.value) {
-// //         documents.value.data = documents.value.data.filter(document => document.id !== docIdBeingRouted.value);
-// //         documentsCount.value = documents.value.data.length;
-// //     } else {
-// //         getDocuments();
-// //     }
-// // }
-
-
+const receivedDoc = ref(false);
 
 const receiveDocument = (id) => {
     Swal.fire({
@@ -50,6 +37,8 @@ const receiveDocument = (id) => {
                         documentsCount.value = documents.value.data.length;
                     }
                 });
+            receivedDoc.value = true;
+            emits('receive-document', receivedDoc.value);
         }
     })
 }
@@ -60,8 +49,8 @@ const receiveDocument = (id) => {
     <router-link :to="`/admin/documents/transactions/${document.id}`">
         <i v-if="(route.name != 'admin.documents.transactions')" class="fa fa-eye mr-2"></i>
     </router-link>
-    <a v-if="(route.query.to_do === 'to-receive' || document.last_assigned === authUserStore.user.employee_id) && document.last_transaction_type =='RECEIVED'" href="#"
-        @click.prevent="receiveDocument(document.id)">
+    <a v-if="(route.query.to_do === 'to-receive' || document.last_assigned === authUserStore.user.employee_id) && document.last_transaction_type == null"
+        href="#" @click.prevent="receiveDocument(document.id)">
         <font-awesome-icon icon="fa fa-circle-down" class="mr-2" />
     </a>
     <a v-if="(document.status.name === 'ACTIVE' && authUserStore.user.role === 'ADMIN') || route.query.to_do === 'to-receive' || route.query.to_do === 'to-release'"
