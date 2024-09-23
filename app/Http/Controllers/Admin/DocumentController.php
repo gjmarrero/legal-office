@@ -1,6 +1,7 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
+
+// require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Enums\DocumentStatus;
 use App\Enums\DocumentType;
@@ -16,6 +17,14 @@ use Illuminate\Support\Str;
 // use League\CommonMark\Node\Block\Document;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\DocumentAttachment;
+use Webklex\PDFMerger\Facades\PDFMergerFacade as PDFMerger;
+// use GrofGraf\LaravelPDFMerger\PDFMerger;
+// use Softplaceweb\PdfMerger\Facades\PdfMerger;
+use Symfony\Component\Filesystem\Filesystem,
+Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand,
+Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
+use Symfony\Component\Process\Process;
 
 
 use App\Models\Document;
@@ -63,48 +72,48 @@ class DocumentController extends Controller
                             });
                         });
                     })
-                    ->when(request('query_type'), function($query) use ($doc_type,$query_type){
+                    ->when(request('query_type'), function ($query) use ($doc_type, $query_type) {
                         $query
-                        ->when($query_type==='active', function($query){
-                            $query->active();
-                        })
-                        ->when($query_type==='all', function($query){
-                            $query->userCount();
-                        })
-                        ->when($doc_type === 'cases', function ($query){
-                            $query->case();
-                        })
-                        ->when($doc_type === 'administrative', function ($query) {
-                            $query->administrativeCases();
-                        })
-                        ->when($doc_type === 'judicial', function ($query) {
-                            $query->judicialCases();
-                        })
-                        ->when($doc_type === 'quasi', function ($query) {
-                            $query->quasiCases();
-                        })
-                        ->when($doc_type === 'referrals', function ($query) {
-                            $query->referral();
-                        })
-                        ->when($doc_type === 'admin_docs', function ($query) {
-                            $query->adminDocs();
-                        })
-                        ->when($doc_type === 'municipal', function ($query) {
-                            $query->municipalOrdinances();
-                        })
-                        ->when($doc_type === 'other_referral', function ($query) {
-                            $query->otherReferrals();
-                        })
-                        ->when($doc_type == 'provincial', function ($query) {
-                            $query->provincialOrdinances();
-                        })
-                        ->when($doc_type === 'code', function ($query) {
-                            $query->codes();
-                        })
-                        ->when($doc_type === 'notary', function ($query) {
-                            $query->notaries();
-                        });                        
-                    });                    
+                            ->when($query_type === 'active', function ($query) {
+                                $query->active();
+                            })
+                            ->when($query_type === 'all', function ($query) {
+                                $query->userCount();
+                            })
+                            ->when($doc_type === 'cases', function ($query) {
+                                $query->case();
+                            })
+                            ->when($doc_type === 'administrative', function ($query) {
+                                $query->administrativeCases();
+                            })
+                            ->when($doc_type === 'judicial', function ($query) {
+                                $query->judicialCases();
+                            })
+                            ->when($doc_type === 'quasi', function ($query) {
+                                $query->quasiCases();
+                            })
+                            ->when($doc_type === 'referrals', function ($query) {
+                                $query->referral();
+                            })
+                            ->when($doc_type === 'admin_docs', function ($query) {
+                                $query->adminDocs();
+                            })
+                            ->when($doc_type === 'municipal', function ($query) {
+                                $query->municipalOrdinances();
+                            })
+                            ->when($doc_type === 'other_referral', function ($query) {
+                                $query->otherReferrals();
+                            })
+                            ->when($doc_type == 'provincial', function ($query) {
+                                $query->provincialOrdinances();
+                            })
+                            ->when($doc_type === 'code', function ($query) {
+                                $query->codes();
+                            })
+                            ->when($doc_type === 'notary', function ($query) {
+                                $query->notaries();
+                            });
+                    });
             });
         $docWithoutReset = Document::with('client:id,name,office', 'transactions')
             ->whereDoesntHave('document_resets')
@@ -136,15 +145,15 @@ class DocumentController extends Controller
                     });
                 });
             })
-            ->when(request('query_type'), function ($query) use($doc_type, $query_type) {
+            ->when(request('query_type'), function ($query) use ($doc_type, $query_type) {
                 $query
-                    ->when($query_type==='all', function($query){
+                    ->when($query_type === 'all', function ($query) {
                         $query->userCount();
                     })
-                    ->when($query_type==='active', function($query){
+                    ->when($query_type === 'active', function ($query) {
                         $query->active();
                     })
-                    ->when($doc_type === 'cases', function($query){
+                    ->when($doc_type === 'cases', function ($query) {
                         $query->case();
                     })
                     ->when($doc_type === 'administrative', function ($query) {
@@ -174,11 +183,11 @@ class DocumentController extends Controller
                     ->when($doc_type === 'code', function ($query) {
                         $query->codes();
                     })
-                    ->when($doc_type === 'notary', function ($query){
+                    ->when($doc_type === 'notary', function ($query) {
                         $query->notaries();
                     });
-            });          
-            
+            });
+
         $documents_union = $docWithReset->unionAll($docWithoutReset);
 
         $documents = $documents_union
@@ -203,7 +212,7 @@ class DocumentController extends Controller
                 'days_active' => $document->days_active,
             ]);
 
-        
+
         return $documents;
 
         // $documents = Document::query()
@@ -396,8 +405,8 @@ class DocumentController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
-            $path = 'public/uploads/documents/' . $file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            $path = 'uploads/documents/' . $file_name;
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         $created_document = Document::create([
@@ -445,7 +454,7 @@ class DocumentController extends Controller
             $file = request()->file('document_file');
             $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
             $path = 'public/uploads/documents/' . $file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         $validated['document_file'] = $file_name;
@@ -483,7 +492,7 @@ class DocumentController extends Controller
 
         $update_last_transaction->update($setTransactionStatus);
 
-        return Document::with('client:id,name,office')->where('id',$document->id)->limit(1)->get()
+        return Document::with('client:id,name,office')->where('id', $document->id)->limit(1)->get()
             ->map(fn($doc) => [
                 'id' => $doc->id,
                 'date_received' => $doc->date_received,
@@ -495,8 +504,8 @@ class DocumentController extends Controller
                 'description' => $doc->description,
                 'remarks' => $doc->remarks,
                 'status' => [
-                    'name'=>$doc->status->name,
-                    'color'=>$doc->status->color(),       
+                    'name' => $doc->status->name,
+                    'color' => $doc->status->color(),
                 ],
                 'last_assigned' => $document->last_assignment,
                 'last_transaction_type' => $document->last_transaction_type,
@@ -523,7 +532,7 @@ class DocumentController extends Controller
 
     public function getDocument(Document $document)
     {
-        $document = Document::with('client:id,name,office')->where('id',$document->id)->limit(1)->get()
+        $document = Document::with('client:id,name,office')->where('id', $document->id)->limit(1)->get()
             ->map(fn($doc) => [
                 'id' => $doc->id,
                 'date_received' => $doc->date_received,
@@ -535,17 +544,97 @@ class DocumentController extends Controller
                 'description' => $doc->description,
                 'remarks' => $doc->remarks,
                 'status' => [
-                    'name'=>$doc->status->name,       
+                    'name' => $doc->status->name,
                 ],
                 'last_assigned' => $document->last_assignment,
                 'last_transaction_type' => $document->last_transaction_type,
                 'type' => $doc->type->name,
                 'days_active' => $doc->days_active,
                 'document_file' => $doc->document_file,
-            ]);        
+            ]);
 
         return $document;
 
+    }
+
+    public function attachfile(Document $document)
+    {
+
+        $file_name = '';
+
+        $validated = request()->validate([
+            'document_id' => 'required',
+        ]);
+
+        if (request()->hasFile('document_file')) {
+            $file = request()->file('document_file');
+            $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
+            $path = 'uploads/documents/' . $file_name;
+            Storage::disk('public')->put($path, file_get_contents($file));
+
+        }
+
+        DocumentAttachment::create([
+            'document_id' => $validated['document_id'],
+            'document_file' => $file_name,
+        ]);
+
+        return response()->json(['success' => true]);
+
+
+    }
+
+    public function getAdditionalFiles(Document $document){
+        $additional_files = DB::table('document_attachments')->select('document_file')->where('document_id', $document->id)->get();
+
+        return $additional_files;
+    }
+
+    public function getAttachedFiles(Document $document)
+    {
+
+        $main_file = DB::table('documents')->select('document_file','updated_at',DB::raw("'main' as file_type"))->where('id', $document->id);
+
+        $transaction_files = DB::table('transactions')->select('document_file','updated_at',DB::raw("'transaction' as file_type"))->where([['document_id', $document->id],['document_file','<>',null]]);
+
+        $additional_files = DB::table('document_attachments')->select('document_file','updated_at',DB::raw("'additional' as file_type"))->where('document_id', $document->id);
+
+        $all_files = $main_file->union($transaction_files)->union($additional_files)->orderBy('updated_at')->get();        
+
+        $pdfVersion = "1.4";
+
+        $original_filename = "";
+        
+        foreach ($all_files as $attached_file) {
+            $original_filename = $attached_file->document_file;
+            
+            if($attached_file->file_type === 'transaction'){
+                $current_file = Storage::disk("public")->path('uploads/transaction_documents/'.$attached_file->document_file);
+            }else{
+                $current_file = Storage::disk("public")->path('uploads/documents/'.$attached_file->document_file);
+            }
+            
+            $converted_file = Storage::disk("public")->path('uploads/documents/converted/'.$original_filename);
+
+            exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
+
+        }
+
+        $oMerger = PDFMerger::init();
+        foreach ($all_files as $converted){
+            $oMerger->addPDF(Storage::disk('public')->path('uploads/documents/converted/'.$converted->document_file));
+        }        
+        $oMerger->merge();
+
+        $merged_file = 'merged_'.$document->id.'.pdf';
+
+        $oMerger->save(Storage::disk('public')->path('uploads/merged/merged_'.$document->id.'.pdf'));
+
+        foreach ($all_files as $delete_file){
+            unlink(Storage::disk("public")->path('uploads/documents/converted/'.$delete_file->document_file));
+        }
+
+        return $merged_file;
     }
 
     public function getDocumentFile(Document $document)

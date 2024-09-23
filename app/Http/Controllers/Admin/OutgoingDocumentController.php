@@ -56,7 +56,7 @@ class OutgoingDocumentController extends Controller
             $file = request()->file('document_file');
             $file_name = time().'_'.$file->getClientOriginalName();
             $path = 'public/uploads/outgoing/'.$file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         OutgoingDocument::create([
@@ -87,7 +87,7 @@ class OutgoingDocumentController extends Controller
             $file = request()->file('document_file');
             $file_name = time().'_'.$file->getClientOriginalName();
             $path = 'public/uploads/outgoing/'.$file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         $validated['document_file'] = $file_name;

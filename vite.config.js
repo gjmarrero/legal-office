@@ -10,6 +10,11 @@ export default defineConfig({
             host: '192.168.6.221',
         },
     },
+    esbuild: {
+        supported: {
+            'top-level-await': true //browsers can handle top-level-await features
+        },
+    },
     plugins: [
         // basicSsl(),
         laravel({

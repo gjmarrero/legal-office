@@ -1,0 +1,48 @@
+{
+    "name": "softplaceweb/laravel-10-pdf-merger",
+    "description": "Laravel Pdf Merger",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "tcpdf",
+        "pdf",
+        "merger"
+    ],
+    "authors": [
+        {
+            "name": "Softplaceweb"
+        }
+    ],
+    "require": {
+        "php": ">8.0",
+        "illuminate/support": "^9.0|^10.0",
+        "tecnickcom/tcpdf": "^6.4.4",
+        "setasign/fpdi": "^2.3.6",
+        "anton-am/pdf-version-converter": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Softplaceweb\\PdfMerger\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Softplaceweb\\PdfMerger\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Softplaceweb\\PdfMerger\\PdfMergerServiceProvider"
+            ],
+            "aliases": {
+                "PdfMerger": "Softplaceweb\\PdfMerger\\Facades\\PdfMerger"
+            }
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.3",
+        "orchestra/testbench": "^8.0"
+    }
+}

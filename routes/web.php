@@ -106,6 +106,9 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/documents/receive/{document}', [TransactionController::class, 'receive']);
 
     Route::post('/api/documents/route', [TransactionController::class, 'route']);
+    Route::post('/api/documents/attachfile', [DocumentController::class, 'attachfile']);
+    Route::get('/api/documents/getAttachedFiles/{document}', [DocumentController::class, 'getAttachedFiles']);
+    Route::get('/api/documents/getAdditionalFiles/{document}', [DocumentController::class, 'getAdditionalFiles']);
 
     Route::get('/api/documents/file/{document}', [DocumentController::class, 'getDocumentFile']);
 

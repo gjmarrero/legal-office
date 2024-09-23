@@ -15,7 +15,7 @@ const props = defineProps({
     document: Object,
 });
 
-const emits = defineEmits(['receive-document', 'archiveDocument', 'routeDocument', 'reopenDocument', 'deleteDocument']);
+const emits = defineEmits(['attach-file', 'receive-document', 'archiveDocument', 'routeDocument', 'reopenDocument', 'deleteDocument']);
 
 const receivedDoc = ref(false);
 
@@ -49,6 +49,11 @@ const receiveDocument = (id) => {
     <router-link :to="`/admin/documents/transactions/${document.id}`">
         <i v-if="(route.name != 'admin.documents.transactions')" class="fa fa-eye mr-2"></i>
     </router-link>
+    <a v-if="(route.name != 'admin.documents')"
+        href="#" @click.prevent="$emit('attachFile',document.id)">
+        <font-awesome-icon icon="fa-solid fa-paperclip" class="mr-2"/>
+    </a>
+    
     <a v-if="(route.query.to_do === 'to-receive' || document.last_assigned === authUserStore.user.employee_id) && document.last_transaction_type == null"
         href="#" @click.prevent="receiveDocument(document.id)">
         <font-awesome-icon icon="fa fa-circle-down" class="mr-2" />

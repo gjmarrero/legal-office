@@ -9,11 +9,13 @@ import TransactionModal from './TransactionModal.vue';
 import DocumentButtons from './DocumentButtons.vue';
 import Swal from 'sweetalert2';
 
+
+
 const authUserStore = useAuthUserStore();
 const router = useRouter();
 const route = useRoute();
 const transactions = ref({ 'data': [] });
-const transaction_attachments = ref({'data':[]});
+const transaction_attachments = ref({ 'data': [] });
 
 const doc = reactive({
     id: '',
@@ -31,7 +33,7 @@ const doc = reactive({
     last_transaction_type: '',
 });
 
-const document = ref({'data': []});
+const document = ref({ 'data': [] });
 
 const previewSource = ref();
 
@@ -39,12 +41,14 @@ const toastr = useToastr();
 
 const main_document_path = ref('/storage/uploads/documents/');
 const transaction_path = ref('/storage/uploads/transaction_documents/');
+const merged_path = ref('/storage/uploads/merged/');
+const merged_files = ref();
 
 const getTransactions = () => {
     axios.get(`/api/documents/transactions/${route.params.id}`)
         .then((response) => {
             transactions.value = response.data;
-            transaction_attachments.value.data = transactions.value.data.filter(transaction => (transaction.attachment !== null && transaction.attachment !== '') );
+            transaction_attachments.value.data = transactions.value.data.filter(transaction => (transaction.attachment !== null && transaction.attachment !== ''));
         })
 }
 
@@ -66,20 +70,28 @@ const getDocument = () => {
 }
 
 //download file
-const getFile = () => {
-    axios.get(`/api/documents/file/${route.params.id}`, { responseType: 'blob' })
-        .then((response) => {
-            var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-            var fileLink = document.createElement('a');
+// const getFile = () => {
+//     axios.get(`/api/documents/file/${route.params.id}`, { responseType: 'blob' })
+//         .then((response) => {
+//             var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+//             var fileLink = document.createElement('a');
 
-            fileLink.href = fileURL;
-            fileLink.setAttribute('download', doc.document_file);
-            document.body.appendChild(fileLink);
+//             fileLink.href = fileURL;
+//             fileLink.setAttribute('download', doc.document_file);
+//             document.body.appendChild(fileLink);
 
-            fileLink.click();
-            fileLink.remove();
-            toastr.success('File downloaded');
-        });
+//             fileLink.click();
+//             fileLink.remove();
+//             toastr.success('File downloaded');
+//         });
+// }
+
+const getFile = (event) => {
+    form.file = event.target.files[0];
+}
+
+const getFileAttachment = (event) => {
+    file_form.file = event.target.files[0];
 }
 
 const getTransaction_File = (transaction) => {
@@ -103,10 +115,36 @@ const rotatePdf = () => {
     rotateLeft.value += 90;
 }
 
-const previewFile = (document_path, document_file) => {
-    previewSource.value = document_path + document_file;
-    console.log("File:" + previewSource.value);
+// const previewFile = (document_path, document_file) => {
+//     // previewSource.value = document_path + document_file;
+
+//     console.log("File:" + previewSource.value);
+// }
+
+
+
+const getAttachedFiles = () => {
+    axios.get(`/api/documents/getAttachedFiles/${route.params.id}`)
+        .then((response) => {
+            attachedFiles.value = response.data;
+            merged_files.value = response.data;
+            previewSource.value = merged_path.value + merged_files.value;
+        })
 }
+
+const additionalFiles = ref();
+
+const getAdditionalFiles = () => {
+    axios.get(`/api/documents/getAdditionalFiles/${route.params.id}`)
+        .then((response) => {
+            additionalFiles.value = response.data;
+        })
+}
+const previewFile = (document_path,document_file) => {
+    previewSource.value = document_path+document_file;
+    // console.log(document_path + document_file);
+}
+
 const modalVisible = ref(false);
 
 const editTransaction = ref({});
@@ -143,6 +181,10 @@ const form = reactive({
     remarks: '',
 });
 
+const file_form = reactive({
+    file: null,
+});
+
 const employees = ref();
 
 const getEmployees = () => {
@@ -156,6 +198,14 @@ const routeDocument = (id) => {
     docIdBeingRouted.value = id;
     $('#moveDocumentModal').modal('show');
 }
+
+const docIdAttach = ref();
+
+const attachFile = (id) => {
+    docIdAttach.value = id;
+    $('#attachFileModal').modal('show');
+}
+
 
 const archiveDocument = (id) => {
     docIdBeingRouted.value = id;
@@ -201,7 +251,7 @@ const createRouteDocument = () => {
     formData.append('employee_id', form.employee_id);
     formData.append('action', form.action);
     formData.append('document_file', form.file);
-    
+
     if (routeOutside.value) {
         formData.append('routeOutside', 1);
     } else {
@@ -217,6 +267,20 @@ const createRouteDocument = () => {
             getTransactions();
         });
 }
+
+const attachedFiles = ref({ 'data': [] });
+
+const createAttachFile = () => {
+    const formData = new FormData();
+    formData.append('document_id', docIdAttach.value);
+    formData.append('document_file', file_form.file);
+
+    axios.post(`/api/documents/attachfile`, formData)
+        .then((response) => {
+            $('#attachFileModal').modal('hide');
+        })
+}
+
 
 const createArchiveDocument = () => {
     const formData = new FormData();
@@ -278,7 +342,7 @@ const deleteDocument = (id) => {
 }
 
 const receiveDocument = (value) => {
-    if(value){
+    if (value) {
         getTransactions();
         getDocument();
     }
@@ -287,6 +351,8 @@ const receiveDocument = (value) => {
 onMounted(() => {
     getDocument();
     getTransactions();
+    getAttachedFiles();
+    getAdditionalFiles();
     getEmployees();
 })
 </script>
@@ -314,48 +380,54 @@ onMounted(() => {
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <div class="jumbotron">
+                            <div class="jumbotron" style="overflow: scroll; height:385px;">
                                 <p class="lead">Title: {{ doc.title }} {{ doc.last_assignment }}</p>
                                 <p class="lead">Date Received: {{ doc.date_received }}</p>
                                 <p class="lead">Client: {{ doc.client_name }}</p>
-                                <p class="lead"><a href="#"
-                                        @click.prevent="previewFile(main_document_path, doc.document_file)">
+                                <p class="lead">
+                                    <a href="#" @click.prevent="previewFile(main_document_path, doc.document_file)">
                                         {{ doc.document_file }}
-                                        <!-- <span v-for="file in transactions.data" @click="test(file.attachment)">{{ file.attachment }}</span> -->
-                                        <ul>
-                                            <li v-for="file in transaction_attachments.data" @click="previewFile(transaction_path, file.attachment)">{{ file.attachment }}</li>
-                                        </ul>
-                                        <!-- @click.prevent="getFile(doc)" -->
-                                    </a></p>
+                                    </a>
+                                </p>
+                                <p class="lead" v-for="additionalFile in additionalFiles">
+                                    <a href="#"
+                                        @click.prevent="previewFile(main_document_path, additionalFile.document_file)">
+                                        {{ additionalFile.document_file }}
+                                    </a>
+                                </p>
+                                <p class="lead" v-for="file in transaction_attachments.data">
+                                    <a href="#" @click.prevent="previewFile(transaction_path, file.attachment)">
+                                        {{ file.attachment }}
+                                    </a>
+                                </p>
+                                <!-- @click.prevent="getFile(doc)" -->
                                 <hr class="my-4">
                                 <p>Content: {{ doc.description }}</p>
                             </div>
-                            <DocumentButtons
-                                :key="doc.id"
-                                v-bind:document="doc"
-                                @receive-document="receiveDocument"
-                                @archive-document="archiveDocument"
-                                @route-document="routeDocument"
-                                @reopen-document="reopenDocument"
-                                @delete-document="deleteDocument"
-                            />
+                            <DocumentButtons :key="doc.id" v-bind:document="doc" @attach-file="attachFile"
+                                @receive-document="receiveDocument" @archive-document="archiveDocument"
+                                @route-document="routeDocument" @reopen-document="reopenDocument"
+                                @delete-document="deleteDocument" />
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <div class="jumbotron" style="overflow: scroll; height:385px;">
+                            <div class="jumbotron" style="overflow: scroll; height:407px;">
+                                <a @click.prevent="rotatePdf">
+                                    <font-awesome-icon icon="fa-solid fa-rotate-right" class="mr-2" />
+                                </a>
+                                <a class="download-link" :href="previewSource" download>
+                                    <font-awesome-icon icon="fa-solid fa-download" class="mr-2"/>
+                                </a>
                                 <!-- <VuePDF :pdf="pdf" height="50px"/> -->
-                                <button align-self-center @click="rotatePdf">
-                                    <font-awesome-icon icon="fa fa-rotate-right" />
-                                </button>
-                                <vue-pdf-embed :source="previewSource" :page="1" :rotation="rotateLeft" />
+                                <vue-pdf-embed :source="previewSource" :rotation="rotateLeft" :downloadable="true" />
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <table v-if="transactions.data.length > 0" class="table table-bordered">
                     <thead>
                         <tr>
@@ -392,10 +464,11 @@ onMounted(() => {
                             </td>
                             <td>
                                 <span class="badge" :class="`badge-${transaction.type.color}`">{{ transaction.type.name
-                                }}</span>
+                                    }}</span>
                             </td>
                             <td>
-                                <span class="badge" :class="`badge-${transaction.status.color}`">{{ transaction.status.name
+                                <span class="badge" :class="`badge-${transaction.status.color}`">{{
+                                    transaction.status.name
                                 }}</span>
                             </td>
                             <td>{{ transaction.remarks }}</td>
@@ -415,7 +488,7 @@ onMounted(() => {
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
                         <span>Route Document</span>
-                        
+
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -430,8 +503,9 @@ onMounted(() => {
                                         <label for="employee">Employee/Office</label>
                                         <select v-model="form.employee_id" id="employee_id" name="employee_id"
                                             class="form-control">
-                                            <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{
-                                                employee.emp_name }}</option>
+                                            <option v-for="employee in employees" :key="employee.id"
+                                                :value="employee.id">{{
+                                                    employee.emp_name }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -472,5 +546,34 @@ onMounted(() => {
         </div>
     </div>
 
-    
+    <div class="modal fade" id="attachFileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <span>Attach File</span>
+
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <Form @submit.prevent="createAttachFile()">
+                            <div class="form-group">
+                                <input type="file" class="form-control-file" id="document_file" name="document_file"
+                                    @change="getFileAttachment" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </Form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
 </template>

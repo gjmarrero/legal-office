@@ -63,8 +63,8 @@ class TransactionController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
-            $path = 'public/uploads/transaction_documents/' . $file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            $path = 'uploads/transaction_documents/' . $file_name;
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         if ($routeOutside == 1) {
@@ -136,8 +136,8 @@ class TransactionController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $file_name = time() . '_' . 'document_file' . '' . $file->getClientOriginalName();
-            $path = 'public/uploads/transaction_documents/' . $file_name;
-            Storage::disk('local')->put($path, file_get_contents($file));
+            $path = 'uploads/transaction_documents/' . $file_name;
+            Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         $validated['document_file'] = $file_name;
