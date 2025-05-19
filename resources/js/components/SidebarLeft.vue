@@ -2,13 +2,14 @@
     import { useAuthUserStore } from '../stores/AuthUserStore.js';
     import { useRouter } from 'vue-router';
     import { useSettingStore} from '../stores/SettingStore.js';
+import { onMounted } from 'vue';
 
     const router = useRouter();
 
     const authUserStore = useAuthUserStore();
 
     const settingStore = useSettingStore();
-
+    
     const logout = () => {
         axios.post('/logout')
             .then((response) => {
@@ -16,6 +17,9 @@
                 router.push('/login');
             })
     }
+    onMounted(()=>{
+        console.log("image", authUserStore.user.avatar)
+    })
 </script>
 <template>
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -35,7 +39,6 @@
                     <a href="#" class="d-block">{{ authUserStore.user.name }}</a>
                 </div>
             </div>
-
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">

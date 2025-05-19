@@ -69,6 +69,10 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
         $('#userFormModal').modal('show');
     };
 
+    const addEmployee = () => {
+        $('#employeeFormModal').modal('show');
+    }
+
     const editUser = (user) => {
         editing.value = true;
         form.value.resetForm();
@@ -93,6 +97,17 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
                 console.log(error);
             });
     }
+
+    const createEmployee = (values, { resetForm, setErrors}) => {
+        axios.post('/api/employees', values)
+            .then((response) => {
+                // employees.value.data.unshift(response.data);
+                $('#employeeFormModal').modal('hide');
+                resetForm();
+                toastr.success('Employee added successfully');
+                getEmployees()
+            })
+    };
 
     const handleSubmit = (values, actions) => {
         console.log(actions);
@@ -186,8 +201,11 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
                 <div class="container-fluid">
                     <div class="d-flex justify-content-between">
                         <div class="d-flex">
-                            <button type="button" class="mb-2 btn btn-primary" @click="addUser">
+                            <button type="button" class="mb-2 btn btn-primary mr-2" @click="addUser">
                                 <i class="fa fa-plus-circle mr-1"></i> Add New User
+                            </button>
+                            <button type="button" class="mb-2 btn btn-primary" @click="addEmployee">
+                                <i class="fa fa-plus-circle mr-1"></i> Add New Employee
                             </button>
                             <div v-if="selectedUsers.length > 0">
                                 <button type="button" class="ml-2 mb-2 btn btn-danger" @click="bulkDelete">
@@ -236,6 +254,42 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
                     <Bootstrap4Pagination :data="users" @pagination-change-page="getUsers" />
                 </div>
            </div>
+
+           <div class="modal fade" id="employeeFormModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            <span v-if="editing">Edit Employee</span>
+                            <span v-else>Add New Employee</span>
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                    <Form ref="form" @submit="createEmployee" v-slot="{ errors }">
+                      <div class="modal-body">
+                            
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1">Employee Name</label>
+                                <Field name="emp_name" type="text" class="form-control" :class="{'is-invalid':errors.emp_name}" id="emp_name" />
+                                <!-- <span class="invalid-feedback">{{ errors.emp_name }}</span> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1">Position/Designation</label>
+                                <Field name="emp_position" type="text" class="form-control" :class="{'is-invalid':errors.emp_position}" id="emp_position" />
+                                <!-- <span class="invalid-feedback">{{ errors.emp_position }}</span> -->
+                            </div>
+                      </div>                    
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </Form>
+                    </div>
+                </div>
+            </div>
 
             <div class="modal fade" id="userFormModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">

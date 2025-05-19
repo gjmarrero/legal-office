@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DocumentAttachmentOutgoing;
 use App\Models\OutgoingDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,9 +33,11 @@ class OutgoingDocumentController extends Controller
                 'id' => $document->id,
                 'date_dispatched' => $document->date_dispatched,
                 'recipient' => $document->recipient,
+                'recipient_office' => $document->recipient_office,
                 'subject' => $document->subject,
                 'content' => $document->content,
                 'attachment' => $document->document_file,
+                'additional_attachments' => $document->attachments,
                 'remarks' => $document->remarks,
                 
             ]);
@@ -47,6 +50,7 @@ class OutgoingDocumentController extends Controller
 
         $validated = request()->validate([
             'recipient' => 'required',
+            'recipient_office' => 'required',
             'subject' => 'required',
             'content' => 'required',
             'date_dispatched' => 'required'
@@ -55,12 +59,13 @@ class OutgoingDocumentController extends Controller
         if(request()->hasFile('document_file')){
             $file = request()->file('document_file');
             $file_name = time().'_'.$file->getClientOriginalName();
-            $path = 'public/uploads/outgoing/'.$file_name;
+            $path = '/uploads/outgoing/'.$file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
         }
 
         OutgoingDocument::create([
             'recipient' => $validated['recipient'],
+            'recipient_office' => $validated['recipient_office'],
             'date_dispatched' => $validated['date_dispatched'],
             'subject' => $validated['subject'],
             'content' => $validated['content'],
@@ -78,6 +83,7 @@ class OutgoingDocumentController extends Controller
 
         $validated = request()->validate([
             'recipient' => 'required',
+            'recipient_office' => 'required',
             'subject' => 'required',
             'content' => 'required',
             'date_dispatched' => 'required'
@@ -95,5 +101,32 @@ class OutgoingDocumentController extends Controller
         $document->update($validated);
         
         return response()->json(['success' => true]);
+    }
+
+    public function attachFile(OutgoingDocument $document)
+    {
+
+        $file_name = '';
+
+        $validated = request()->validate([
+            'document_id' => 'required',
+        ]);
+
+        if (request()->hasFile('document_file')) {
+            $file = request()->file('document_file');
+            $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
+            $path = 'uploads/outgoing_documents/' . $file_name;
+            Storage::disk('public')->put($path, file_get_contents($file));
+
+        }
+
+        DocumentAttachmentOutgoing::create([
+            'document_id' => $validated['document_id'],
+            'document_file' => $file_name,
+        ]);
+
+        return response()->json(['success' => true]);
+
+
     }
 }

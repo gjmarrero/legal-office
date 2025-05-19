@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref } from 'vue';
-import VuePdfEmbed from 'vue-pdf-embed';
+import { onMounted, ref, computed } from 'vue';
+import { VuePdf } from 'vue3-pdfjs';
 
 const props = defineProps({
     document_source: String,
@@ -19,14 +19,19 @@ const closeModal = () => {
     emits('modal-stat', show.value);
 };
 
-const rotateLeft = ref(0);
+const rotation = ref(0)
 
-const rotatePdf = () => {
-    rotateLeft.value += 90;
+const rotationStyle = computed(() => ({
+    transform: `rotate(${rotation.value}deg)`,
+    transformOrigin: 'center',
+}))
+
+function rotatePdf() {
+    rotation.value = (rotation.value + 90) % 360
 }
-
 onMounted(() => {
-    openModal();
+    console.log("pdf source", props.document_source)
+    openModal()
 })
 </script>
 
@@ -40,13 +45,32 @@ onMounted(() => {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <button align-self-center @click="rotatePdf">
-                        <font-awesome-icon icon="fa fa-rotate-right" />
-                    </button>
-                    <vue-pdf-embed :source="document_source" :rotation="rotateLeft"/>
+                <div class="modal-body document-div">
+                    <a @click.prevent="rotatePdf">
+                        <font-awesome-icon icon="fa-solid fa-rotate-right" class="mr-2" />
+                    </a>
+                    <!-- <a @click.prevent="zoomIn">
+                        <font-awesome-icon icon="fa-solid fa-search-plus" class="mr-2" />
+                    </a>
+                    <a @click.prevent="zoomOut">
+                        <font-awesome-icon icon="fa-solid fa-search-minus" class="mr-2" />
+                    </a> -->
+                    <a :href="previewSource" download>
+                        <font-awesome-icon icon="fa-solid fa-download" class="mr-2" />
+                    </a>
+                    <!-- <VuePdfEmbed :src="'http://192.168.6.221:8000/storage/uploads/outgoing/1746515747_OPAG_APTFB_HGDG.pdf'" /> -->
+                    <div :style="rotationStyle">
+                        <VuePdf :src="document_source" />
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </template>
+<style lang="css" scoped>
+    .document-div {
+        height: 410px;
+        overflow: scroll;
+    }
+</style>

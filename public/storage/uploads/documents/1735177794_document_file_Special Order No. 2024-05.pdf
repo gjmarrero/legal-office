@@ -1,0 +1,1830 @@
+ false};
+
+    }
+  };
+}
+ts.arrayIterator = arrayIterator;
+function arrayReverseIterator(array) {
+  let i = array.length;
+  return {
+    next: function() {
+      if (i === 0) {
+        return {value: undefined, done: true};
+      }
+        i--;
+        return {value: array[i], done: false};
+
+    }
+  };
+}
+ts.arrayReverseIterator = arrayReverseIterator;
+/**
+ * Stable sort of an array. Elements equal to each other maintain their relative position in the array.
+ */
+function stableSort(array, comparer) {
+  const indices = indicesOf(array);
+  stableSortIndices(array, indices, comparer);
+  return indices.map(function(i) {
+    return array[i];
+  });
+}
+ts.stableSort = stableSort;
+function rangeEquals(array1, array2, pos, end) {
+  while (pos < end) {
+    if (array1[pos] !== array2[pos]) {
+      return false;
+    }
+    pos++;
+  }
+  return true;
+}
+ts.rangeEquals = rangeEquals;
+/**
+ * Returns the element at a specific offset in an array if non-empty, `undefined` otherwise.
+ * A negative offset indicates the element should be retrieved from the end of the array.
+ */
+function elementAt(array, offset) {
+  if (array) {
+    offset = toOffset(array, offset);
+    if (offset < array.length) {
+      return array[offset];
+    }
+  }
+  return undefined;
+}
+ts.elementAt = elementAt;
+/**
+ * Returns the first element of an array if non-empty, `undefined` otherwise.
+ */
+function firstOrUndefined(array) {
+  return array === undefined || array.length === 0 ? undefined : array[0];
+}
+ts.firstOrUndefined = firstOrUndefined;
+function first(array) {
+  ts.Debug.assert(array.length !== 0);
+  return array[0];
+}
+ts.first = first;
+/**
+ * Returns the last element of an array if non-empty, `undefined` otherwise.
+ */
+function lastOrUndefined(array) {
+  return array === undefined || array.length === 0 ? undefined : array[array.length - 1];
+}
+ts.lastOrUndefined = lastOrUndefined;
+function last(array) {
+  ts.Debug.assert(array.length !== 0);
+  return array[array.length - 1];
+}
+ts.last = last;
+/**
+ * Returns the only element of an array if it contains only one element, `undefined` otherwise.
+ */
+function singleOrUndefined(array) {
+  return array && array.length === 1 ? array[0] : undefined;
+}
+ts.singleOrUndefined = singleOrUndefined;
+/**
+ * Returns the only element of an array if it contains only one element; throws otherwise.
+ */
+function single(array) {
+  return ts.Debug.checkDefined(singleOrUndefined(array));
+}
+ts.single = single;
+function singleOrMany(array) {
+  return array && array.length === 1 ? array[0] : array;
+}
+ts.singleOrMany = singleOrMany;
+function replaceElement(array, index, value) {
+  const result = array.slice(0);
+  result[index] = value;
+  return result;
+}
+ts.replaceElement = replaceElement;
+/**
+ * Performs a binary search, finding the index at which `value` occurs in `array`.
+ * If no such index is found, returns the 2's-complement of first index at which
+ * `array[index]` exceeds `value`.
+ * @param array A sorted array whose first element must be no larger than number
+ * @param value The value to be searched for in the array.
+ * @param keySelector A callback used to select the search key from `value` and each element of
+ * `array`.
+ * @param keyComparer A callback used to compare two keys in a sorted array.
+ * @param offset An offset into `array` at which to start the search.
+ */
+function binarySearch(array, value, keySelector, keyComparer, offset) {
+  return binarySearchKey(array, keySelector(value), keySelector, keyComparer, offset);
+}
+ts.binarySearch = binarySearch;
+/**
+ * Performs a binary search, finding the index at which an object with `key` occurs in `array`.
+ * If no such index is found, returns the 2's-complement of first index at which
+ * `array[index]` exceeds `key`.
+ * @param array A sorted array whose first element must be no larger than number
+ * @param key The key to be searched for in the array.
+ * @param keySelector A callback used to select the search key from each element of `array`.
+ * @param keyComparer A callback used to compare two keys in a sorted array.
+ * @param offset An offset into `array` at which to start the search.
+ */
+function binarySearchKey(array, key, keySelector, keyComparer, offset) {
+  if (!some(array)) {
+    return -1;
+  }
+  let low = offset || 0;
+  let high = array.length - 1;
+  while (low <= high) {
+    const middle = low + ((high - low) >> 1);
+    const midKey = keySelector(array[middle], middle);
+    switch (keyComparer(midKey, key)) {
+      case -1 /* Comparison.LessThan */:
+        low = middle + 1;
+        break;
+      case 0 /* Comparison.EqualTo */:
+        return middle;
+      case 1 /* Comparison.GreaterThan */:
+        high = middle - 1;
+        break;
+    }
+  }
+  return ~low;
+}
+ts.binarySearchKey = binarySearchKey;
+function reduceLeft(array, f, initial, start, count) {
+  if (array && array.length > 0) {
+    const size = array.length;
+    if (size > 0) {
+      let pos = start === undefined || start < 0 ? 0 : start;
+      const end = count === undefined || pos + count > size - 1 ? size - 1 : pos + count;
+      let result = void 0;
+      if (arguments.length <= 2) {
+        result = array[pos];
+        pos++;
+      } else {
+        result = initial;
+      }
+      while (pos <= end) {
+        result = f(result, array[pos], pos);
+        pos++;
+      }
+      return result;
+    }
+  }
+  return initial;
+}
+ts.reduceLeft = reduceLeft;
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+/**
+ * Indicates whether a map-like contains an own property with the specified key.
+ *
+ * @param map A map-like.
+ * @param key A property key.
+ */
+function hasProperty(map, key) {
+  return hasOwnProperty.call(map, key);
+}
+ts.hasProperty = hasProperty;
+/**
+ * Gets the value of an owned property in a map-like.
+ *
+ * @param map A map-like.
+ * @param key A property key.
+ */
+function getProperty(map, key) {
+  return hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+ts.getProperty = getProperty;
+/**
+ * Gets the owned, enumerable property keys of a map-like.
+ */
+function getOwnKeys(map) {
+  const keys = [];
+  for (const key in map) {
+    if (hasOwnProperty.call(map, key)) {
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+ts.getOwnKeys = getOwnKeys;
+function getAllKeys(obj) {
+  const result = [];
+  do {
+    const names = Object.getOwnPropertyNames(obj);
+    for (let _i = 0, names_1 = names; _i < names_1.length; _i++) {
+      const name = names_1[_i];
+      pushIfUnique(result, name);
+    }
+  } while (obj = Object.getPrototypeOf(obj));
+  return result;
+}
+ts.getAllKeys = getAllKeys;
+function getOwnValues(collection) {
+  const values = [];
+  for (const key in collection) {
+    if (hasOwnProperty.call(collection, key)) {
+      values.push(collection[key]);
+    }
+  }
+  return values;
+}
+ts.getOwnValues = getOwnValues;
+const _entries = Object.entries || (function(obj) {
+                 const keys = getOwnKeys(obj);
+                 const result = Array(keys.length);
+                 for (let i = 0; i < keys.length; i++) {
+                   result[i] = [keys[i], obj[keys[i]]];
+                 }
+                 return result;
+               });
+function getEntries(obj) {
+  return obj ? _entries(obj) : [];
+}
+ts.getEntries = getEntries;
+function arrayOf(count, f) {
+  const result = new Array(count);
+  for (let i = 0; i < count; i++) {
+    result[i] = f(i);
+  }
+  return result;
+}
+ts.arrayOf = arrayOf;
+function arrayFrom(iterator, map) {
+  const result = [];
+  for (let iterResult = iterator.next(); !iterResult.done; iterResult = iterator.next()) {
+    result.push(map ? map(iterResult.value) : iterResult.value);
+  }
+  return result;
+}
+ts.arrayFrom = arrayFrom;
+function assign(t) {
+  const args = [];
+  for (let _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+  for (let _a = 0, args_1 = args; _a < args_1.length; _a++) {
+    const arg = args_1[_a];
+    if (arg === undefined)
+      {continue;}
+    for (const p in arg) {
+      if (hasProperty(arg, p)) {
+        t[p] = arg[p];
+      }
+    }
+  }
+  return t;
+}
+ts.assign = assign;
+/**
+ * Performs a shallow equality comparison of the contents of two map-likes.
+ *
+ * @param left A map-like whose properties should be compared.
+ * @param right A map-like whose properties should be compared.
+ */
+function equalOwnProperties(left, right, equalityComparer) {
+  if (equalityComparer === void 0) {
+    equalityComparer = equateValues;
+  }
+  if (left === right)
+    {return true;}
+  if (!left || !right)
+    {return false;}
+  for (var key in left) {
+    if (hasOwnProperty.call(left, key)) {
+      if (!hasOwnProperty.call(right, key))
+        {return false;}
+      if (!equalityComparer(left[key], right[key]))
+        {return false;}
+    }
+  }
+  for (var key in right) {
+    if (hasOwnProperty.call(right, key)) {
+      if (!hasOwnProperty.call(left, key))
+        {return false;}
+    }
+  }
+  return true;
+}
+ts.equalOwnProperties = equalOwnProperties;
+function arrayToMap(array, makeKey, makeValue) {
+  if (makeValue === void 0) {
+    makeValue = identity;
+  }
+  const result = new ts.Map();
+  for (let _i = 0, array_6 = array; _i < array_6.length; _i++) {
+    const value = array_6[_i];
+    const key = makeKey(value);
+    if (key !== undefined)
+      {result.set(key, makeValue(value));}
+  }
+  return result;
+}
+ts.arrayToMap = arrayToMap;
+function arrayToNumericMap(array, makeKey, makeValue) {
+  if (makeValue === void 0) {
+    makeValue = identity;
+  }
+  const result = [];
+  for (let _i = 0, array_7 = array; _i < array_7.length; _i++) {
+    const value = array_7[_i];
+    result[makeKey(value)] = makeValue(value);
+  }
+  return result;
+}
+ts.arrayToNumericMap = arrayToNumericMap;
+function arrayToMultiMap(values, makeKey, makeValue) {
+  if (makeValue === void 0) {
+    makeValue = identity;
+  }
+  const result = createMultiMap();
+  for (let _i = 0, values_1 = values; _i < values_1.length; _i++) {
+    const value = values_1[_i];
+    result.add(makeKey(value), makeValue(value));
+  }
+  return result;
+}
+ts.arrayToMultiMap = arrayToMultiMap;
+function group(values, getGroupId, resultSelector) {
+  if (resultSelector === void 0) {
+    resultSelector = identity;
+  }
+  return arrayFrom(arrayToMultiMap(values, getGroupId).values(), resultSelector);
+}
+ts.group = group;
+function clone(object) {
+  const result = {};
+  for (const id in object) {
+    if (hasOwnProperty.call(object, id)) {
+      result[id] = object[id];
+    }
+  }
+  return result;
+}
+ts.clone = clone;
+/**
+ * Creates a new object by adding the own properties of `second`, then the own properties of `first`.
+ *
+ * NOTE: This means that if a property exists in both `first` and `second`, the property in `first` will be chosen.
+ */
+function extend(first, second) {
+  const result = {};
+  for (var id in second) {
+    if (hasOwnProperty.call(second, id)) {
+      result[id] = second[id];
+    }
+  }
+  for (var id in first) {
+    if (hasOwnProperty.call(first, id)) {
+      result[id] = first[id];
+    }
+  }
+  return result;
+}
+ts.extend = extend;
+function copyProperties(first, second) {
+  for (const id in second) {
+    if (hasOwnProperty.call(second, id)) {
+      first[id] = second[id];
+    }
+  }
+}
+ts.copyProperties = copyProperties;
+function maybeBind(obj, fn) {
+  return fn ? fn.bind(obj) : undefined;
+}
+ts.maybeBind = maybeBind;
+function createMultiMap() {
+  const map = new ts.Map();
+  map.add = multiMapAdd;
+  map.remove = multiMapRemove;
+  return map;
+}
+ts.createMultiMap = createMultiMap;
+function multiMapAdd(key, value) {
+  let values = this.get(key);
+  if (values) {
+    values.push(value);
+  } else {
+    this.set(key, values = [value]);
+  }
+  return values;
+}
+function multiMapRemove(key, value) {
+  const values = this.get(key);
+  if (values) {
+    unorderedRemoveItem(values, value);
+    if (!values.length) {
+      this.delete(key);
+    }
+  }
+}
+function createUnderscoreEscapedMultiMap() {
+  return createMultiMap();
+}
+ts.createUnderscoreEscapedMultiMap = createUnderscoreEscapedMultiMap;
+function createQueue(items) {
+  const elements = (items === null || items === void 0 ? void 0 : items.slice()) || [];
+  let headIndex = 0;
+  function isEmpty() {
+    return headIndex === elements.length;
+  }
+  function enqueue() {
+    const items = [];
+    for (let _i = 0; _i < arguments.length; _i++) {
+      items[_i] = arguments[_i];
+    }
+    elements.push.apply(elements, items);
+  }
+  function dequeue() {
+    if (isEmpty()) {
+      throw new Error('Queue is empty');
+    }
+    const result = elements[headIndex];
+    elements[headIndex] = undefined;  // Don't keep referencing dequeued item
+    headIndex++;
+    // If more than half of the queue is empty, copy the remaining elements to the
+    // front and shrink the array (unless we'd be saving fewer than 100 slots)
+    if (headIndex > 100 && headIndex > (elements.length >> 1)) {
+      const newLength = elements.length - headIndex;
+      elements.copyWithin(/* target*/ 0, /* start*/ headIndex);
+      elements.length = newLength;
+      headIndex = 0;
+    }
+    return result;
+  }
+  return {
+    enqueue,
+    dequeue,
+    isEmpty,
+  };
+}
+ts.createQueue = createQueue;
+/**
+ * Creates a Set with custom equality and hash code functionality.  This is useful when you
+ * want to use something looser than object identity - e.g. "has the same span".
+ *
+ * If `equals(a, b)`, it must be the case that `getHashCode(a) === getHashCode(b)`.
+ * The converse is not required.
+ *
+ * To facilitate a perf optimization (lazy allocation of bucket arrays), `TElement` is
+ * assumed not to be an array type.
+ */
+function createSet(getHashCode, equals) {
+  const multiMap = new ts.Map();
+  let size = 0;
+  function getElementIterator() {
+    const valueIt = multiMap.values();
+    let arrayIt;
+    return {
+      next: function() {
+        while (true) {
+          if (arrayIt) {
+            var n = arrayIt.next();
+            if (!n.done) {
+              return {value: n.value};
+            }
+            arrayIt = undefined;
+          } else {
+            var n = valueIt.next();
+            if (n.done) {
+              return {value: undefined, done: true};
+            }
+            if (!isArray(n.value)) {
+              return {value: n.value};
+            }
+            arrayIt = arrayIterator(n.value);
+          }
+        }
+      }
+    };
+  }
+  const set = {
+    has: function(element) {
+      const hash = getHashCode(element);
+      if (!multiMap.has(hash))
+        {return false;}
+      const candidates = multiMap.get(hash);
+      if (!isArray(candidates))
+        {return equals(candidates, element);}
+      for (let _i = 0, candidates_1 = candidates; _i < candidates_1.length; _i++) {
+        const candidate = candidates_1[_i];
+        if (equals(candidate, element)) {
+          return true;
+        }
+      }
+      return false;
+    },
+    add: function(element) {
+      const hash = getHashCode(element);
+      if (multiMap.has(hash)) {
+        const values = multiMap.get(hash);
+        if (isArray(values)) {
+          if (!contains(values, element, equals)) {
+            values.push(element);
+            size++;
+          }
+        } else {
+          const value = values;
+          if (!equals(value, element)) {
+            multiMap.set(hash, [value, element]);
+            size++;
+          }
+        }
+      } else {
+        multiMap.set(hash, element);
+        size++;
+      }
+      return this;
+    },
+    delete: function(element) {
+      const hash = getHashCode(element);
+      if (!multiMap.has(hash))
+        {return false;}
+      const candidates = multiMap.get(hash);
+      if (isArray(candidates)) {
+        for (let i = 0; i < candidates.length; i++) {
+          if (equals(candidates[i], element)) {
+            if (candidates.length === 1) {
+              multiMap.delete(hash);
+            } else if (candidates.length === 2) {
+              multiMap.set(hash, candidates[1 - i]);
+            } else {
+              unorderedRemoveItemAt(candidates, i);
+            }
+            size--;
+            return true;
+          }
+        }
+      } else {
+        const candidate = candidates;
+        if (equals(candidate, element)) {
+          multiMap.delete(hash);
+          size--;
+          return true;
+        }
+      }
+      return false;
+    },
+    clear: function() {
+      multiMap.clear();
+      size = 0;
+    },
+    get size() {
+      return size;
+    },
+    forEach: function(action) {
+      for (let _i = 0, _a = arrayFrom(multiMap.values()); _i < _a.length; _i++) {
+        const elements = _a[_i];
+        if (isArray(elements)) {
+          for (let _b = 0, elements_1 = elements; _b < elements_1.length; _b++) {
+            var element = elements_1[_b];
+            action(element, element);
+          }
+        } else {
+          var element = elements;
+          action(element, element);
+        }
+      }
+    },
+    keys: function() {
+      return getElementIterator();
+    },
+    values: function() {
+      return getElementIterator();
+    },
+    entries: function() {
+      const it = getElementIterator();
+      return {
+        next: function() {
+          const n = it.next();
+          return n.done ? n : {value: [n.value, n.value]};
+        }
+      };
+    },
+  };
+  return set;
+}
+ts.createSet = createSet;
+/**
+ * Tests whether a value is an array.
+ */
+function isArray(value) {
+  return Array.isArray ? Array.isArray(value) : value instanceof Array;
+}
+ts.isArray = isArray;
+function toArray(value) {
+  return isArray(value) ? value : [value];
+}
+ts.toArray = toArray;
+/**
+ * Tests whether a value is string
+ */
+function isString(text) {
+  return typeof text === 'string';
+}
+ts.isString = isString;
+function isNumber(x) {
+  return typeof x === 'number';
+}
+ts.isNumber = isNumber;
+function tryCast(value, test) {
+  return value !== undefined && test(value) ? value : undefined;
+}
+ts.tryCast = tryCast;
+function cast(value, test) {
+  if (value !== undefined && test(value))
+    {return value;}
+  return ts.Debug.fail('Invalid cast. The supplied value '.concat(value, ' did not pass the test \'')
+                           .concat(ts.Debug.getFunctionName(test), '\'.'));
+}
+ts.cast = cast;
+/** Does nothing. */
+function noop(_) {
+}
+ts.noop = noop;
+ts.noopPush = {
+  push: noop,
+  length: 0
+};
+/** Do nothing and return false */
+function returnFalse() {
+  return false;
+}
+ts.returnFalse = returnFalse;
+/** Do nothing and return true */
+function returnTrue() {
+  return true;
+}
+ts.returnTrue = returnTrue;
+/** Do nothing and return undefined */
+function returnUndefined() {
+  return undefined;
+}
+ts.returnUndefined = returnUndefined;
+/** Returns its argument. */
+function identity(x) {
+  return x;
+}
+ts.identity = identity;
+/** Returns lower case string */
+function toLowerCase(x) {
+  return x.toLowerCase();
+}
+ts.toLowerCase = toLowerCase;
+// We convert the file names to lower case as key for file name on case insensitive file system
+// While doing so we need to handle special characters (eg \u0130) to ensure that we dont convert
+// it to lower case, fileName with its lowercase form can exist along side it.
+// Handle special characters and make those case sensitive instead
+//
+// |-#--|-Unicode--|-Char code-|-Desc-------------------------------------------------------------------|
+// | 1. | i        | 105       | Ascii i                                                                |
+// | 2. | I        | 73        | Ascii I                                                                |
+// |-------- Special characters ------------------------------------------------------------------------|
+// | 3. | \u0130   | 304       | Upper case I with dot above                                            |
+// | 4. | i,\u0307 | 105,775   | i, followed by 775: Lower case of (3rd item)                           |
+// | 5. | I,\u0307 | 73,775    | I, followed by 775: Upper case of (4th item), lower case is (4th item) |
+// | 6. | \u0131   | 305       | Lower case i without dot, upper case is I (2nd item)                   |
+// | 7. | \u00DF   | 223       | Lower case sharp s                                                     |
+//
+// Because item 3 is special where in its lowercase character has its own
+// upper case form we cant convert its case.
+// Rest special characters are either already in lower case format or
+// they have corresponding upper case character so they dont need special handling
+//
+// But to avoid having to do string building for most common cases, also ignore
+// a-z, 0-9, \u0131, \u00DF, \, /, ., : and space
+const fileNameLowerCaseRegExp = /[^\u0130\u0131\u00DFa-z0-9\\/:\-_\. ]+/g;
+/**
+ * Case insensitive file systems have descripencies in how they handle some characters (eg. turkish Upper case I with dot on top - \u0130)
+ * This function is used in places where we want to make file name as a key on these systems
+ * It is possible on mac to be able to refer to file name with I with dot on top as a fileName with its lower case form
+ * But on windows we cannot. Windows can have fileName with I with dot on top next to its lower case and they can not each be referred with the lowercase forms
+ * Technically we would want this function to be platform sepcific as well but
+ * our api has till now only taken caseSensitive as the only input and just for some characters we dont want to update API and ensure all customers use those api
+ * We could use upper case and we would still need to deal with the descripencies but
+ * we want to continue using lower case since in most cases filenames are lowercasewe and wont need any case changes and avoid having to store another string for the key
+ * So for this function purpose, we go ahead and assume character I with dot on top it as case sensitive since its very unlikely to use lower case form of that special character
+ */
+function toFileNameLowerCase(x) {
+  return fileNameLowerCaseRegExp.test(x) ? x.replace(fileNameLowerCaseRegExp, toLowerCase) : x;
+}
+ts.toFileNameLowerCase = toFileNameLowerCase;
+/** Throws an error because a function is not implemented. */
+function notImplemented() {
+  throw new Error('Not implemented');
+}
+ts.notImplemented = notImplemented;
+function memoize(callback) {
+  let value;
+  return function() {
+    if (callback) {
+      value = callback();
+      callback = undefined;
+    }
+    return value;
+  };
+}
+ts.memoize = memoize;
+/** A version of `memoize` that supports a single primitive argument */
+function memoizeOne(callback) {
+  const map = new ts.Map();
+  return function(arg) {
+    const key = ''.concat(typeof arg, ':').concat(arg);
+    let value = map.get(key);
+    if (value === undefined && !map.has(key)) {
+      value = callback(arg);
+      map.set(key, value);
+    }
+    return value;
+  };
+}
+ts.memoizeOne = memoizeOne;
+function compose(a, b, c, d, e) {
+  if (!!e) {
+    const args_2 = [];
+    for (let i = 0; i < arguments.length; i++) {
+      args_2[i] = arguments[i];
+    }
+    return function(t) {
+      return reduceLeft(args_2, function(u, f) {
+        return f(u);
+      }, t);
+    };
+  } if (d) {
+    return function(t) {
+      return d(c(b(a(t))));
+    };
+  } if (c) {
+    return function(t) {
+      return c(b(a(t)));
+    };
+  } if (b) {
+    return function(t) {
+      return b(a(t));
+    };
+  } if (a) {
+    return function(t) {
+      return a(t);
+    };
+  }
+    return function(t) {
+      return t;
+    };
+
+}
+ts.compose = compose;
+let AssertionLevel;
+(function(AssertionLevel) {
+AssertionLevel[AssertionLevel['None'] = 0] = 'None';
+AssertionLevel[AssertionLevel['Normal'] = 1] = 'Normal';
+AssertionLevel[AssertionLevel['Aggressive'] = 2] = 'Aggressive';
+AssertionLevel[AssertionLevel['VeryAggressive'] = 3] = 'VeryAggressive';
+})(AssertionLevel = ts.AssertionLevel || (ts.AssertionLevel = {}));
+function equateValues(a, b) {
+  return a === b;
+}
+ts.equateValues = equateValues;
+/**
+ * Compare the equality of two strings using a case-sensitive ordinal comparison.
+ *
+ * Case-sensitive comparisons compare both strings one code-point at a time using the integer
+ * value of each code-point after applying `toUpperCase` to each string. We always map both
+ * strings to their upper-case form as some unicode characters do not properly round-trip to
+ * lowercase (such as `ẞ` (German sharp capital s)).
+ */
+function equateStringsCaseInsensitive(a, b) {
+  return a === b || a !== undefined && b !== undefined && a.toUpperCase() === b.toUpperCase();
+}
+ts.equateStringsCaseInsensitive = equateStringsCaseInsensitive;
+/**
+ * Compare the equality of two strings using a case-sensitive ordinal comparison.
+ *
+ * Case-sensitive comparisons compare both strings one code-point at a time using the
+ * integer value of each code-point.
+ */
+function equateStringsCaseSensitive(a, b) {
+  return equateValues(a, b);
+}
+ts.equateStringsCaseSensitive = equateStringsCaseSensitive;
+function compareComparableValues(a, b) {
+  return a === b      ? 0 /* Comparison.EqualTo */ :
+      a === undefined ? -1 /* Comparison.LessThan */ :
+      b === undefined ? 1 /* Comparison.GreaterThan */ :
+      a < b           ? -1 /* Comparison.LessThan */ :
+                        1 /* Comparison.GreaterThan */;
+}
+/**
+ * Compare two numeric values for their order relative to each other.
+ * To compare strings, use any of the `compareStrings` functions.
+ */
+function compareValues(a, b) {
+  return compareComparableValues(a, b);
+}
+ts.compareValues = compareValues;
+/**
+ * Compare two TextSpans, first by `start`, then by `length`.
+ */
+function compareTextSpans(a, b) {
+  return compareValues(a === null || a === void 0 ? void 0 : a.start, b === null || b === void 0 ? void 0 : b.start) ||
+      compareValues(a === null || a === void 0 ? void 0 : a.length, b === null || b === void 0 ? void 0 : b.length);
+}
+ts.compareTextSpans = compareTextSpans;
+function min(items, compare) {
+  return reduceLeft(items, function(x, y) {
+    return compare(x, y) === -1 /* Comparison.LessThan */ ? x : y;
+  });
+}
+ts.min = min;
+/**
+ * Compare two strings using a case-insensitive ordinal comparison.
+ *
+ * Ordinal comparisons are based on the difference between the unicode code points of both
+ * strings. Characters with multiple unicode representations are considered unequal. Ordinal
+ * comparisons provide predictable ordering, but place "a" after "B".
+ *
+ * Case-insensitive comparisons compare both strings one code-point at a time using the integer
+ * value of each code-point after applying `toUpperCase` to each string. We always map both
+ * strings to their upper-case form as some unicode characters do not properly round-trip to
+ * lowercase (such as `ẞ` (German sharp capital s)).
+ */
+function compareStringsCaseInsensitive(a, b) {
+  if (a === b)
+    {return 0 /* Comparison.EqualTo */;}
+  if (a === undefined)
+    {return -1 /* Comparison.LessThan */;}
+  if (b === undefined)
+    {return 1 /* Comparison.GreaterThan */;}
+  a = a.toUpperCase();
+  b = b.toUpperCase();
+  return a < b ? -1 /* Comparison.LessThan */ : a > b ? 1 /* Comparison.GreaterThan */ : 0 /* Comparison.EqualTo */;
+}
+ts.compareStringsCaseInsensitive = compareStringsCaseInsensitive;
+/**
+ * Compare two strings using a case-sensitive ordinal comparison.
+ *
+ * Ordinal comparisons are based on the difference between the unicode code points of both
+ * strings. Characters with multiple unicode representations are considered unequal. Ordinal
+ * comparisons provide predictable ordering, but place "a" after "B".
+ *
+ * Case-sensitive comparisons compare both strings one code-point at a time using the integer
+ * value of each code-point.
+ */
+function compareStringsCaseSensitive(a, b) {
+  return compareComparableValues(a, b);
+}
+ts.compareStringsCaseSensitive = compareStringsCaseSensitive;
+function getStringComparer(ignoreCase) {
+  return ignoreCase ? compareStringsCaseInsensitive : compareStringsCaseSensitive;
+}
+ts.getStringComparer = getStringComparer;
+/**
+ * Creates a string comparer for use with string collation in the UI.
+ */
+const createUIStringComparer = (function() {
+  let defaultComparer;
+  let enUSComparer;
+  const stringComparerFactory = getStringComparerFactory();
+  return createStringComparer;
+  function compareWithCallback(a, b, comparer) {
+    if (a === b)
+      {return 0 /* Comparison.EqualTo */;}
+    if (a === undefined)
+      {return -1 /* Comparison.LessThan */;}
+    if (b === undefined)
+      {return 1 /* Comparison.GreaterThan */;}
+    const value = comparer(a, b);
+    return value < 0 ? -1 /* Comparison.LessThan */ :
+        value > 0    ? 1 /* Comparison.GreaterThan */ :
+                       0 /* Comparison.EqualTo */;
+  }
+  function createIntlCollatorStringComparer(locale) {
+    // Intl.Collator.prototype.compare is bound to the collator. See NOTE in
+    // http://www.ecma-international.org/ecma-402/2.0/#sec-Intl.Collator.prototype.compare
+    const comparer = new Intl.Collator(locale, {usage: 'sort', sensitivity: 'variant'}).compare;
+    return function(a, b) {
+      return compareWithCallback(a, b, comparer);
+    };
+  }
+  function createLocaleCompareStringComparer(locale) {
+    // if the locale is not the default locale (`undefined`), use the fallback comparer.
+    if (locale !== undefined)
+      {return createFallbackStringComparer();}
+    return function(a, b) {
+      return compareWithCallback(a, b, compareStrings);
+    };
+    function compareStrings(a, b) {
+      return a.localeCompare(b);
+    }
+  }
+  function createFallbackStringComparer() {
+    // An ordinal comparison puts "A" after "b", but for the UI we want "A" before "b".
+    // We first sort case insensitively.  So "Aaa" will come before "baa".
+    // Then we sort case sensitively, so "aaa" will come before "Aaa".
+    //
+    // For case insensitive comparisons we always map both strings to their
+    // upper-case form as some unicode characters do not properly round-trip to
+    // lowercase (such as `Ã¡ÂºÅ¾` (German sharp capital s)).
+    return function(a, b) {
+      return compareWithCallback(a, b, compareDictionaryOrder);
+    };
+    function compareDictionaryOrder(a, b) {
+      return compareStrings(a.toUpperCase(), b.toUpperCase()) || compareStrings(a, b);
+    }
+    function compareStrings(a, b) {
+      return a < b ? -1 /* Comparison.LessThan */ : a > b ? 1 /* Comparison.GreaterThan */ : 0 /* Comparison.EqualTo */;
+    }
+  }
+  function getStringComparerFactory() {
+    // If the host supports Intl, we use it for comparisons using the default locale.
+    if (typeof Intl === 'object' && typeof Intl.Collator === 'function') {
+      return createIntlCollatorStringComparer;
+    }
+    // If the host does not support Intl, we fall back to localeCompare.
+    // localeCompare in Node v0.10 is just an ordinal comparison, so don't use it.
+    if (typeof String.prototype.localeCompare === 'function' &&
+        typeof String.prototype.toLocaleUpperCase === 'function' && 'a'.localeCompare('B') < 0) {
+      return createLocaleCompareStringComparer;
+    }
+    // Otherwise, fall back to ordinal comparison:
+    return createFallbackStringComparer;
+  }
+  function createStringComparer(locale) {
+    // Hold onto common string comparers. This avoids constantly reallocating comparers during
+    // tests.
+    if (locale === undefined) {
+      return defaultComparer || (defaultComparer = stringComparerFactory(locale));
+    } if (locale === 'en-US') {
+      return enUSComparer || (enUSComparer = stringComparerFactory(locale));
+    }
+      return stringComparerFactory(locale);
+
+  }
+})();
+let uiComparerCaseSensitive;
+let uiLocale;
+function getUILocale() {
+  return uiLocale;
+}
+ts.getUILocale = getUILocale;
+function setUILocale(value) {
+  if (uiLocale !== value) {
+    uiLocale = value;
+    uiComparerCaseSensitive = undefined;
+  }
+}
+ts.setUILocale = setUILocale;
+/**
+ * Compare two strings in a using the case-sensitive sort behavior of the UI locale.
+ *
+ * Ordering is not predictable between different host locales, but is best for displaying
+ * ordered data for UI presentation. Characters with multiple unicode representations may
+ * be considered equal.
+ *
+ * Case-sensitive comparisons compare strings that differ in base characters, or
+ * accents/diacritic marks, or case as unequal.
+ */
+function compareStringsCaseSensitiveUI(a, b) {
+  const comparer = uiComparerCaseSensitive || (uiComparerCaseSensitive = createUIStringComparer(uiLocale));
+  return comparer(a, b);
+}
+ts.compareStringsCaseSensitiveUI = compareStringsCaseSensitiveUI;
+function compareProperties(a, b, key, comparer) {
+  return a === b      ? 0 /* Comparison.EqualTo */ :
+      a === undefined ? -1 /* Comparison.LessThan */ :
+      b === undefined ? 1 /* Comparison.GreaterThan */ :
+                        comparer(a[key], b[key]);
+}
+ts.compareProperties = compareProperties;
+/** True is greater than false. */
+function compareBooleans(a, b) {
+  return compareValues(a ? 1 : 0, b ? 1 : 0);
+}
+ts.compareBooleans = compareBooleans;
+/**
+ * Given a name and a list of names that are *not* equal to the name, return a spelling suggestion if there is one that is close enough.
+ * Names less than length 3 only check for case-insensitive equality.
+ *
+ * find the candidate with the smallest Levenshtein distance,
+ *    except for candidates:
+ *      * With no name
+ *      * Whose length differs from the target name by more than 0.34 of the length of the name.
+ *      * Whose levenshtein distance is more than 0.4 of the length of the name
+ *        (0.4 allows 1 substitution/transposition for every 5 characters,
+ *         and 1 insertion/deletion at 3 characters)
+ */
+function getSpellingSuggestion(name, candidates, getName) {
+  const maximumLengthDifference = Math.max(2, Math.floor(name.length * 0.34));
+  let bestDistance = Math.floor(name.length * 0.4) + 1;  // If the best result is worse than this, don't bother.
+  let bestCandidate;
+  for (let _i = 0, candidates_2 = candidates; _i < candidates_2.length; _i++) {
+    const candidate = candidates_2[_i];
+    const candidateName = getName(candidate);
+    if (candidateName !== undefined && Math.abs(candidateName.length - name.length) <= maximumLengthDifference) {
+      if (candidateName === name) {
+        continue;
+      }
+      // Only consider candidates less than 3 characters long when they differ by case.
+      // Otherwise, don't bother, since a user would usually notice differences of a 2-character name.
+      if (candidateName.length < 3 && candidateName.toLowerCase() !== name.toLowerCase()) {
+        continue;
+      }
+      const distance = levenshteinWithMax(name, candidateName, bestDistance - 0.1);
+      if (distance === undefined) {
+        continue;
+      }
+      ts.Debug.assert(distance < bestDistance);  // Else `levenshteinWithMax` should return undefined
+      bestDistance = distance;
+      bestCandidate = candidate;
+    }
+  }
+  return bestCandidate;
+}
+ts.getSpellingSuggestion = getSpellingSuggestion;
+function levenshteinWithMax(s1, s2, max) {
+  let previous = new Array(s2.length + 1);
+  let current = new Array(s2.length + 1);
+  /** Represents any value > max. We don't care about the particular value. */
+  const big = max + 0.01;
+  for (var i = 0; i <= s2.length; i++) {
+    previous[i] = i;
+  }
+  for (var i = 1; i <= s1.length; i++) {
+    const c1 = s1.charCodeAt(i - 1);
+    const minJ = Math.ceil(i > max ? i - max : 1);
+    const maxJ = Math.floor(s2.length > max + i ? max + i : s2.length);
+    current[0] = i;
+    /** Smallest value of the matrix in the ith column. */
+    let colMin = i;
+    for (var j = 1; j < minJ; j++) {
+      current[j] = big;
+    }
+    for (var j = minJ; j <= maxJ; j++) {
+      // case difference should be significantly cheaper than other differences
+      const substitutionDistance =
+          s1[i - 1].toLowerCase() === s2[j - 1].toLowerCase() ? (previous[j - 1] + 0.1) : (previous[j - 1] + 2);
+      const dist = c1 === s2.charCodeAt(j - 1) ?
+          previous[j - 1] :
+          Math.min(/* delete*/ previous[j] + 1, /* insert*/ current[j - 1] + 1, /* substitute*/ substitutionDistance);
+      current[j] = dist;
+      colMin = Math.min(colMin, dist);
+    }
+    for (var j = maxJ + 1; j <= s2.length; j++) {
+      current[j] = big;
+    }
+    if (colMin > max) {
+      // Give up -- everything in this column is > max and it can't get better in future columns.
+      return undefined;
+    }
+    const temp = previous;
+    previous = current;
+    current = temp;
+  }
+  const res = previous[s2.length];
+  return res > max ? undefined : res;
+}
+function endsWith(str, suffix) {
+  const expectedPos = str.length - suffix.length;
+  return expectedPos >= 0 && str.indexOf(suffix, expectedPos) === expectedPos;
+}
+ts.endsWith = endsWith;
+function removeSuffix(str, suffix) {
+  return endsWith(str, suffix) ? str.slice(0, str.length - suffix.length) : str;
+}
+ts.removeSuffix = removeSuffix;
+function tryRemoveSuffix(str, suffix) {
+  return endsWith(str, suffix) ? str.slice(0, str.length - suffix.length) : undefined;
+}
+ts.tryRemoveSuffix = tryRemoveSuffix;
+function stringContains(str, substring) {
+  return str.indexOf(substring) !== -1;
+}
+ts.stringContains = stringContains;
+/**
+ * Takes a string like "jquery-min.4.2.3" and returns "jquery"
+ */
+function removeMinAndVersionNumbers(fileName) {
+  // We used to use the regex /[.-]((min)|(\d+(\.\d+)*))$/ and would just .replace it twice.
+  // Unfortunately, that regex has O(n^2) performance because v8 doesn't match from the end of the string.
+  // Instead, we now essentially scan the filename (backwards) ourselves.
+  let end = fileName.length;
+  for (let pos = end - 1; pos > 0; pos--) {
+    let ch = fileName.charCodeAt(pos);
+    if (ch >= 48 /* CharacterCodes._0 */ && ch <= 57 /* CharacterCodes._9 */) {
+      // Match a \d+ segment
+      do {
+        --pos;
+        ch = fileName.charCodeAt(pos);
+      } while (pos > 0 && ch >= 48 /* CharacterCodes._0 */ && ch <= 57 /* CharacterCodes._9 */);
+    } else if (pos > 4 && (ch === 110 /* CharacterCodes.n */ || ch === 78 /* CharacterCodes.N */)) {
+      // Looking for "min" or "min"
+      // Already matched the 'n'
+      --pos;
+      ch = fileName.charCodeAt(pos);
+      if (ch !== 105 /* CharacterCodes.i */ && ch !== 73 /* CharacterCodes.I */) {
+        break;
+      }
+      --pos;
+      ch = fileName.charCodeAt(pos);
+      if (ch !== 109 /* CharacterCodes.m */ && ch !== 77 /* CharacterCodes.M */) {
+        break;
+      }
+      --pos;
+      ch = fileName.charCodeAt(pos);
+    } else {
+      // This character is not part of either suffix pattern
+      break;
+    }
+    if (ch !== 45 /* CharacterCodes.minus */ && ch !== 46 /* CharacterCodes.dot */) {
+      break;
+    }
+    end = pos;
+  }
+  // end might be fileName.length, in which case this should internally no-op
+  return end === fileName.length ? fileName : fileName.slice(0, end);
+}
+ts.removeMinAndVersionNumbers = removeMinAndVersionNumbers;
+/** Remove an item from an array, moving everything to its right one space left. */
+function orderedRemoveItem(array, item) {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === item) {
+      orderedRemoveItemAt(array, i);
+      return true;
+    }
+  }
+  return false;
+}
+ts.orderedRemoveItem = orderedRemoveItem;
+/** Remove an item by index from an array, moving everything to its right one space left. */
+function orderedRemoveItemAt(array, index) {
+  // This seems to be faster than either `array.splice(i, 1)` or `array.copyWithin(i, i+ 1)`.
+  for (let i = index; i < array.length - 1; i++) {
+    array[i] = array[i + 1];
+  }
+  array.pop();
+}
+ts.orderedRemoveItemAt = orderedRemoveItemAt;
+function unorderedRemoveItemAt(array, index) {
+  // Fill in the "hole" left at `index`.
+  array[index] = array[array.length - 1];
+  array.pop();
+}
+ts.unorderedRemoveItemAt = unorderedRemoveItemAt;
+/** Remove the *first* occurrence of `item` from the array. */
+function unorderedRemoveItem(array, item) {
+  return unorderedRemoveFirstItemWhere(array, function(element) {
+    return element === item;
+  });
+}
+ts.unorderedRemoveItem = unorderedRemoveItem;
+/** Remove the *first* element satisfying `predicate`. */
+function unorderedRemoveFirstItemWhere(array, predicate) {
+  for (let i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      unorderedRemoveItemAt(array, i);
+      return true;
+    }
+  }
+  return false;
+}
+function createGetCanonicalFileName(useCaseSensitiveFileNames) {
+  return useCaseSensitiveFileNames ? identity : toFileNameLowerCase;
+}
+ts.createGetCanonicalFileName = createGetCanonicalFileName;
+function patternText(_a) {
+  const prefix = _a.prefix, suffix = _a.suffix;
+  return ''.concat(prefix, '*').concat(suffix);
+}
+ts.patternText = patternText;
+/**
+ * Given that candidate matches pattern, returns the text matching the '*'.
+ * E.g.: matchedText(tryParsePattern("foo*baz"), "foobarbaz") === "bar"
+ */
+function matchedText(pattern, candidate) {
+  ts.Debug.assert(isPatternMatch(pattern, candidate));
+  return candidate.substring(pattern.prefix.length, candidate.length - pattern.suffix.length);
+}
+ts.matchedText = matchedText;
+/** Return the object corresponding to the best pattern to match `candidate`. */
+function findBestPatternMatch(values, getPattern, candidate) {
+  let matchedValue;
+  // use length of prefix as betterness criteria
+  let longestMatchPrefixLength = -1;
+  for (let _i = 0, values_2 = values; _i < values_2.length; _i++) {
+    const v = values_2[_i];
+    const pattern = getPattern(v);
+    if (isPatternMatch(pattern, candidate) && pattern.prefix.length > longestMatchPrefixLength) {
+      longestMatchPrefixLength = pattern.prefix.length;
+      matchedValue = v;
+    }
+  }
+  return matchedValue;
+}
+ts.findBestPatternMatch = findBestPatternMatch;
+function startsWith(str, prefix) {
+  return str.lastIndexOf(prefix, 0) === 0;
+}
+ts.startsWith = startsWith;
+function removePrefix(str, prefix) {
+  return startsWith(str, prefix) ? str.substr(prefix.length) : str;
+}
+ts.removePrefix = removePrefix;
+function tryRemovePrefix(str, prefix, getCanonicalFileName) {
+  if (getCanonicalFileName === void 0) {
+    getCanonicalFileName = identity;
+  }
+  return startsWith(getCanonicalFileName(str), getCanonicalFileName(prefix)) ? str.substring(prefix.length) : undefined;
+}
+ts.tryRemovePrefix = tryRemovePrefix;
+function isPatternMatch(_a, candidate) {
+  const prefix = _a.prefix, suffix = _a.suffix;
+  return candidate.length >= prefix.length + suffix.length && startsWith(candidate, prefix) &&
+      endsWith(candidate, suffix);
+}
+ts.isPatternMatch = isPatternMatch;
+function and(f, g) {
+  return function(arg) {
+    return f(arg) && g(arg);
+  };
+}
+ts.and = and;
+function or() {
+  const fs = [];
+  for (let _i = 0; _i < arguments.length; _i++) {
+    fs[_i] = arguments[_i];
+  }
+  return function() {
+    const args = [];
+    for (let _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+    let lastResult;
+    for (let _a = 0, fs_1 = fs; _a < fs_1.length; _a++) {
+      const f = fs_1[_a];
+      lastResult = f.apply(void 0, args);
+      if (lastResult) {
+        return lastResult;
+      }
+    }
+    return lastResult;
+  };
+}
+ts.or = or;
+function not(fn) {
+  return function() {
+    const args = [];
+    for (let _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+    return !fn.apply(void 0, args);
+  };
+}
+ts.not = not;
+function assertType(_) {
+}
+ts.assertType = assertType;
+function singleElementArray(t) {
+  return t === undefined ? undefined : [t];
+}
+ts.singleElementArray = singleElementArray;
+function enumerateInsertsAndDeletes(newItems, oldItems, comparer, inserted, deleted, unchanged) {
+  unchanged = unchanged || noop;
+  let newIndex = 0;
+  let oldIndex = 0;
+  const newLen = newItems.length;
+  const oldLen = oldItems.length;
+  let hasChanges = false;
+  while (newIndex < newLen && oldIndex < oldLen) {
+    const newItem = newItems[newIndex];
+    const oldItem = oldItems[oldIndex];
+    const compareResult = comparer(newItem, oldItem);
+    if (compareResult === -1 /* Comparison.LessThan */) {
+      inserted(newItem);
+      newIndex++;
+      hasChanges = true;
+    } else if (compareResult === 1 /* Comparison.GreaterThan */) {
+      deleted(oldItem);
+      oldIndex++;
+      hasChanges = true;
+    } else {
+      unchanged(oldItem, newItem);
+      newIndex++;
+      oldIndex++;
+    }
+  }
+  while (newIndex < newLen) {
+    inserted(newItems[newIndex++]);
+    hasChanges = true;
+  }
+  while (oldIndex < oldLen) {
+    deleted(oldItems[oldIndex++]);
+    hasChanges = true;
+  }
+  return hasChanges;
+}
+ts.enumerateInsertsAndDeletes = enumerateInsertsAndDeletes;
+function fill(length, cb) {
+  const result = Array(length);
+  for (let i = 0; i < length; i++) {
+    result[i] = cb(i);
+  }
+  return result;
+}
+ts.fill = fill;
+function cartesianProduct(arrays) {
+  const result = [];
+  cartesianProductWorker(arrays, result, /* outer*/ undefined, 0);
+  return result;
+}
+ts.cartesianProduct = cartesianProduct;
+function cartesianProductWorker(arrays, result, outer, index) {
+  for (let _i = 0, _a = arrays[index]; _i < _a.length; _i++) {
+    const element = _a[_i];
+    let inner = void 0;
+    if (outer) {
+      inner = outer.slice();
+      inner.push(element);
+    } else {
+      inner = [element];
+    }
+    if (index === arrays.length - 1) {
+      result.push(inner);
+    } else {
+      cartesianProductWorker(arrays, result, inner, index + 1);
+    }
+  }
+}
+/**
+ * Returns string left-padded with spaces or zeros until it reaches the given length.
+ *
+ * @param s String to pad.
+ * @param length Final padded length. If less than or equal to 's.length', returns 's' unchanged.
+ * @param padString Character to use as padding (default " ").
+ */
+function padLeft(s, length, padString) {
+  if (padString === void 0) {
+    padString = ' ';
+  }
+  return length <= s.length ? s : padString.repeat(length - s.length) + s;
+}
+ts.padLeft = padLeft;
+/**
+ * Returns string right-padded with spaces until it reaches the given length.
+ *
+ * @param s String to pad.
+ * @param length Final padded length. If less than or equal to 's.length', returns 's' unchanged.
+ * @param padString Character to use as padding (default " ").
+ */
+function padRight(s, length, padString) {
+  if (padString === void 0) {
+    padString = ' ';
+  }
+  return length <= s.length ? s : s + padString.repeat(length - s.length);
+}
+ts.padRight = padRight;
+function takeWhile(array, predicate) {
+  const len = array.length;
+  let index = 0;
+  while (index < len && predicate(array[index])) {
+    index++;
+  }
+  return array.slice(0, index);
+}
+ts.takeWhile = takeWhile;
+/**
+ * Removes the leading and trailing white space and line terminator characters from a string.
+ */
+ts.trimString = !!String.prototype.trim ? (function(s) {
+  return s.trim();
+}) :
+                                          function(s) {
+                                            return ts.trimStringEnd(ts.trimStringStart(s));
+                                          };
+/**
+ * Returns a copy with trailing whitespace removed.
+ */
+ts.trimStringEnd = !!String.prototype.trimEnd ? (function(s) {
+  return s.trimEnd();
+}) :
+                                                trimEndImpl;
+/**
+ * Returns a copy with leading whitespace removed.
+ */
+ts.trimStringStart = !!String.prototype.trimStart ? (function(s) {
+  return s.trimStart();
+}) :
+                                                    function(s) {
+                                                      return s.replace(/^\s+/g, '');
+                                                    };
+/**
+ * https://jsbench.me/gjkoxld4au/1
+ * The simple regex for this, /\s+$/g is O(n^2) in v8.
+ * The native .trimEnd method is by far best, but since that's technically ES2019,
+ * we provide a (still much faster than the simple regex) fallback.
+ */
+function trimEndImpl(s) {
+  let end = s.length - 1;
+  while (end >= 0) {
+    if (!ts.isWhiteSpaceLike(s.charCodeAt(end)))
+      {break;}
+    end--;
+  }
+  return s.slice(0, end + 1);
+}
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function(ts) {
+let LogLevel;
+(function(LogLevel) {
+LogLevel[LogLevel['Off'] = 0] = 'Off';
+LogLevel[LogLevel['Error'] = 1] = 'Error';
+LogLevel[LogLevel['Warning'] = 2] = 'Warning';
+LogLevel[LogLevel['Info'] = 3] = 'Info';
+LogLevel[LogLevel['Verbose'] = 4] = 'Verbose';
+})(LogLevel = ts.LogLevel || (ts.LogLevel = {}));
+let Debug;
+(function(Debug) {
+let typeScriptVersion;
+
+let currentAssertionLevel = 0 /* AssertionLevel.None */;
+Debug.currentLogLevel = LogLevel.Warning;
+Debug.isDebugging = false;
+Debug.enableDeprecationWarnings = true;
+function getTypeScriptVersion() {
+  return typeScriptVersion !== null && typeScriptVersion !== void 0 ? typeScriptVersion :
+                                                                      (typeScriptVersion = new ts.Version(ts.version));
+}
+Debug.getTypeScriptVersion = getTypeScriptVersion;
+function shouldLog(level) {
+  return Debug.currentLogLevel <= level;
+}
+Debug.shouldLog = shouldLog;
+function logMessage(level, s) {
+  if (Debug.loggingHost && shouldLog(level)) {
+    Debug.loggingHost.log(level, s);
+  }
+}
+function log(s) {
+  logMessage(LogLevel.Info, s);
+}
+Debug.log = log;
+(function(log_1) {
+function error(s) {
+  logMessage(LogLevel.Error, s);
+}
+log_1.error = error;
+function warn(s) {
+  logMessage(LogLevel.Warning, s);
+}
+log_1.warn = warn;
+function log(s) {
+  logMessage(LogLevel.Info, s);
+}
+log_1.log = log;
+function trace(s) {
+  logMessage(LogLevel.Verbose, s);
+}
+log_1.trace = trace;
+})(log = Debug.log || (Debug.log = {}));
+const assertionCache = {};
+function getAssertionLevel() {
+  return currentAssertionLevel;
+}
+Debug.getAssertionLevel = getAssertionLevel;
+function setAssertionLevel(level) {
+  const prevAssertionLevel = currentAssertionLevel;
+  currentAssertionLevel = level;
+  if (level > prevAssertionLevel) {
+    // restore assertion functions for the current assertion level (see `shouldAssertFunction`).
+    for (let _i = 0, _a = ts.getOwnKeys(assertionCache); _i < _a.length; _i++) {
+      const key = _a[_i];
+      const cachedFunc = assertionCache[key];
+      if (cachedFunc !== undefined && Debug[key] !== cachedFunc.assertion && level >= cachedFunc.level) {
+        Debug[key] = cachedFunc;
+        assertionCache[key] = undefined;
+      }
+    }
+  }
+}
+Debug.setAssertionLevel = setAssertionLevel;
+function shouldAssert(level) {
+  return currentAssertionLevel >= level;
+}
+Debug.shouldAssert = shouldAssert;
+/**
+ * Tests whether an assertion function should be executed. If it shouldn't, it is cached and replaced with `ts.noop`.
+ * Replaced assertion functions are restored when `Debug.setAssertionLevel` is set to a high enough level.
+ * @param level The minimum assertion level required.
+ * @param name The name of the current assertion function.
+ */
+function shouldAssertFunction(level, name) {
+  if (!shouldAssert(level)) {
+    assertionCache[name] = {level, assertion: Debug[name]};
+    Debug[name] = ts.noop;
+    return false;
+  }
+  return true;
+}
+function fail(message, stackCrawlMark) {
+  debugger;
+  const e = new Error(message ? 'Debug Failure. '.concat(message) : 'Debug Failure.');
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(e, stackCrawlMark || fail);
+  }
+  throw e;
+}
+Debug.fail = fail;
+function failBadSyntaxKind(node, message, stackCrawlMark) {
+  return fail(
+      ''.concat(message || 'Unexpected node.', '\r\nNode ').concat(formatSyntaxKind(node.kind), ' was unexpected.'),
+      stackCrawlMark || failBadSyntaxKind);
+}
+Debug.failBadSyntaxKind = failBadSyntaxKind;
+function assert(expression, message, verboseDebugInfo, stackCrawlMark) {
+  if (!expression) {
+    message = message ? 'False expression: '.concat(message) : 'False expression.';
+    if (verboseDebugInfo) {
+      message += '\r\nVerbose Debug Information: ' +
+          (typeof verboseDebugInfo === 'string' ? verboseDebugInfo : verboseDebugInfo());
+    }
+    fail(message, stackCrawlMark || assert);
+  }
+}
+Debug.assert = assert;
+function assertEqual(a, b, msg, msg2, stackCrawlMark) {
+  if (a !== b) {
+    const message = msg ? msg2 ? ''.concat(msg, ' ').concat(msg2) : msg : '';
+    fail('Expected '.concat(a, ' === ').concat(b, '. ').concat(message), stackCrawlMark || assertEqual);
+  }
+}
+Debug.assertEqual = assertEqual;
+function assertLessThan(a, b, msg, stackCrawlMark) {
+  if (a >= b) {
+    fail('Expected '.concat(a, ' < ').concat(b, '. ').concat(msg || ''), stackCrawlMark || assertLessThan);
+  }
+}
+Debug.assertLessThan = assertLessThan;
+function assertLessThanOrEqual(a, b, stackCrawlMark) {
+  if (a > b) {
+    fail('Expected '.concat(a, ' <= ').concat(b), stackCrawlMark || assertLessThanOrEqual);
+  }
+}
+Debug.assertLessThanOrEqual = assertLessThanOrEqual;
+function assertGreaterThanOrEqual(a, b, stackCrawlMark) {
+  if (a < b) {
+    fail('Expected '.concat(a, ' >= ').concat(b), stackCrawlMark || assertGreaterThanOrEqual);
+  }
+}
+Debug.assertGreaterThanOrEqual = assertGreaterThanOrEqual;
+function assertIsDefined(value, message, stackCrawlMark) {
+  // eslint-disable-next-line no-null/no-null
+  if (value === undefined || value === null) {
+    fail(message, stackCrawlMark || assertIsDefined);
+  }
+}
+Debug.assertIsDefined = assertIsDefined;
+function checkDefined(value, message, stackCrawlMark) {
+  assertIsDefined(value, message, stackCrawlMark || checkDefined);
+  return value;
+}
+Debug.checkDefined = checkDefined;
+function assertEachIsDefined(value, message, stackCrawlMark) {
+  for (let _i = 0, value_1 = value; _i < value_1.length; _i++) {
+    const v = value_1[_i];
+    assertIsDefined(v, message, stackCrawlMark || assertEachIsDefined);
+  }
+}
+Debug.assertEachIsDefined = assertEachIsDefined;
+function checkEachDefined(value, message, stackCrawlMark) {
+  assertEachIsDefined(value, message, stackCrawlMark || checkEachDefined);
+  return value;
+}
+Debug.checkEachDefined = checkEachDefined;
+function assertNever(member, message, stackCrawlMark) {
+  if (message === void 0) {
+    message = 'Illegal value:';
+  }
+  const detail = typeof member === 'object' && ts.hasProperty(member, 'kind') && ts.hasProperty(member, 'pos') ?
+      'SyntaxKind: ' + formatSyntaxKind(member.kind) :
+      JSON.stringify(member);
+  return fail(''.concat(message, ' ').concat(detail), stackCrawlMark || assertNever);
+}
+Debug.assertNever = assertNever;
+function assertEachNode(nodes, test, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertEachNode')) {
+    assert(test === undefined || ts.every(nodes, test), message || 'Unexpected node.', function() {
+      return 'Node array did not pass test \''.concat(getFunctionName(test), '\'.');
+    }, stackCrawlMark || assertEachNode);
+  }
+}
+Debug.assertEachNode = assertEachNode;
+function assertNode(node, test, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertNode')) {
+    assert(node !== undefined && (test === undefined || test(node)), message || 'Unexpected node.', function() {
+      return 'Node '
+          .concat(formatSyntaxKind(node === null || node === void 0 ? void 0 : node.kind), ' did not pass test \'')
+          .concat(getFunctionName(test), '\'.');
+    }, stackCrawlMark || assertNode);
+  }
+}
+Debug.assertNode = assertNode;
+function assertNotNode(node, test, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertNotNode')) {
+    assert(node === undefined || test === undefined || !test(node), message || 'Unexpected node.', function() {
+      return 'Node '.concat(formatSyntaxKind(node.kind), ' should not have passed test \'')
+          .concat(getFunctionName(test), '\'.');
+    }, stackCrawlMark || assertNotNode);
+  }
+}
+Debug.assertNotNode = assertNotNode;
+function assertOptionalNode(node, test, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertOptionalNode')) {
+    assert(test === undefined || node === undefined || test(node), message || 'Unexpected node.', function() {
+      return 'Node '
+          .concat(formatSyntaxKind(node === null || node === void 0 ? void 0 : node.kind), ' did not pass test \'')
+          .concat(getFunctionName(test), '\'.');
+    }, stackCrawlMark || assertOptionalNode);
+  }
+}
+Debug.assertOptionalNode = assertOptionalNode;
+function assertOptionalToken(node, kind, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertOptionalToken')) {
+    assert(kind === undefined || node === undefined || node.kind === kind, message || 'Unexpected node.', function() {
+      return 'Node '.concat(formatSyntaxKind(node === null || node === void 0 ? void 0 : node.kind), ' was not a \'')
+          .concat(formatSyntaxKind(kind), '\' token.');
+    }, stackCrawlMark || assertOptionalToken);
+  }
+}
+Debug.assertOptionalToken = assertOptionalToken;
+function assertMissingNode(node, message, stackCrawlMark) {
+  if (shouldAssertFunction(1 /* AssertionLevel.Normal */, 'assertMissingNode')) {
+    assert(node === undefined, message || 'Unexpected node.', function() {
+      return 'Node '.concat(formatSyntaxKind(node.kind), ' was unexpected\'.');
+    }, stackCrawlMark || assertMissingNode);
+  }
+}
+Debug.assertMissingNode = assertMissingNode;
+function type(_value) {
+}
+Debug.type = type;
+function getFunctionName(func) {
+  if (typeof func !== 'function') {
+    return '';
+  } if (ts.hasProperty(func, 'name')) {
+    return func.name;
+  }
+    const text = Function.prototype.toString.call(func);
+    const match = /^function\s+([\w\$]+)\s*\(/.exec(text);
+    return match ? match[1] : '';
+
+}
+Debug.getFunctionName = getFunctionName;
+function formatSymbol(symbol) {
+  return '{ name: '.concat(ts.unescapeLeadingUnderscores(symbol.escapedName), '; flags: ')
+      .concat(formatSymbolFlags(symbol.flags), '; declarations: ')
+      .concat(ts.map(symbol.declarations, function(node) {
+        return formatSyntaxKind(node.kind);
+      }), ' }');
+}
+Debug.formatSymbol = formatSymbol;
+/**
+ * Formats an enum value as a string for debugging and debug assertions.
+ */
+function formatEnum(value, enumObject, isFlags) {
+  if (value === void 0) {
+    value = 0;
+  }
+  const members = getEnumMembers(enumObject);
+  if (value === 0) {
+    return members.length > 0 && members[0][0] === 0 ? members[0][1] : '0';
+  }
+  if (isFlags) {
+    const result = [];
+    let remainingFlags = value;
+    for (let _i = 0, members_1 = members; _i < members_1.length; _i++) {
+      var _a = members_1[_i], enumValue = _a[0], enumName = _a[1];
+      if (enumValue > value) {
+        break;
+      }
+      if (enumValue !== 0 && enumValue & value) {
+        result.push(enumName);
+        remainingFlags &= ~enumValue;
+      }
+    }
+    if (remainingFlags === 0) {
+      return result.join('|');
+    }
+  } else {
+    for (let _b = 0, members_2 = members; _b < members_2.length; _b++) {
+      var _c = members_2[_b], enumValue = _c[0], enumName = _c[1];
+      if (enumValue === value) {
+        return enumName;
+      }
+    }
+  }
+  return value.toString();
+}
+Debug.formatEnum = formatEnum;
+const enumMemberCache = new ts.Map();
+function getEnumMembers(enumObject) {
+  // Assuming enum objects do not change at runtime, we can cache the enum members list
+  // to reuse later. This saves us from reconstructing this each and every time we call
+  // a formatting function (which can be expensive for large enums like SyntaxKind).
+  const existing = enumMemberCache.get(enumObject);
+  if (existing) {
+    return existing;
+  }
+  const result = [];
+  for (const name in enumObject) {
+    const value = enumObject[name];
+    if (typeof value === 'number') {
+      result.push([value, name]);
+    }
+  }
+  const sorted = ts.stableSort(result, function(x, y) {
+    return ts.compareValues(x[0], y[0]);
+  });
+  enumMemberCache.set(enumObject, sorted);
+  return sorted;
+}
+function formatSyntaxKind(kind) {
+  return formatEnum(kind, ts.SyntaxKind, /* isFlags*/ false);
+}
+Debug.formatSyntaxKind = formatSyntaxKind;
+function formatSnippetKind(kind) {
+  return formatEnum(kind, ts.SnippetKind, /* isFlags*/ false);
+}
+Debug.formatSnippetKind = formatSnippetKind;
+function formatNodeFlags(flags) {
+  return formatEnum(flags, ts.NodeFlags, /* isFlags*/ true);
+}
+Debug.formatNodeFlags = formatNodeFlags;
+function formatModifierFlags(flags) {
+  return formatEnum(flags, ts.ModifierFlags, /* isFlags*/ true);
+}
+Debug.formatModifierFlags = formatModifierFlags;
+function formatTransformFlags(flags) {
+  return formatEnum(flags, ts.TransformFlags, /* isFlags*/ true);
+}
+Debug.formatTransformFlags = formatTransformFlags;
+function formatEmitFlags(flags) {
+  return formatEnum(flags, ts.EmitFlags, /* isFlags*/ true);
+}
+Debug.formatEmitFlags = formatEmitFlags;
+function formatSymbolFlags(flags) {
+  return formatEnum(flags, ts.SymbolFlags, /* isFlags*/ true);
+}
+Debug.formatSymbolFlags = formatSymbolFlags;
+function formatTypeFlags(flags) {
+  return formatEnum(flags, ts.TypeFlags, /* isFlags*/ true);
+}
+Debug.formatTypeFlags = formatTypeFlags;
+function formatSignatureFlags(flags) {
+  return formatEnum(flags, ts.SignatureFlags, /* isFlags*/ true);
+}
+Debug.formatSignatureFlags = formatSignatureFlags;
+function formatObjectFlags(flags) {
+  return formatEnum(flags, ts.ObjectFlags, /* isFlags*/ true);
+}
+Debug.formatObjectFlags = formatObjectFlags;
+function formatFlowFlags(flags) {
+  return formatEnum(flags, ts.FlowFlags, /* isFlags*/ true);
+}
+Debug.formatFlowFlags = formatFlowFlags;
+function formatRelationComparisonResult(result) {
+  return formatEnum(result, ts.RelationComparisonResult, /* isFlags*/ true);
+}
+Debug.formatRelationComparisonResult = formatRelationComparisonResult;
+function formatCheckMode(mode) {
+  return formatEnum(mode, ts.CheckMode, /* isFlags*/ true);
+}
+Debug.formatCheckMode = formatCheckMode;
+function formatSignatureCheckMode(mode) {
+  return formatEnum(mode, ts.SignatureCheckMode, /* isFlags*/ true);
+}
+Debug.formatSignatureCheckMode = formatSignatureCheckMode;
+function formatTypeFacts(facts) {
+  return formatEnum(facts, ts.TypeFacts, /* isFlags*/ true);
+}
+Debug.formatTypeFacts = formatTypeFacts;
+let isDebugInfoEnabled = false;
+let extendedDebugModule;
+function extendedDebug() {
+  enableDebugInfo();
+  if (!extendedDebugModule) {
+    throw new Error('Debugging helpers could not be loaded.');
+  }
+  return extendedDebugModule;
+}
+function printControlFlowGraph(flowNode) {
+  return console.log(formatControlFlowGraph(flowNode));
+}
+Debug.printControlFlowGraph = printControlFlowGraph;
+function formatControlFlowGraph(flowNode) {
+  return extendedDebug().formatControlFlowGraph(flowNode);
+}
+Debug.formatControlFlowGraph = formatControlFlowGraph;
+let flowNodeProto;
+function attachFlowNodeDebugInfoWorker(flowNode) {
+  if (!('__debugFlowFlags' in flowNode)) {  // eslint-disable-line local/no-in-operator
+    Object.defineProperties(flowNode, {
+      // for use with vscode-js-debug's new customDescriptionGenerator i

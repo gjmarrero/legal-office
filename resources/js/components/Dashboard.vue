@@ -14,9 +14,9 @@ const getDocumentsCount = () => {
             status: selectedDocumentStatus.value,
         }
     })
-    .then((response) => {
-        totalDocumentsCount.value = response.data.totalDocumentsCount;
-    })
+        .then((response) => {
+            totalDocumentsCount.value = response.data.totalDocumentsCount;
+        })
 }
 
 const getOverdueDocumentsCount = () => {
@@ -25,13 +25,13 @@ const getOverdueDocumentsCount = () => {
             type: selectedDocumentType.value,
         }
     })
-    .then((response) => {
-        totalOverdueDocumentsCount.value = response.data.totalOverdueDocumentsCount;
-    })
+        .then((response) => {
+            totalOverdueDocumentsCount.value = response.data.totalOverdueDocumentsCount;
+        })
 }
 
 const selectedReferralNearDueType = ref('referrals');
-const nearDueReferrals = ref({'data': []});
+const nearDueReferrals = ref({ 'data': [] });
 const totalReferralNearDueCount = ref(0);
 
 const getReferralNearDueCount = () => {
@@ -41,33 +41,33 @@ const getReferralNearDueCount = () => {
             doc_type: selectedReferralType,
         }
     })
-    .then((response) => {
-        nearDueReferrals.value.data = response.data;
-        if(selectedReferralType === 'referrals'){
-            nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral => 
-                (referral.type === 8 && (referral.days_active >= 1 && referral.days_active <= 3)) ||
-                ((referral.type === 1 || referral.type === 2 || referral.type === 4) && (referral.days_active >= 4 && referral.days_active <= 7)) ||
-                (referral.type === 3 && (referral.days_active >= 7 && referral.days_active <=10))
-            )
-        }else if(selectedReferralType === 'admin_docs'){
-            nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                (referral.days_active >= 1 && referral.days_active <= 3)
-            )
-        }else if(selectedReferralType === 'municipal' || selectedReferralType === 'provincial' || selectedReferralType === 'other_referral'){
-            nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                (referral.days_active >= 4 && referral.days_active <= 7)
-            )
-        }else if(selectedReferralType === 'code'){
-            nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                (referral.days_active >= 7 && referral.days_active <= 10)
-            )
-        }
-        totalReferralNearDueCount.value = nearDueReferrals.value.data.length;
-    })
+        .then((response) => {
+            nearDueReferrals.value.data = response.data;
+            if (selectedReferralType === 'referrals') {
+                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+                    (referral.type === 8 && (referral.days_active >= 1 && referral.days_active <= 3)) ||
+                    ((referral.type === 1 || referral.type === 2 || referral.type === 4) && (referral.days_active >= 4 && referral.days_active <= 7)) ||
+                    (referral.type === 3 && (referral.days_active >= 7 && referral.days_active <= 10))
+                )
+            } else if (selectedReferralType === 'admin_docs') {
+                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+                    (referral.days_active >= 1 && referral.days_active <= 3)
+                )
+            } else if (selectedReferralType === 'municipal' || selectedReferralType === 'provincial' || selectedReferralType === 'other_referral') {
+                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+                    (referral.days_active >= 4 && referral.days_active <= 7)
+                )
+            } else if (selectedReferralType === 'code') {
+                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+                    (referral.days_active >= 7 && referral.days_active <= 10)
+                )
+            }
+            totalReferralNearDueCount.value = nearDueReferrals.value.data.length;
+        })
 }
 
 const selectedReferralPastDueType = ref('referrals');
-const pastDueReferrals = ref({'data': []});
+const pastDueReferrals = ref({ 'data': [] });
 const totalReferralPastDueCount = ref(0);
 
 const getReferralPastDueCount = () => {
@@ -77,35 +77,35 @@ const getReferralPastDueCount = () => {
             doc_type: selectedReferralType,
         }
     })
-    .then((response) => {
-        pastDueReferrals.value.data = response.data;
-        if(selectedReferralType === 'referrals'){
-            pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral => 
-                (referral.type === 8 && referral.days_active > 3) ||
-                (referral.type === 1 && referral.days_active > 7) ||
-                (referral.type === 2 && referral.days_active > 7) ||
-                (referral.type === 3 && referral.days_active > 10) ||
-                (referral.type === 4 && referral.days_active > 7) 
-            )
-        }else if(selectedReferralType === 'admin_docs'){
-            pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                referral.days_active > 3    
-            )
-        }else if(selectedReferralType === 'municipal' || selectedReferralType === 'municipal' || selectedReferralType === 'other_referral'){
-            pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                referral.days_active > 7
-            )
-        }else if(selectedReferralType === 'code'){
-            pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                referral.days_active > 10
-            )
-        }
-        totalReferralPastDueCount.value = pastDueReferrals.value.data.length;
-    })
+        .then((response) => {
+            pastDueReferrals.value.data = response.data;
+            if (selectedReferralType === 'referrals') {
+                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+                    (referral.type === 8 && referral.days_active > 3) ||
+                    (referral.type === 1 && referral.days_active > 7) ||
+                    (referral.type === 2 && referral.days_active > 7) ||
+                    (referral.type === 3 && referral.days_active > 10) ||
+                    (referral.type === 4 && referral.days_active > 7)
+                )
+            } else if (selectedReferralType === 'admin_docs') {
+                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+                    referral.days_active > 3
+                )
+            } else if (selectedReferralType === 'municipal' || selectedReferralType === 'municipal' || selectedReferralType === 'other_referral') {
+                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+                    referral.days_active > 7
+                )
+            } else if (selectedReferralType === 'code') {
+                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+                    referral.days_active > 10
+                )
+            }
+            totalReferralPastDueCount.value = pastDueReferrals.value.data.length;
+        })
 }
 
 const selectedCaseNearDueType = ref('cases');
-const nearDueCases = ref({'data': []});
+const nearDueCases = ref({ 'data': [] });
 const totalCaseNearDueCount = ref(0);
 
 const getCaseNearDueCount = () => {
@@ -115,17 +115,17 @@ const getCaseNearDueCount = () => {
             doc_type: selectedCaseType,
         }
     })
-    .then((response) => {
-        nearDueCases.value.data = response.data;
-        nearDueCases.value.data = nearDueCases.value.data.filter(court_case =>
-            court_case.days_active >= 12 && court_case.days_active <= 15
-        )        
-        totalCaseNearDueCount.value = nearDueCases.value.data.length;
-    })
+        .then((response) => {
+            nearDueCases.value.data = response.data;
+            nearDueCases.value.data = nearDueCases.value.data.filter(court_case =>
+                court_case.days_active >= 12 && court_case.days_active <= 15
+            )
+            totalCaseNearDueCount.value = nearDueCases.value.data.length;
+        })
 }
 
 const selectedCasePastDueType = ref('cases');
-const pastDueCases = ref({'data': []});
+const pastDueCases = ref({ 'data': [] });
 const totalCasePastDueCount = ref(0);
 
 const getCasePastDueCount = () => {
@@ -135,13 +135,13 @@ const getCasePastDueCount = () => {
             doc_type: selectedCaseType,
         }
     })
-    .then((response) => {
-        pastDueCases.value.data = response.data;
-        pastDueCases.value.data = pastDueCases.value.data.filter(court_case =>
-            court_case.days_active > 15
-        )
-        totalCasePastDueCount.value = pastDueCases.value.data.length;
-    })
+        .then((response) => {
+            pastDueCases.value.data = response.data;
+            pastDueCases.value.data = pastDueCases.value.data.filter(court_case =>
+                court_case.days_active > 15
+            )
+            totalCasePastDueCount.value = pastDueCases.value.data.length;
+        })
 }
 
 const totalToReceiveCount = ref(0);
@@ -164,9 +164,9 @@ const getUsersCount = () => {
             date_range: selectedDateRange.value,
         }
     })
-    .then((response) => {
-        totalUsersCount.value = response.data.totalUsersCount;
-    })
+        .then((response) => {
+            totalUsersCount.value = response.data.totalUsersCount;
+        })
 };
 
 const currentUser = reactive({});
@@ -176,7 +176,7 @@ const getUser = () => {
         .then((response) => {
             currentUser.name = response.data.name;
             currentUser.id = response.data.id;
-    })
+        })
 }
 
 const selectedReferralTypeTotal = ref('referrals');
@@ -212,36 +212,37 @@ onMounted(() => {
 </script>
 
 <template>
-     <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">Dashboard</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <!-- <ol class="breadcrumb float-sm-right">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard</h1>
+                </div>
+                <div class="col-sm-6">
+                    <!-- <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                                 <li class="breadcrumb-item active">Starter Page</li>
                             </ol> -->
-                        </div>
-                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="content">
-                
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
+    <div class="content">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="jumbotron">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
                                     <p class="lead">To Do</p>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="small-box bg-info">
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
-                                                        <h3>{{ totalToReceiveCount }}</h3>                                                        
+                                                        <h3>{{ totalToReceiveCount }}</h3>
                                                     </div>
                                                     <p>To Receive</p>
                                                 </div>
@@ -271,7 +272,7 @@ onMounted(() => {
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                
+
                                                 <router-link class="small-box-footer" v-if="totalToReleaseCount > 0"
                                                     :to="{
                                                         name: 'admin.documents',
@@ -285,16 +286,12 @@ onMounted(() => {
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
                                     <p class="lead">Near Due Documents</p>
                                     <div class="row">
                                         <div class="col-lg-6">
@@ -302,8 +299,10 @@ onMounted(() => {
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalReferralNearDueCount }}</h3>
-                                                        <select v-model="selectedReferralNearDueType" @change="getReferralNearDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                        <select v-model="selectedReferralNearDueType"
+                                                            @change="getReferralNearDueCount()"
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="referrals" selected>All</option>
                                                             <option value="code">Code</option>
                                                             <option value="municipal">Municipal</option>
@@ -317,8 +316,8 @@ onMounted(() => {
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                <router-link class="small-box-footer" v-if="totalReferralNearDueCount > 0"
-                                                    :to="{
+                                                <router-link class="small-box-footer"
+                                                    v-if="totalReferralNearDueCount > 0" :to="{
                                                         name: 'admin.documents',
                                                         query: {
                                                             query_type: 'active',
@@ -335,8 +334,10 @@ onMounted(() => {
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalCaseNearDueCount }}</h3>
-                                                        <select v-model="selectedCaseNearDueType" @change="getCaseNearDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                        <select v-model="selectedCaseNearDueType"
+                                                            @change="getCaseNearDueCount()"
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="cases">All</option>
                                                             <option value="administrative">Administrative</option>
                                                             <option value="judicial">Judicial</option>
@@ -348,7 +349,7 @@ onMounted(() => {
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                
+
                                                 <router-link class="small-box-footer" v-if="totalCaseNearDueCount > 0"
                                                     :to="{
                                                         name: 'admin.documents',
@@ -362,17 +363,12 @@ onMounted(() => {
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
                                     <p class="lead">Past Due Documents</p>
                                     <div class="row">
                                         <div class="col-lg-6">
@@ -380,8 +376,10 @@ onMounted(() => {
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalReferralPastDueCount }}</h3>
-                                                        <select v-model="selectedReferralPastDueType" @change="getReferralPastDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                        <select v-model="selectedReferralPastDueType"
+                                                            @change="getReferralPastDueCount()"
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="referrals">All</option>
                                                             <option value="code">Code</option>
                                                             <option value="municipal">Municipal</option>
@@ -395,8 +393,8 @@ onMounted(() => {
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                <router-link class="small-box-footer" v-if="totalReferralPastDueCount > 0"
-                                                    :to="{
+                                                <router-link class="small-box-footer"
+                                                    v-if="totalReferralPastDueCount > 0" :to="{
                                                         name: 'admin.documents',
                                                         query: {
                                                             query_type: 'active',
@@ -413,8 +411,10 @@ onMounted(() => {
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalCasePastDueCount }}</h3>
-                                                        <select v-model="selectedCasePastDueType" @change="getCasePastDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                        <select v-model="selectedCasePastDueType"
+                                                            @change="getCasePastDueCount()"
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="cases">All</option>
                                                             <option value="administrative">Administrative</option>
                                                             <option value="judicial">Judicial</option>
@@ -443,44 +443,47 @@ onMounted(() => {
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
-                                    <p class="lead">Totals</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="jumbotron">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="lead">Document Count</p>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="small-box bg-info">
                                                 <div class="inner">
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalReferrals }}</h3>
-                                                        <select v-model="selectedReferralTypeTotal" @change="getTotals()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                        <select v-model="selectedReferralTypeTotal"
+                                                            @change="getTotals()"
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="referrals" selected>All</option>
                                                             <option value="code">Code</option>
                                                             <option value="municipal">Municipal</option>
                                                             <option value="provincial">Provincial</option>
                                                             <option value="other_referral">Other Referrals</option>
                                                             <option value="admin_docs">Admin Docs</option>
-                                                        </select>                                                        
+                                                        </select>
                                                     </div>
                                                     <p>Total Referrals</p>
                                                 </div>
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                <router-link class="small-box-footer" v-if="totalReferrals > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            query_type: 'all',
-                                                            doc_type: 'referrals'
-                                                        }
-                                                    }">
+                                                <router-link class="small-box-footer" v-if="totalReferrals > 0" :to="{
+                                                    name: 'admin.documents',
+                                                    query: {
+                                                        query_type: 'all',
+                                                        doc_type: 'referrals'
+                                                    }
+                                                }">
                                                     View
                                                 </router-link>
                                             </div>
@@ -491,7 +494,8 @@ onMounted(() => {
                                                     <div class="d-flex justify-content-between">
                                                         <h3 class="mr-3">{{ totalCases }}</h3>
                                                         <select v-model="selectedCaseTypeTotal" @change="getTotals()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
+                                                            style="height: 2rem; outline: 2px solid transparent;"
+                                                            class="px-1 rounded border-0 form-control">
                                                             <option value="cases" selected>All</option>
                                                             <option value="administrative">Administrative</option>
                                                             <option value="judicial">Municipal</option>
@@ -503,179 +507,29 @@ onMounted(() => {
                                                 <div class="icon">
                                                     <i class="ion ion-bag"></i>
                                                 </div>
-                                                
-                                                <router-link class="small-box-footer" v-if="totalCases > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            query_type: 'all',
-                                                            doc_type: 'cases',
-                                                        }
-                                                    }">
+
+                                                <router-link class="small-box-footer" v-if="totalCases > 0" :to="{
+                                                    name: 'admin.documents',
+                                                    query: {
+                                                        query_type: 'all',
+                                                        doc_type: 'cases',
+                                                    }
+                                                }">
                                                     View
                                                 </router-link>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
-                                    <p class="lead">Near Due Documents</p>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="small-box bg-info">
-                                                <div class="inner">
-                                                    <div class="d-flex justify-content-between">
-                                                        <h3 class="mr-3">{{ totalReferralNearDueCount }}</h3>
-                                                        <select v-model="selectedReferralNearDueType" @change="getReferralNearDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
-                                                            <option value="referrals" selected>All</option>
-                                                            <option value="code">Code</option>
-                                                            <option value="municipal">Municipal</option>
-                                                            <option value="provincial">Provincial</option>
-                                                            <option value="other_referral">Other Referrals</option>
-                                                            <option value="admin_docs">Admin Docs</option>
-                                                        </select>
-                                                    </div>
-                                                    <p>Referrals</p>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-bag"></i>
-                                                </div>
-                                                <router-link class="small-box-footer" v-if="totalReferralNearDueCount > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            doc_type: selectedReferralNearDueType,
-                                                            status: 'near_due'
-                                                        }
-                                                    }">
-                                                    View
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="small-box bg-info">
-                                                <div class="inner">
-                                                    <div class="d-flex justify-content-between">
-                                                        <h3 class="mr-3">{{ totalCaseNearDueCount }}</h3>
-                                                        <select v-model="selectedCaseNearDueType" @change="getCaseNearDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
-                                                            <option value="cases">All</option>
-                                                            <option value="administrative">Administrative</option>
-                                                            <option value="judicial">Judicial</option>
-                                                            <option value="quasi">Quasi-Judicial</option>
-                                                        </select>
-                                                    </div>
-                                                    <p>Court Cases</p>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-bag"></i>
-                                                </div>
-                                                
-                                                <router-link class="small-box-footer" v-if="totalCaseNearDueCount > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            doc_type: selectedCaseNearDueType,
-                                                            status: 'near_due'
-                                                        }
-                                                    }">
-                                                    View
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    
-                    <!-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="jumbotron">
-                                    <p class="lead">Past Due Documents</p>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="small-box bg-info">
-                                                <div class="inner">
-                                                    <div class="d-flex justify-content-between">
-                                                        <h3 class="mr-3">{{ totalReferralPastDueCount }}</h3>
-                                                        <select v-model="selectedReferralPastDueType" @change="getReferralPastDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
-                                                            <option value="referrals">All</option>
-                                                            <option value="code">Code</option>
-                                                            <option value="municipal">Municipal</option>
-                                                            <option value="provincial">Provincial</option>
-                                                            <option value="other_referral">Other Referrals</option>
-                                                            <option value="admin_docs">Admin Docs</option>
-                                                        </select>
-                                                    </div>
-                                                    <p>Referrals</p>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-bag"></i>
-                                                </div>
-                                                <router-link class="small-box-footer" v-if="totalReferralPastDueCount > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            doc_type: selectedReferralPastDueType,
-                                                            status: 'past_due'
-                                                        }
-                                                    }">
-                                                    View
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="small-box bg-info">
-                                                <div class="inner">
-                                                    <div class="d-flex justify-content-between">
-                                                        <h3 class="mr-3">{{ totalCasePastDueCount }}</h3>
-                                                        <select v-model="selectedCasePastDueType" @change="getCasePastDueCount()"
-                                                            style="height: 2rem; outline: 2px solid transparent;" class="px-1 rounded border-0 form-control">
-                                                            <option value="cases">All</option>
-                                                            <option value="administrative">Administrative</option>
-                                                            <option value="judicial">Judicial</option>
-                                                            <option value="quasi">Quasi Judicial</option>
-                                                        </select>
-                                                    </div>
-                                                    <p>Court Cases</p>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-bag"></i>
-                                                </div>
-                                                <router-link class="small-box-footer" v-if="totalCasePastDueCount > 0"
-                                                    :to="{
-                                                        name: 'admin.documents',
-                                                        query: {
-                                                            doc_type: selectedCasePastDueType,
-                                                            status: 'past_due'
-                                                        }
-                                                    }">
-                                                    View
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>                     -->
                 </div>
 
-                <!-- <div class="row">
+            </div>
+        </div>
+
+        <!-- <div class="row">
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-info">
                             <div class="inner">
@@ -703,5 +557,5 @@ onMounted(() => {
                         </div>
                     </div>
                 </div> -->
-            </div> 
+    </div>
 </template>

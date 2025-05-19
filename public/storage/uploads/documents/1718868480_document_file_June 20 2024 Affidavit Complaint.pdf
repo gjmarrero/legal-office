@@ -1,0 +1,2805 @@
+heck that this trivia is actually a header,
+                // but the consequences of being wrong are very minor.
+                ts.suppressLeadingTrivia(oldImportDecls[0]);
+                var oldImportGroups = shouldCombine
+                    ? ts.group(oldImportDecls, function (importDecl) { return getExternalModuleName(importDecl.moduleSpecifier); })
+                    : [oldImportDecls];
+                var sortedImportGroups = shouldSort
+                    ? ts.stableSort(oldImportGroups, function (group1, group2) { return compareModuleSpecifiers(group1[0].moduleSpecifier, group2[0].moduleSpecifier); })
+                    : oldImportGroups;
+                var newImportDecls = ts.flatMap(sortedImportGroups, function (importGroup) {
+                    return getExternalModuleName(importGroup[0].moduleSpecifier)
+                        ? coalesce(importGroup)
+                        : importGroup;
+                });
+                // Delete all nodes if there are no imports.
+                if (newImportDecls.length === 0) {
+                    // Consider the first node to have trailingTrivia as we want to exclude the
+                    // "header" comment.
+                    changeTracker.deleteNodes(sourceFile, oldImportDecls, {
+                        trailingTriviaOption: ts.textChanges.TrailingTriviaOption.Include,
+                    }, /*hasTrailingComment*/ true);
+                }
+                else {
+                    // Note: Delete the surrounding trivia because it will have been retained in newImportDecls.
+                    var replaceOptions = {
+                        leadingTriviaOption: ts.textChanges.LeadingTriviaOption.Exclude,
+                        trailingTriviaOption: ts.textChanges.TrailingTriviaOption.Include,
+                        suffix: ts.getNewLineOrDefaultFromHost(host, formatContext.options),
+                    };
+                    changeTracker.replaceNodeWithNodes(sourceFile, oldImportDecls[0], newImportDecls, replaceOptions);
+                    var hasTrailingComment = changeTracker.nodeHasTrailingComment(sourceFile, oldImportDecls[0], replaceOptions);
+                    changeTracker.deleteNodes(sourceFile, oldImportDecls.slice(1), {
+                        trailingTriviaOption: ts.textChanges.TrailingTriviaOption.Include,
+                    }, hasTrailingComment);
+                }
+            }
+        }
+        OrganizeImports.organizeImports = organizeImports;
+        function groupImportsByNewlineContiguous(sourceFile, importDecls) {
+            var scanner = ts.createScanner(sourceFile.languageVersion, /*skipTrivia*/ false, sourceFile.languageVariant);
+            var groupImports = [];
+            var groupIndex = 0;
+            for (var _i = 0, importDecls_1 = importDecls; _i < importDecls_1.length; _i++) {
+                var topLevelImportDecl = importDecls_1[_i];
+                if (isNewGroup(sourceFile, topLevelImportDecl, scanner)) {
+                    groupIndex++;
+                }
+                if (!groupImports[groupIndex]) {
+                    groupImports[groupIndex] = [];
+                }
+                groupImports[groupIndex].push(topLevelImportDecl);
+            }
+            return groupImports;
+        }
+        // a new group is created if an import includes at least two new line
+        // new line from multi-line comment doesn't count
+        function isNewGroup(sourceFile, topLevelImportDecl, scanner) {
+            var startPos = topLevelImportDecl.getFullStart();
+            var endPos = topLevelImportDecl.getStart();
+            scanner.setText(sourceFile.text, startPos, endPos - startPos);
+            var numberOfNewLines = 0;
+            while (scanner.getTokenPos() < endPos) {
+                var tokenKind = scanner.scan();
+                if (tokenKind === 4 /* SyntaxKind.NewLineTrivia */) {
+                    numberOfNewLines++;
+                    if (numberOfNewLines >= 2) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        function removeUnusedImports(oldImports, sourceFile, program) {
+            var typeChecker = program.getTypeChecker();
+            var compilerOptions = program.getCompilerOptions();
+            var jsxNamespace = typeChecker.getJsxNamespace(sourceFile);
+            var jsxFragmentFactory = typeChecker.getJsxFragmentFactory(sourceFile);
+            var jsxElementsPresent = !!(sourceFile.transformFlags & 2 /* TransformFlags.ContainsJsx */);
+            var usedImports = [];
+            for (var _i = 0, oldImports_1 = oldImports; _i < oldImports_1.length; _i++) {
+                var importDecl = oldImports_1[_i];
+                var importClause = importDecl.importClause, moduleSpecifier = importDecl.moduleSpecifier;
+                if (!importClause) {
+                    // Imports without import clauses are assumed to be included for their side effects and are not removed.
+                    usedImports.push(importDecl);
+                    continue;
+                }
+                var name = importClause.name, namedBindings = importClause.namedBindings;
+                // Default import
+                if (name && !isDeclarationUsed(name)) {
+                    name = undefined;
+                }
+                if (namedBindings) {
+                    if (ts.isNamespaceImport(namedBindings)) {
+                        // Namespace import
+                        if (!isDeclarationUsed(namedBindings.name)) {
+                            namedBindings = undefined;
+                        }
+                    }
+                    else {
+                        // List of named imports
+                        var newElements = namedBindings.elements.filter(function (e) { return isDeclarationUsed(e.name); });
+                        if (newElements.length < namedBindings.elements.length) {
+                            namedBindings = newElements.length
+                                ? ts.factory.updateNamedImports(namedBindings, newElements)
+                                : undefined;
+                        }
+                    }
+                }
+                if (name || namedBindings) {
+                    usedImports.push(updateImportDeclarationAndClause(importDecl, name, namedBindings));
+                }
+                // If a module is imported to be augmented, it’s used
+                else if (hasModuleDeclarationMatchingSpecifier(sourceFile, moduleSpecifier)) {
+                    // If we’re in a declaration file, it’s safe to remove the import clause from it
+                    if (sourceFile.isDeclarationFile) {
+                        usedImports.push(ts.factory.createImportDeclaration(importDecl.modifiers,
+                        /*importClause*/ undefined, moduleSpecifier,
+                        /*assertClause*/ undefined));
+                    }
+                    // If we’re not in a declaration file, we can’t remove the import clause even though
+                    // the imported symbols are unused, because removing them makes it look like the import
+                    // declaration has side effects, which will cause it to be preserved in the JS emit.
+                    else {
+                        usedImports.push(importDecl);
+                    }
+                }
+            }
+            return usedImports;
+            function isDeclarationUsed(identifier) {
+                // The JSX factory symbol is always used if JSX elements are present - even if they are not allowed.
+                return jsxElementsPresent && (identifier.text === jsxNamespace || jsxFragmentFactory && identifier.text === jsxFragmentFactory) && ts.jsxModeNeedsExplicitImport(compilerOptions.jsx) ||
+                    ts.FindAllReferences.Core.isSymbolReferencedInFile(identifier, typeChecker, sourceFile);
+            }
+        }
+        function hasModuleDeclarationMatchingSpecifier(sourceFile, moduleSpecifier) {
+            var moduleSpecifierText = ts.isStringLiteral(moduleSpecifier) && moduleSpecifier.text;
+            return ts.isString(moduleSpecifierText) && ts.some(sourceFile.moduleAugmentations, function (moduleName) {
+                return ts.isStringLiteral(moduleName)
+                    && moduleName.text === moduleSpecifierText;
+            });
+        }
+        function getExternalModuleName(specifier) {
+            return specifier !== undefined && ts.isStringLiteralLike(specifier)
+                ? specifier.text
+                : undefined;
+        }
+        // Internal for testing
+        /**
+         * @param importGroup a list of ImportDeclarations, all with the same module name.
+         */
+        function coalesceImports(importGroup) {
+            var _a;
+            if (importGroup.length === 0) {
+                return importGroup;
+            }
+            var _b = getCategorizedImports(importGroup), importWithoutClause = _b.importWithoutClause, typeOnlyImports = _b.typeOnlyImports, regularImports = _b.regularImports;
+            var coalescedImports = [];
+            if (importWithoutClause) {
+                coalescedImports.push(importWithoutClause);
+            }
+            for (var _i = 0, _c = [regularImports, typeOnlyImports]; _i < _c.length; _i++) {
+                var group_2 = _c[_i];
+                var isTypeOnly = group_2 === typeOnlyImports;
+                var defaultImports = group_2.defaultImports, namespaceImports = group_2.namespaceImports, namedImports = group_2.namedImports;
+                // Normally, we don't combine default and namespace imports, but it would be silly to
+                // produce two import declarations in this special case.
+                if (!isTypeOnly && defaultImports.length === 1 && namespaceImports.length === 1 && namedImports.length === 0) {
+                    // Add the namespace import to the existing default ImportDeclaration.
+                    var defaultImport = defaultImports[0];
+                    coalescedImports.push(updateImportDeclarationAndClause(defaultImport, defaultImport.importClause.name, namespaceImports[0].importClause.namedBindings)); // TODO: GH#18217
+                    continue;
+                }
+                var sortedNamespaceImports = ts.stableSort(namespaceImports, function (i1, i2) {
+                    return compareIdentifiers(i1.importClause.namedBindings.name, i2.importClause.namedBindings.name);
+                }); // TODO: GH#18217
+                for (var _d = 0, sortedNamespaceImports_1 = sortedNamespaceImports; _d < sortedNamespaceImports_1.length; _d++) {
+                    var namespaceImport = sortedNamespaceImports_1[_d];
+                    // Drop the name, if any
+                    coalescedImports.push(updateImportDeclarationAndClause(namespaceImport, /*name*/ undefined, namespaceImport.importClause.namedBindings)); // TODO: GH#18217
+                }
+                if (defaultImports.length === 0 && namedImports.length === 0) {
+                    continue;
+                }
+                var newDefaultImport = void 0;
+                var newImportSpecifiers = [];
+                if (defaultImports.length === 1) {
+                    newDefaultImport = defaultImports[0].importClause.name;
+                }
+                else {
+                    for (var _e = 0, defaultImports_1 = defaultImports; _e < defaultImports_1.length; _e++) {
+                        var defaultImport = defaultImports_1[_e];
+                        newImportSpecifiers.push(ts.factory.createImportSpecifier(/*isTypeOnly*/ false, ts.factory.createIdentifier("default"), defaultImport.importClause.name)); // TODO: GH#18217
+                    }
+                }
+                newImportSpecifiers.push.apply(newImportSpecifiers, getNewImportSpecifiers(namedImports));
+                var sortedImportSpecifiers = sortSpecifiers(newImportSpecifiers);
+                var importDecl = defaultImports.length > 0
+                    ? defaultImports[0]
+                    : namedImports[0];
+                var newNamedImports = sortedImportSpecifiers.length === 0
+                    ? newDefaultImport
+                        ? undefined
+                        : ts.factory.createNamedImports(ts.emptyArray)
+                    : namedImports.length === 0
+                        ? ts.factory.createNamedImports(sortedImportSpecifiers)
+                        : ts.factory.updateNamedImports(namedImports[0].importClause.namedBindings, sortedImportSpecifiers); // TODO: GH#18217
+                // Type-only imports are not allowed to mix default, namespace, and named imports in any combination.
+                // We could rewrite a default import as a named import (`import { default as name }`), but we currently
+                // choose not to as a stylistic preference.
+                if (isTypeOnly && newDefaultImport && newNamedImports) {
+                    coalescedImports.push(updateImportDeclarationAndClause(importDecl, newDefaultImport, /*namedBindings*/ undefined));
+                    coalescedImports.push(updateImportDeclarationAndClause((_a = namedImports[0]) !== null && _a !== void 0 ? _a : importDecl, /*name*/ undefined, newNamedImports));
+                }
+                else {
+                    coalescedImports.push(updateImportDeclarationAndClause(importDecl, newDefaultImport, newNamedImports));
+                }
+            }
+            return coalescedImports;
+        }
+        OrganizeImports.coalesceImports = coalesceImports;
+        /*
+         * Returns entire import declarations because they may already have been rewritten and
+         * may lack parent pointers.  The desired parts can easily be recovered based on the
+         * categorization.
+         *
+         * NB: There may be overlap between `defaultImports` and `namespaceImports`/`namedImports`.
+         */
+        function getCategorizedImports(importGroup) {
+            var importWithoutClause;
+            var typeOnlyImports = { defaultImports: [], namespaceImports: [], namedImports: [] };
+            var regularImports = { defaultImports: [], namespaceImports: [], namedImports: [] };
+            for (var _i = 0, importGroup_1 = importGroup; _i < importGroup_1.length; _i++) {
+                var importDeclaration = importGroup_1[_i];
+                if (importDeclaration.importClause === undefined) {
+                    // Only the first such import is interesting - the others are redundant.
+                    // Note: Unfortunately, we will lose trivia that was on this node.
+                    importWithoutClause = importWithoutClause || importDeclaration;
+                    continue;
+                }
+                var group_3 = importDeclaration.importClause.isTypeOnly ? typeOnlyImports : regularImports;
+                var _a = importDeclaration.importClause, name = _a.name, namedBindings = _a.namedBindings;
+                if (name) {
+                    group_3.defaultImports.push(importDeclaration);
+                }
+                if (namedBindings) {
+                    if (ts.isNamespaceImport(namedBindings)) {
+                        group_3.namespaceImports.push(importDeclaration);
+                    }
+                    else {
+                        group_3.namedImports.push(importDeclaration);
+                    }
+                }
+            }
+            return {
+                importWithoutClause: importWithoutClause,
+                typeOnlyImports: typeOnlyImports,
+                regularImports: regularImports,
+            };
+        }
+        // Internal for testing
+        /**
+         * @param exportGroup a list of ExportDeclarations, all with the same module name.
+         */
+        function coalesceExports(exportGroup) {
+            if (exportGroup.length === 0) {
+                return exportGroup;
+            }
+            var _a = getCategorizedExports(exportGroup), exportWithoutClause = _a.exportWithoutClause, namedExports = _a.namedExports, typeOnlyExports = _a.typeOnlyExports;
+            var coalescedExports = [];
+            if (exportWithoutClause) {
+                coalescedExports.push(exportWithoutClause);
+            }
+            for (var _i = 0, _b = [namedExports, typeOnlyExports]; _i < _b.length; _i++) {
+                var exportGroup_1 = _b[_i];
+                if (exportGroup_1.length === 0) {
+                    continue;
+                }
+                var newExportSpecifiers = [];
+                newExportSpecifiers.push.apply(newExportSpecifiers, ts.flatMap(exportGroup_1, function (i) { return i.exportClause && ts.isNamedExports(i.exportClause) ? i.exportClause.elements : ts.emptyArray; }));
+                var sortedExportSpecifiers = sortSpecifiers(newExportSpecifiers);
+                var exportDecl = exportGroup_1[0];
+                coalescedExports.push(ts.factory.updateExportDeclaration(exportDecl, exportDecl.modifiers, exportDecl.isTypeOnly, exportDecl.exportClause && (ts.isNamedExports(exportDecl.exportClause) ?
+                    ts.factory.updateNamedExports(exportDecl.exportClause, sortedExportSpecifiers) :
+                    ts.factory.updateNamespaceExport(exportDecl.exportClause, exportDecl.exportClause.name)), exportDecl.moduleSpecifier, exportDecl.assertClause));
+            }
+            return coalescedExports;
+            /*
+             * Returns entire export declarations because they may already have been rewritten and
+             * may lack parent pointers.  The desired parts can easily be recovered based on the
+             * categorization.
+             */
+            function getCategorizedExports(exportGroup) {
+                var exportWithoutClause;
+                var namedExports = [];
+                var typeOnlyExports = [];
+                for (var _i = 0, exportGroup_2 = exportGroup; _i < exportGroup_2.length; _i++) {
+                    var exportDeclaration = exportGroup_2[_i];
+                    if (exportDeclaration.exportClause === undefined) {
+                        // Only the first such export is interesting - the others are redundant.
+                        // Note: Unfortunately, we will lose trivia that was on this node.
+                        exportWithoutClause = exportWithoutClause || exportDeclaration;
+                    }
+                    else if (exportDeclaration.isTypeOnly) {
+                        typeOnlyExports.push(exportDeclaration);
+                    }
+                    else {
+                        namedExports.push(exportDeclaration);
+                    }
+                }
+                return {
+                    exportWithoutClause: exportWithoutClause,
+                    namedExports: namedExports,
+                    typeOnlyExports: typeOnlyExports,
+                };
+            }
+        }
+        OrganizeImports.coalesceExports = coalesceExports;
+        function updateImportDeclarationAndClause(importDeclaration, name, namedBindings) {
+            return ts.factory.updateImportDeclaration(importDeclaration, importDeclaration.modifiers, ts.factory.updateImportClause(importDeclaration.importClause, importDeclaration.importClause.isTypeOnly, name, namedBindings), // TODO: GH#18217
+            importDeclaration.moduleSpecifier, importDeclaration.assertClause);
+        }
+        function sortSpecifiers(specifiers) {
+            return ts.stableSort(specifiers, compareImportOrExportSpecifiers);
+        }
+        function compareImportOrExportSpecifiers(s1, s2) {
+            return ts.compareBooleans(s1.isTypeOnly, s2.isTypeOnly)
+                || compareIdentifiers(s1.propertyName || s1.name, s2.propertyName || s2.name)
+                || compareIdentifiers(s1.name, s2.name);
+        }
+        OrganizeImports.compareImportOrExportSpecifiers = compareImportOrExportSpecifiers;
+        /* internal */ // Exported for testing
+        function compareModuleSpecifiers(m1, m2) {
+            var name1 = m1 === undefined ? undefined : getExternalModuleName(m1);
+            var name2 = m2 === undefined ? undefined : getExternalModuleName(m2);
+            return ts.compareBooleans(name1 === undefined, name2 === undefined) ||
+                ts.compareBooleans(ts.isExternalModuleNameRelative(name1), ts.isExternalModuleNameRelative(name2)) ||
+                ts.compareStringsCaseInsensitive(name1, name2);
+        }
+        OrganizeImports.compareModuleSpecifiers = compareModuleSpecifiers;
+        function compareIdentifiers(s1, s2) {
+            return ts.compareStringsCaseInsensitive(s1.text, s2.text);
+        }
+        function getModuleSpecifierExpression(declaration) {
+            var _a;
+            switch (declaration.kind) {
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                    return (_a = ts.tryCast(declaration.moduleReference, ts.isExternalModuleReference)) === null || _a === void 0 ? void 0 : _a.expression;
+                case 269 /* SyntaxKind.ImportDeclaration */:
+                    return declaration.moduleSpecifier;
+                case 240 /* SyntaxKind.VariableStatement */:
+                    return declaration.declarationList.declarations[0].initializer.arguments[0];
+            }
+        }
+        function importsAreSorted(imports) {
+            return ts.arrayIsSorted(imports, compareImportsOrRequireStatements);
+        }
+        OrganizeImports.importsAreSorted = importsAreSorted;
+        function importSpecifiersAreSorted(imports) {
+            return ts.arrayIsSorted(imports, compareImportOrExportSpecifiers);
+        }
+        OrganizeImports.importSpecifiersAreSorted = importSpecifiersAreSorted;
+        function getImportDeclarationInsertionIndex(sortedImports, newImport) {
+            var index = ts.binarySearch(sortedImports, newImport, ts.identity, compareImportsOrRequireStatements);
+            return index < 0 ? ~index : index;
+        }
+        OrganizeImports.getImportDeclarationInsertionIndex = getImportDeclarationInsertionIndex;
+        function getImportSpecifierInsertionIndex(sortedImports, newImport) {
+            var index = ts.binarySearch(sortedImports, newImport, ts.identity, compareImportOrExportSpecifiers);
+            return index < 0 ? ~index : index;
+        }
+        OrganizeImports.getImportSpecifierInsertionIndex = getImportSpecifierInsertionIndex;
+        function compareImportsOrRequireStatements(s1, s2) {
+            return compareModuleSpecifiers(getModuleSpecifierExpression(s1), getModuleSpecifierExpression(s2)) || compareImportKind(s1, s2);
+        }
+        OrganizeImports.compareImportsOrRequireStatements = compareImportsOrRequireStatements;
+        function compareImportKind(s1, s2) {
+            return ts.compareValues(getImportKindOrder(s1), getImportKindOrder(s2));
+        }
+        // 1. Side-effect imports
+        // 2. Type-only imports
+        // 3. Namespace imports
+        // 4. Default imports
+        // 5. Named imports
+        // 6. ImportEqualsDeclarations
+        // 7. Require variable statements
+        function getImportKindOrder(s1) {
+            var _a;
+            switch (s1.kind) {
+                case 269 /* SyntaxKind.ImportDeclaration */:
+                    if (!s1.importClause)
+                        return 0;
+                    if (s1.importClause.isTypeOnly)
+                        return 1;
+                    if (((_a = s1.importClause.namedBindings) === null || _a === void 0 ? void 0 : _a.kind) === 271 /* SyntaxKind.NamespaceImport */)
+                        return 2;
+                    if (s1.importClause.name)
+                        return 3;
+                    return 4;
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                    return 5;
+                case 240 /* SyntaxKind.VariableStatement */:
+                    return 6;
+            }
+        }
+        function getNewImportSpecifiers(namedImports) {
+            return ts.flatMap(namedImports, function (namedImport) {
+                return ts.map(tryGetNamedBindingElements(namedImport), function (importSpecifier) {
+                    return importSpecifier.name && importSpecifier.propertyName && importSpecifier.name.escapedText === importSpecifier.propertyName.escapedText
+                        ? ts.factory.updateImportSpecifier(importSpecifier, importSpecifier.isTypeOnly, /*propertyName*/ undefined, importSpecifier.name)
+                        : importSpecifier;
+                });
+            });
+        }
+        function tryGetNamedBindingElements(namedImport) {
+            var _a;
+            return ((_a = namedImport.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings) && ts.isNamedImports(namedImport.importClause.namedBindings)
+                ? namedImport.importClause.namedBindings.elements
+                : undefined;
+        }
+    })(OrganizeImports = ts.OrganizeImports || (ts.OrganizeImports = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var OutliningElementsCollector;
+    (function (OutliningElementsCollector) {
+        function collectElements(sourceFile, cancellationToken) {
+            var res = [];
+            addNodeOutliningSpans(sourceFile, cancellationToken, res);
+            addRegionOutliningSpans(sourceFile, res);
+            return res.sort(function (span1, span2) { return span1.textSpan.start - span2.textSpan.start; });
+        }
+        OutliningElementsCollector.collectElements = collectElements;
+        function addNodeOutliningSpans(sourceFile, cancellationToken, out) {
+            var depthRemaining = 40;
+            var current = 0;
+            // Includes the EOF Token so that comments which aren't attached to statements are included
+            var statements = __spreadArray(__spreadArray([], sourceFile.statements, true), [sourceFile.endOfFileToken], false);
+            var n = statements.length;
+            while (current < n) {
+                while (current < n && !ts.isAnyImportSyntax(statements[current])) {
+                    visitNonImportNode(statements[current]);
+                    current++;
+                }
+                if (current === n)
+                    break;
+                var firstImport = current;
+                while (current < n && ts.isAnyImportSyntax(statements[current])) {
+                    addOutliningForLeadingCommentsForNode(statements[current], sourceFile, cancellationToken, out);
+                    current++;
+                }
+                var lastImport = current - 1;
+                if (lastImport !== firstImport) {
+                    out.push(createOutliningSpanFromBounds(ts.findChildOfKind(statements[firstImport], 100 /* SyntaxKind.ImportKeyword */, sourceFile).getStart(sourceFile), statements[lastImport].getEnd(), "imports" /* OutliningSpanKind.Imports */));
+                }
+            }
+            function visitNonImportNode(n) {
+                var _a;
+                if (depthRemaining === 0)
+                    return;
+                cancellationToken.throwIfCancellationRequested();
+                if (ts.isDeclaration(n) || ts.isVariableStatement(n) || ts.isReturnStatement(n) || ts.isCallOrNewExpression(n) || n.kind === 1 /* SyntaxKind.EndOfFileToken */) {
+                    addOutliningForLeadingCommentsForNode(n, sourceFile, cancellationToken, out);
+                }
+                if (ts.isFunctionLike(n) && ts.isBinaryExpression(n.parent) && ts.isPropertyAccessExpression(n.parent.left)) {
+                    addOutliningForLeadingCommentsForNode(n.parent.left, sourceFile, cancellationToken, out);
+                }
+                if (ts.isBlock(n) || ts.isModuleBlock(n)) {
+                    addOutliningForLeadingCommentsForPos(n.statements.end, sourceFile, cancellationToken, out);
+                }
+                if (ts.isClassLike(n) || ts.isInterfaceDeclaration(n)) {
+                    addOutliningForLeadingCommentsForPos(n.members.end, sourceFile, cancellationToken, out);
+                }
+                var span = getOutliningSpanForNode(n, sourceFile);
+                if (span)
+                    out.push(span);
+                depthRemaining--;
+                if (ts.isCallExpression(n)) {
+                    depthRemaining++;
+                    visitNonImportNode(n.expression);
+                    depthRemaining--;
+                    n.arguments.forEach(visitNonImportNode);
+                    (_a = n.typeArguments) === null || _a === void 0 ? void 0 : _a.forEach(visitNonImportNode);
+                }
+                else if (ts.isIfStatement(n) && n.elseStatement && ts.isIfStatement(n.elseStatement)) {
+                    // Consider an 'else if' to be on the same depth as the 'if'.
+                    visitNonImportNode(n.expression);
+                    visitNonImportNode(n.thenStatement);
+                    depthRemaining++;
+                    visitNonImportNode(n.elseStatement);
+                    depthRemaining--;
+                }
+                else {
+                    n.forEachChild(visitNonImportNode);
+                }
+                depthRemaining++;
+            }
+        }
+        function addRegionOutliningSpans(sourceFile, out) {
+            var regions = [];
+            var lineStarts = sourceFile.getLineStarts();
+            for (var _i = 0, lineStarts_1 = lineStarts; _i < lineStarts_1.length; _i++) {
+                var currentLineStart = lineStarts_1[_i];
+                var lineEnd = sourceFile.getLineEndOfPosition(currentLineStart);
+                var lineText = sourceFile.text.substring(currentLineStart, lineEnd);
+                var result = isRegionDelimiter(lineText);
+                if (!result || ts.isInComment(sourceFile, currentLineStart)) {
+                    continue;
+                }
+                if (!result[1]) {
+                    var span = ts.createTextSpanFromBounds(sourceFile.text.indexOf("//", currentLineStart), lineEnd);
+                    regions.push(createOutliningSpan(span, "region" /* OutliningSpanKind.Region */, span, /*autoCollapse*/ false, result[2] || "#region"));
+                }
+                else {
+                    var region = regions.pop();
+                    if (region) {
+                        region.textSpan.length = lineEnd - region.textSpan.start;
+                        region.hintSpan.length = lineEnd - region.textSpan.start;
+                        out.push(region);
+                    }
+                }
+            }
+        }
+        var regionDelimiterRegExp = /^#(end)?region(?:\s+(.*))?(?:\r)?$/;
+        function isRegionDelimiter(lineText) {
+            // We trim the leading whitespace and // without the regex since the
+            // multiple potential whitespace matches can make for some gnarly backtracking behavior
+            lineText = ts.trimStringStart(lineText);
+            if (!ts.startsWith(lineText, "\/\/")) {
+                return null; // eslint-disable-line no-null/no-null
+            }
+            lineText = ts.trimString(lineText.slice(2));
+            return regionDelimiterRegExp.exec(lineText);
+        }
+        function addOutliningForLeadingCommentsForPos(pos, sourceFile, cancellationToken, out) {
+            var comments = ts.getLeadingCommentRanges(sourceFile.text, pos);
+            if (!comments)
+                return;
+            var firstSingleLineCommentStart = -1;
+            var lastSingleLineCommentEnd = -1;
+            var singleLineCommentCount = 0;
+            var sourceText = sourceFile.getFullText();
+            for (var _i = 0, comments_1 = comments; _i < comments_1.length; _i++) {
+                var _a = comments_1[_i], kind = _a.kind, pos_1 = _a.pos, end = _a.end;
+                cancellationToken.throwIfCancellationRequested();
+                switch (kind) {
+                    case 2 /* SyntaxKind.SingleLineCommentTrivia */:
+                        // never fold region delimiters into single-line comment regions
+                        var commentText = sourceText.slice(pos_1, end);
+                        if (isRegionDelimiter(commentText)) {
+                            combineAndAddMultipleSingleLineComments();
+                            singleLineCommentCount = 0;
+                            break;
+                        }
+                        // For single line comments, combine consecutive ones (2 or more) into
+                        // a single span from the start of the first till the end of the last
+                        if (singleLineCommentCount === 0) {
+                            firstSingleLineCommentStart = pos_1;
+                        }
+                        lastSingleLineCommentEnd = end;
+                        singleLineCommentCount++;
+                        break;
+                    case 3 /* SyntaxKind.MultiLineCommentTrivia */:
+                        combineAndAddMultipleSingleLineComments();
+                        out.push(createOutliningSpanFromBounds(pos_1, end, "comment" /* OutliningSpanKind.Comment */));
+                        singleLineCommentCount = 0;
+                        break;
+                    default:
+                        ts.Debug.assertNever(kind);
+                }
+            }
+            combineAndAddMultipleSingleLineComments();
+            function combineAndAddMultipleSingleLineComments() {
+                // Only outline spans of two or more consecutive single line comments
+                if (singleLineCommentCount > 1) {
+                    out.push(createOutliningSpanFromBounds(firstSingleLineCommentStart, lastSingleLineCommentEnd, "comment" /* OutliningSpanKind.Comment */));
+                }
+            }
+        }
+        function addOutliningForLeadingCommentsForNode(n, sourceFile, cancellationToken, out) {
+            if (ts.isJsxText(n))
+                return;
+            addOutliningForLeadingCommentsForPos(n.pos, sourceFile, cancellationToken, out);
+        }
+        function createOutliningSpanFromBounds(pos, end, kind) {
+            return createOutliningSpan(ts.createTextSpanFromBounds(pos, end), kind);
+        }
+        function getOutliningSpanForNode(n, sourceFile) {
+            switch (n.kind) {
+                case 238 /* SyntaxKind.Block */:
+                    if (ts.isFunctionLike(n.parent)) {
+                        return functionSpan(n.parent, n, sourceFile);
+                    }
+                    // Check if the block is standalone, or 'attached' to some parent statement.
+                    // If the latter, we want to collapse the block, but consider its hint span
+                    // to be the entire span of the parent.
+                    switch (n.parent.kind) {
+                        case 243 /* SyntaxKind.DoStatement */:
+                        case 246 /* SyntaxKind.ForInStatement */:
+                        case 247 /* SyntaxKind.ForOfStatement */:
+                        case 245 /* SyntaxKind.ForStatement */:
+                        case 242 /* SyntaxKind.IfStatement */:
+                        case 244 /* SyntaxKind.WhileStatement */:
+                        case 251 /* SyntaxKind.WithStatement */:
+                        case 295 /* SyntaxKind.CatchClause */:
+                            return spanForNode(n.parent);
+                        case 255 /* SyntaxKind.TryStatement */:
+                            // Could be the try-block, or the finally-block.
+                            var tryStatement = n.parent;
+                            if (tryStatement.tryBlock === n) {
+                                return spanForNode(n.parent);
+                            }
+                            else if (tryStatement.finallyBlock === n) {
+                                var node = ts.findChildOfKind(tryStatement, 96 /* SyntaxKind.FinallyKeyword */, sourceFile);
+                                if (node)
+                                    return spanForNode(node);
+                            }
+                        // falls through
+                        default:
+                            // Block was a standalone block.  In this case we want to only collapse
+                            // the span of the block, independent of any parent span.
+                            return createOutliningSpan(ts.createTextSpanFromNode(n, sourceFile), "code" /* OutliningSpanKind.Code */);
+                    }
+                case 265 /* SyntaxKind.ModuleBlock */:
+                    return spanForNode(n.parent);
+                case 260 /* SyntaxKind.ClassDeclaration */:
+                case 228 /* SyntaxKind.ClassExpression */:
+                case 261 /* SyntaxKind.InterfaceDeclaration */:
+                case 263 /* SyntaxKind.EnumDeclaration */:
+                case 266 /* SyntaxKind.CaseBlock */:
+                case 184 /* SyntaxKind.TypeLiteral */:
+                case 203 /* SyntaxKind.ObjectBindingPattern */:
+                    return spanForNode(n);
+                case 186 /* SyntaxKind.TupleType */:
+                    return spanForNode(n, /*autoCollapse*/ false, /*useFullStart*/ !ts.isTupleTypeNode(n.parent), 22 /* SyntaxKind.OpenBracketToken */);
+                case 292 /* SyntaxKind.CaseClause */:
+                case 293 /* SyntaxKind.DefaultClause */:
+                    return spanForNodeArray(n.statements);
+                case 207 /* SyntaxKind.ObjectLiteralExpression */:
+                    return spanForObjectOrArrayLiteral(n);
+                case 206 /* SyntaxKind.ArrayLiteralExpression */:
+                    return spanForObjectOrArrayLiteral(n, 22 /* SyntaxKind.OpenBracketToken */);
+                case 281 /* SyntaxKind.JsxElement */:
+                    return spanForJSXElement(n);
+                case 285 /* SyntaxKind.JsxFragment */:
+                    return spanForJSXFragment(n);
+                case 282 /* SyntaxKind.JsxSelfClosingElement */:
+                case 283 /* SyntaxKind.JsxOpeningElement */:
+                    return spanForJSXAttributes(n.attributes);
+                case 225 /* SyntaxKind.TemplateExpression */:
+                case 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */:
+                    return spanForTemplateLiteral(n);
+                case 204 /* SyntaxKind.ArrayBindingPattern */:
+                    return spanForNode(n, /*autoCollapse*/ false, /*useFullStart*/ !ts.isBindingElement(n.parent), 22 /* SyntaxKind.OpenBracketToken */);
+                case 216 /* SyntaxKind.ArrowFunction */:
+                    return spanForArrowFunction(n);
+                case 210 /* SyntaxKind.CallExpression */:
+                    return spanForCallExpression(n);
+                case 214 /* SyntaxKind.ParenthesizedExpression */:
+                    return spanForParenthesizedExpression(n);
+            }
+            function spanForCallExpression(node) {
+                if (!node.arguments.length) {
+                    return undefined;
+                }
+                var openToken = ts.findChildOfKind(node, 20 /* SyntaxKind.OpenParenToken */, sourceFile);
+                var closeToken = ts.findChildOfKind(node, 21 /* SyntaxKind.CloseParenToken */, sourceFile);
+                if (!openToken || !closeToken || ts.positionsAreOnSameLine(openToken.pos, closeToken.pos, sourceFile)) {
+                    return undefined;
+                }
+                return spanBetweenTokens(openToken, closeToken, node, sourceFile, /*autoCollapse*/ false, /*useFullStart*/ true);
+            }
+            function spanForArrowFunction(node) {
+                if (ts.isBlock(node.body) || ts.isParenthesizedExpression(node.body) || ts.positionsAreOnSameLine(node.body.getFullStart(), node.body.getEnd(), sourceFile)) {
+                    return undefined;
+                }
+                var textSpan = ts.createTextSpanFromBounds(node.body.getFullStart(), node.body.getEnd());
+                return createOutliningSpan(textSpan, "code" /* OutliningSpanKind.Code */, ts.createTextSpanFromNode(node));
+            }
+            function spanForJSXElement(node) {
+                var textSpan = ts.createTextSpanFromBounds(node.openingElement.getStart(sourceFile), node.closingElement.getEnd());
+                var tagName = node.openingElement.tagName.getText(sourceFile);
+                var bannerText = "<" + tagName + ">...</" + tagName + ">";
+                return createOutliningSpan(textSpan, "code" /* OutliningSpanKind.Code */, textSpan, /*autoCollapse*/ false, bannerText);
+            }
+            function spanForJSXFragment(node) {
+                var textSpan = ts.createTextSpanFromBounds(node.openingFragment.getStart(sourceFile), node.closingFragment.getEnd());
+                var bannerText = "<>...</>";
+                return createOutliningSpan(textSpan, "code" /* OutliningSpanKind.Code */, textSpan, /*autoCollapse*/ false, bannerText);
+            }
+            function spanForJSXAttributes(node) {
+                if (node.properties.length === 0) {
+                    return undefined;
+                }
+                return createOutliningSpanFromBounds(node.getStart(sourceFile), node.getEnd(), "code" /* OutliningSpanKind.Code */);
+            }
+            function spanForTemplateLiteral(node) {
+                if (node.kind === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */ && node.text.length === 0) {
+                    return undefined;
+                }
+                return createOutliningSpanFromBounds(node.getStart(sourceFile), node.getEnd(), "code" /* OutliningSpanKind.Code */);
+            }
+            function spanForObjectOrArrayLiteral(node, open) {
+                if (open === void 0) { open = 18 /* SyntaxKind.OpenBraceToken */; }
+                // If the block has no leading keywords and is inside an array literal or call expression,
+                // we only want to collapse the span of the block.
+                // Otherwise, the collapsed section will include the end of the previous line.
+                return spanForNode(node, /*autoCollapse*/ false, /*useFullStart*/ !ts.isArrayLiteralExpression(node.parent) && !ts.isCallExpression(node.parent), open);
+            }
+            function spanForNode(hintSpanNode, autoCollapse, useFullStart, open, close) {
+                if (autoCollapse === void 0) { autoCollapse = false; }
+                if (useFullStart === void 0) { useFullStart = true; }
+                if (open === void 0) { open = 18 /* SyntaxKind.OpenBraceToken */; }
+                if (close === void 0) { close = open === 18 /* SyntaxKind.OpenBraceToken */ ? 19 /* SyntaxKind.CloseBraceToken */ : 23 /* SyntaxKind.CloseBracketToken */; }
+                var openToken = ts.findChildOfKind(n, open, sourceFile);
+                var closeToken = ts.findChildOfKind(n, close, sourceFile);
+                return openToken && closeToken && spanBetweenTokens(openToken, closeToken, hintSpanNode, sourceFile, autoCollapse, useFullStart);
+            }
+            function spanForNodeArray(nodeArray) {
+                return nodeArray.length ? createOutliningSpan(ts.createTextSpanFromRange(nodeArray), "code" /* OutliningSpanKind.Code */) : undefined;
+            }
+            function spanForParenthesizedExpression(node) {
+                if (ts.positionsAreOnSameLine(node.getStart(), node.getEnd(), sourceFile))
+                    return undefined;
+                var textSpan = ts.createTextSpanFromBounds(node.getStart(), node.getEnd());
+                return createOutliningSpan(textSpan, "code" /* OutliningSpanKind.Code */, ts.createTextSpanFromNode(node));
+            }
+        }
+        function functionSpan(node, body, sourceFile) {
+            var openToken = tryGetFunctionOpenToken(node, body, sourceFile);
+            var closeToken = ts.findChildOfKind(body, 19 /* SyntaxKind.CloseBraceToken */, sourceFile);
+            return openToken && closeToken && spanBetweenTokens(openToken, closeToken, node, sourceFile, /*autoCollapse*/ node.kind !== 216 /* SyntaxKind.ArrowFunction */);
+        }
+        function spanBetweenTokens(openToken, closeToken, hintSpanNode, sourceFile, autoCollapse, useFullStart) {
+            if (autoCollapse === void 0) { autoCollapse = false; }
+            if (useFullStart === void 0) { useFullStart = true; }
+            var textSpan = ts.createTextSpanFromBounds(useFullStart ? openToken.getFullStart() : openToken.getStart(sourceFile), closeToken.getEnd());
+            return createOutliningSpan(textSpan, "code" /* OutliningSpanKind.Code */, ts.createTextSpanFromNode(hintSpanNode, sourceFile), autoCollapse);
+        }
+        function createOutliningSpan(textSpan, kind, hintSpan, autoCollapse, bannerText) {
+            if (hintSpan === void 0) { hintSpan = textSpan; }
+            if (autoCollapse === void 0) { autoCollapse = false; }
+            if (bannerText === void 0) { bannerText = "..."; }
+            return { textSpan: textSpan, kind: kind, hintSpan: hintSpan, bannerText: bannerText, autoCollapse: autoCollapse };
+        }
+        function tryGetFunctionOpenToken(node, body, sourceFile) {
+            if (ts.isNodeArrayMultiLine(node.parameters, sourceFile)) {
+                var openParenToken = ts.findChildOfKind(node, 20 /* SyntaxKind.OpenParenToken */, sourceFile);
+                if (openParenToken) {
+                    return openParenToken;
+                }
+            }
+            return ts.findChildOfKind(body, 18 /* SyntaxKind.OpenBraceToken */, sourceFile);
+        }
+    })(OutliningElementsCollector = ts.OutliningElementsCollector || (ts.OutliningElementsCollector = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    // Note(cyrusn): this enum is ordered from strongest match type to weakest match type.
+    var PatternMatchKind;
+    (function (PatternMatchKind) {
+        PatternMatchKind[PatternMatchKind["exact"] = 0] = "exact";
+        PatternMatchKind[PatternMatchKind["prefix"] = 1] = "prefix";
+        PatternMatchKind[PatternMatchKind["substring"] = 2] = "substring";
+        PatternMatchKind[PatternMatchKind["camelCase"] = 3] = "camelCase";
+    })(PatternMatchKind = ts.PatternMatchKind || (ts.PatternMatchKind = {}));
+    function createPatternMatch(kind, isCaseSensitive) {
+        return {
+            kind: kind,
+            isCaseSensitive: isCaseSensitive
+        };
+    }
+    function createPatternMatcher(pattern) {
+        // We'll often see the same candidate string many times when searching (For example, when
+        // we see the name of a module that is used everywhere, or the name of an overload).  As
+        // such, we cache the information we compute about the candidate for the life of this
+        // pattern matcher so we don't have to compute it multiple times.
+        var stringToWordSpans = new ts.Map();
+        var dotSeparatedSegments = pattern.trim().split(".").map(function (p) { return createSegment(p.trim()); });
+        // A segment is considered invalid if we couldn't find any words in it.
+        if (dotSeparatedSegments.some(function (segment) { return !segment.subWordTextChunks.length; }))
+            return undefined;
+        return {
+            getFullMatch: function (containers, candidate) { return getFullMatch(containers, candidate, dotSeparatedSegments, stringToWordSpans); },
+            getMatchForLastSegmentOfPattern: function (candidate) { return matchSegment(candidate, ts.last(dotSeparatedSegments), stringToWordSpans); },
+            patternContainsDots: dotSeparatedSegments.length > 1
+        };
+    }
+    ts.createPatternMatcher = createPatternMatcher;
+    function getFullMatch(candidateContainers, candidate, dotSeparatedSegments, stringToWordSpans) {
+        // First, check that the last part of the dot separated pattern matches the name of the
+        // candidate.  If not, then there's no point in proceeding and doing the more
+        // expensive work.
+        var candidateMatch = matchSegment(candidate, ts.last(dotSeparatedSegments), stringToWordSpans);
+        if (!candidateMatch) {
+            return undefined;
+        }
+        // -1 because the last part was checked against the name, and only the rest
+        // of the parts are checked against the container.
+        if (dotSeparatedSegments.length - 1 > candidateContainers.length) {
+            // There weren't enough container parts to match against the pattern parts.
+            // So this definitely doesn't match.
+            return undefined;
+        }
+        var bestMatch;
+        for (var i = dotSeparatedSegments.length - 2, j = candidateContainers.length - 1; i >= 0; i -= 1, j -= 1) {
+            bestMatch = betterMatch(bestMatch, matchSegment(candidateContainers[j], dotSeparatedSegments[i], stringToWordSpans));
+        }
+        return bestMatch;
+    }
+    function getWordSpans(word, stringToWordSpans) {
+        var spans = stringToWordSpans.get(word);
+        if (!spans) {
+            stringToWordSpans.set(word, spans = breakIntoWordSpans(word));
+        }
+        return spans;
+    }
+    function matchTextChunk(candidate, chunk, stringToWordSpans) {
+        var index = indexOfIgnoringCase(candidate, chunk.textLowerCase);
+        if (index === 0) {
+            // a) Check if the word is a prefix of the candidate, in a case insensitive or
+            //    sensitive manner. If it does, return that there was an exact match if the word and candidate are the same length, else a prefix match.
+            return createPatternMatch(chunk.text.length === candidate.length ? PatternMatchKind.exact : PatternMatchKind.prefix, /*isCaseSensitive:*/ ts.startsWith(candidate, chunk.text));
+        }
+        if (chunk.isLowerCase) {
+            if (index === -1)
+                return undefined;
+            // b) If the part is entirely lowercase, then check if it is contained anywhere in the
+            //    candidate in a case insensitive manner.  If so, return that there was a substring
+            //    match.
+            //
+            //    Note: We only have a substring match if the lowercase part is prefix match of some
+            //    word part. That way we don't match something like 'Class' when the user types 'a'.
+            //    But we would match 'FooAttribute' (since 'Attribute' starts with 'a').
+            var wordSpans = getWordSpans(candidate, stringToWordSpans);
+            for (var _i = 0, wordSpans_1 = wordSpans; _i < wordSpans_1.length; _i++) {
+                var span = wordSpans_1[_i];
+                if (partStartsWith(candidate, span, chunk.text, /*ignoreCase:*/ true)) {
+                    return createPatternMatch(PatternMatchKind.substring, /*isCaseSensitive:*/ partStartsWith(candidate, span, chunk.text, /*ignoreCase:*/ false));
+                }
+            }
+            // c) Is the pattern a substring of the candidate starting on one of the candidate's word boundaries?
+            // We could check every character boundary start of the candidate for the pattern. However, that's
+            // an m * n operation in the wost case. Instead, find the first instance of the pattern
+            // substring, and see if it starts on a capital letter. It seems unlikely that the user will try to
+            // filter the list based on a substring that starts on a capital letter and also with a lowercase one.
+            // (Pattern: fogbar, Candidate: quuxfogbarFogBar).
+            if (chunk.text.length < candidate.length && isUpperCaseLetter(candidate.charCodeAt(index))) {
+                return createPatternMatch(PatternMatchKind.substring, /*isCaseSensitive:*/ false);
+            }
+        }
+        else {
+            // d) If the part was not entirely lowercase, then check if it is contained in the
+            //    candidate in a case *sensitive* manner. If so, return that there was a substring
+            //    match.
+            if (candidate.indexOf(chunk.text) > 0) {
+                return createPatternMatch(PatternMatchKind.substring, /*isCaseSensitive:*/ true);
+            }
+            // e) If the part was not entirely lowercase, then attempt a camel cased match as well.
+            if (chunk.characterSpans.length > 0) {
+                var candidateParts = getWordSpans(candidate, stringToWordSpans);
+                var isCaseSensitive = tryCamelCaseMatch(candidate, candidateParts, chunk, /*ignoreCase:*/ false) ? true
+                    : tryCamelCaseMatch(candidate, candidateParts, chunk, /*ignoreCase:*/ true) ? false : undefined;
+                if (isCaseSensitive !== undefined) {
+                    return createPatternMatch(PatternMatchKind.camelCase, isCaseSensitive);
+                }
+            }
+        }
+    }
+    function matchSegment(candidate, segment, stringToWordSpans) {
+        // First check if the segment matches as is.  This is also useful if the segment contains
+        // characters we would normally strip when splitting into parts that we also may want to
+        // match in the candidate.  For example if the segment is "@int" and the candidate is
+        // "@int", then that will show up as an exact match here.
+        //
+        // Note: if the segment contains a space or an asterisk then we must assume that it's a
+        // multi-word segment.
+        if (every(segment.totalTextChunk.text, function (ch) { return ch !== 32 /* CharacterCodes.space */ && ch !== 42 /* CharacterCodes.asterisk */; })) {
+            var match = matchTextChunk(candidate, segment.totalTextChunk, stringToWordSpans);
+            if (match)
+                return match;
+        }
+        // The logic for pattern matching is now as follows:
+        //
+        // 1) Break the segment passed in into words.  Breaking is rather simple and a
+        //    good way to think about it that if gives you all the individual alphanumeric words
+        //    of the pattern.
+        //
+        // 2) For each word try to match the word against the candidate value.
+        //
+        // 3) Matching is as follows:
+        //
+        //   a) Check if the word is a prefix of the candidate, in a case insensitive or
+        //      sensitive manner. If it does, return that there was an exact match if the word and candidate are the same length, else a prefix match.
+        //
+        //   If the word is entirely lowercase:
+        //      b) Then check if it is contained anywhere in the
+        //          candidate in a case insensitive manner.  If so, return that there was a substring
+        //          match.
+        //
+        //          Note: We only have a substring match if the lowercase part is prefix match of
+        //          some word part. That way we don't match something like 'Class' when the user
+        //          types 'a'. But we would match 'FooAttribute' (since 'Attribute' starts with
+        //          'a').
+        //
+        //       c) The word is all lower case. Is it a case insensitive substring of the candidate starting
+        //          on a part boundary of the candidate?
+        //
+        //   Else:
+        //       d) If the word was not entirely lowercase, then check if it is contained in the
+        //          candidate in a case *sensitive* manner. If so, return that there was a substring
+        //          match.
+        //
+        //       e) If the word was not entirely lowercase, then attempt a camel cased match as
+        //          well.
+        //
+        // Only if all words have some sort of match is the pattern considered matched.
+        var subWordTextChunks = segment.subWordTextChunks;
+        var bestMatch;
+        for (var _i = 0, subWordTextChunks_1 = subWordTextChunks; _i < subWordTextChunks_1.length; _i++) {
+            var subWordTextChunk = subWordTextChunks_1[_i];
+            bestMatch = betterMatch(bestMatch, matchTextChunk(candidate, subWordTextChunk, stringToWordSpans));
+        }
+        return bestMatch;
+    }
+    function betterMatch(a, b) {
+        return ts.min([a, b], compareMatches);
+    }
+    function compareMatches(a, b) {
+        return a === undefined ? 1 /* Comparison.GreaterThan */ : b === undefined ? -1 /* Comparison.LessThan */
+            : ts.compareValues(a.kind, b.kind) || ts.compareBooleans(!a.isCaseSensitive, !b.isCaseSensitive);
+    }
+    function partStartsWith(candidate, candidateSpan, pattern, ignoreCase, patternSpan) {
+        if (patternSpan === void 0) { patternSpan = { start: 0, length: pattern.length }; }
+        return patternSpan.length <= candidateSpan.length // If pattern part is longer than the candidate part there can never be a match.
+            && everyInRange(0, patternSpan.length, function (i) { return equalChars(pattern.charCodeAt(patternSpan.start + i), candidate.charCodeAt(candidateSpan.start + i), ignoreCase); });
+    }
+    function equalChars(ch1, ch2, ignoreCase) {
+        return ignoreCase ? toLowerCase(ch1) === toLowerCase(ch2) : ch1 === ch2;
+    }
+    function tryCamelCaseMatch(candidate, candidateParts, chunk, ignoreCase) {
+        var chunkCharacterSpans = chunk.characterSpans;
+        // Note: we may have more pattern parts than candidate parts.  This is because multiple
+        // pattern parts may match a candidate part.  For example "SiUI" against "SimpleUI".
+        // We'll have 3 pattern parts Si/U/I against two candidate parts Simple/UI.  However, U
+        // and I will both match in UI.
+        var currentCandidate = 0;
+        var currentChunkSpan = 0;
+        var firstMatch;
+        var contiguous;
+        while (true) {
+            // Let's consider our termination cases
+            if (currentChunkSpan === chunkCharacterSpans.length) {
+                return true;
+            }
+            else if (currentCandidate === candidateParts.length) {
+                // No match, since we still have more of the pattern to hit
+                return false;
+            }
+            var candidatePart = candidateParts[currentCandidate];
+            var gotOneMatchThisCandidate = false;
+            // Consider the case of matching SiUI against SimpleUIElement. The candidate parts
+            // will be Simple/UI/Element, and the pattern parts will be Si/U/I.  We'll match 'Si'
+            // against 'Simple' first.  Then we'll match 'U' against 'UI'. However, we want to
+            // still keep matching pattern parts against that candidate part.
+            for (; currentChunkSpan < chunkCharacterSpans.length; currentChunkSpan++) {
+                var chunkCharacterSpan = chunkCharacterSpans[currentChunkSpan];
+                if (gotOneMatchThisCandidate) {
+                    // We've already gotten one pattern part match in this candidate.  We will
+                    // only continue trying to consumer pattern parts if the last part and this
+                    // part are both upper case.
+                    if (!isUpperCaseLetter(chunk.text.charCodeAt(chunkCharacterSpans[currentChunkSpan - 1].start)) ||
+                        !isUpperCaseLetter(chunk.text.charCodeAt(chunkCharacterSpans[currentChunkSpan].start))) {
+                        break;
+                    }
+                }
+                if (!partStartsWith(candidate, candidatePart, chunk.text, ignoreCase, chunkCharacterSpan)) {
+                    break;
+                }
+                gotOneMatchThisCandidate = true;
+                firstMatch = firstMatch === undefined ? currentCandidate : firstMatch;
+                // If we were contiguous, then keep that value.  If we weren't, then keep that
+                // value.  If we don't know, then set the value to 'true' as an initial match is
+                // obviously contiguous.
+                contiguous = contiguous === undefined ? true : contiguous;
+                candidatePart = ts.createTextSpan(candidatePart.start + chunkCharacterSpan.length, candidatePart.length - chunkCharacterSpan.length);
+            }
+            // Check if we matched anything at all.  If we didn't, then we need to unset the
+            // contiguous bit if we currently had it set.
+            // If we haven't set the bit yet, then that means we haven't matched anything so
+            // far, and we don't want to change that.
+            if (!gotOneMatchThisCandidate && contiguous !== undefined) {
+                contiguous = false;
+            }
+            // Move onto the next candidate.
+            currentCandidate++;
+        }
+    }
+    function createSegment(text) {
+        return {
+            totalTextChunk: createTextChunk(text),
+            subWordTextChunks: breakPatternIntoTextChunks(text)
+        };
+    }
+    function isUpperCaseLetter(ch) {
+        // Fast check for the ascii range.
+        if (ch >= 65 /* CharacterCodes.A */ && ch <= 90 /* CharacterCodes.Z */) {
+            return true;
+        }
+        if (ch < 127 /* CharacterCodes.maxAsciiCharacter */ || !ts.isUnicodeIdentifierStart(ch, 99 /* ScriptTarget.Latest */)) {
+            return false;
+        }
+        // TODO: find a way to determine this for any unicode characters in a
+        // non-allocating manner.
+        var str = String.fromCharCode(ch);
+        return str === str.toUpperCase();
+    }
+    function isLowerCaseLetter(ch) {
+        // Fast check for the ascii range.
+        if (ch >= 97 /* CharacterCodes.a */ && ch <= 122 /* CharacterCodes.z */) {
+            return true;
+        }
+        if (ch < 127 /* CharacterCodes.maxAsciiCharacter */ || !ts.isUnicodeIdentifierStart(ch, 99 /* ScriptTarget.Latest */)) {
+            return false;
+        }
+        // TODO: find a way to determine this for any unicode characters in a
+        // non-allocating manner.
+        var str = String.fromCharCode(ch);
+        return str === str.toLowerCase();
+    }
+    // Assumes 'value' is already lowercase.
+    function indexOfIgnoringCase(str, value) {
+        var n = str.length - value.length;
+        var _loop_6 = function (start) {
+            if (every(value, function (valueChar, i) { return toLowerCase(str.charCodeAt(i + start)) === valueChar; })) {
+                return { value: start };
+            }
+        };
+        for (var start = 0; start <= n; start++) {
+            var state_3 = _loop_6(start);
+            if (typeof state_3 === "object")
+                return state_3.value;
+        }
+        return -1;
+    }
+    function toLowerCase(ch) {
+        // Fast convert for the ascii range.
+        if (ch >= 65 /* CharacterCodes.A */ && ch <= 90 /* CharacterCodes.Z */) {
+            return 97 /* CharacterCodes.a */ + (ch - 65 /* CharacterCodes.A */);
+        }
+        if (ch < 127 /* CharacterCodes.maxAsciiCharacter */) {
+            return ch;
+        }
+        // TODO: find a way to compute this for any unicode characters in a
+        // non-allocating manner.
+        return String.fromCharCode(ch).toLowerCase().charCodeAt(0);
+    }
+    function isDigit(ch) {
+        // TODO(cyrusn): Find a way to support this for unicode digits.
+        return ch >= 48 /* CharacterCodes._0 */ && ch <= 57 /* CharacterCodes._9 */;
+    }
+    function isWordChar(ch) {
+        return isUpperCaseLetter(ch) || isLowerCaseLetter(ch) || isDigit(ch) || ch === 95 /* CharacterCodes._ */ || ch === 36 /* CharacterCodes.$ */;
+    }
+    function breakPatternIntoTextChunks(pattern) {
+        var result = [];
+        var wordStart = 0;
+        var wordLength = 0;
+        for (var i = 0; i < pattern.length; i++) {
+            var ch = pattern.charCodeAt(i);
+            if (isWordChar(ch)) {
+                if (wordLength === 0) {
+                    wordStart = i;
+                }
+                wordLength++;
+            }
+            else {
+                if (wordLength > 0) {
+                    result.push(createTextChunk(pattern.substr(wordStart, wordLength)));
+                    wordLength = 0;
+                }
+            }
+        }
+        if (wordLength > 0) {
+            result.push(createTextChunk(pattern.substr(wordStart, wordLength)));
+        }
+        return result;
+    }
+    function createTextChunk(text) {
+        var textLowerCase = text.toLowerCase();
+        return {
+            text: text,
+            textLowerCase: textLowerCase,
+            isLowerCase: text === textLowerCase,
+            characterSpans: breakIntoCharacterSpans(text)
+        };
+    }
+    function breakIntoCharacterSpans(identifier) {
+        return breakIntoSpans(identifier, /*word:*/ false);
+    }
+    ts.breakIntoCharacterSpans = breakIntoCharacterSpans;
+    function breakIntoWordSpans(identifier) {
+        return breakIntoSpans(identifier, /*word:*/ true);
+    }
+    ts.breakIntoWordSpans = breakIntoWordSpans;
+    function breakIntoSpans(identifier, word) {
+        var result = [];
+        var wordStart = 0;
+        for (var i = 1; i < identifier.length; i++) {
+            var lastIsDigit = isDigit(identifier.charCodeAt(i - 1));
+            var currentIsDigit = isDigit(identifier.charCodeAt(i));
+            var hasTransitionFromLowerToUpper = transitionFromLowerToUpper(identifier, word, i);
+            var hasTransitionFromUpperToLower = word && transitionFromUpperToLower(identifier, i, wordStart);
+            if (charIsPunctuation(identifier.charCodeAt(i - 1)) ||
+                charIsPunctuation(identifier.charCodeAt(i)) ||
+                lastIsDigit !== currentIsDigit ||
+                hasTransitionFromLowerToUpper ||
+                hasTransitionFromUpperToLower) {
+                if (!isAllPunctuation(identifier, wordStart, i)) {
+                    result.push(ts.createTextSpan(wordStart, i - wordStart));
+                }
+                wordStart = i;
+            }
+        }
+        if (!isAllPunctuation(identifier, wordStart, identifier.length)) {
+            result.push(ts.createTextSpan(wordStart, identifier.length - wordStart));
+        }
+        return result;
+    }
+    function charIsPunctuation(ch) {
+        switch (ch) {
+            case 33 /* CharacterCodes.exclamation */:
+            case 34 /* CharacterCodes.doubleQuote */:
+            case 35 /* CharacterCodes.hash */:
+            case 37 /* CharacterCodes.percent */:
+            case 38 /* CharacterCodes.ampersand */:
+            case 39 /* CharacterCodes.singleQuote */:
+            case 40 /* CharacterCodes.openParen */:
+            case 41 /* CharacterCodes.closeParen */:
+            case 42 /* CharacterCodes.asterisk */:
+            case 44 /* CharacterCodes.comma */:
+            case 45 /* CharacterCodes.minus */:
+            case 46 /* CharacterCodes.dot */:
+            case 47 /* CharacterCodes.slash */:
+            case 58 /* CharacterCodes.colon */:
+            case 59 /* CharacterCodes.semicolon */:
+            case 63 /* CharacterCodes.question */:
+            case 64 /* CharacterCodes.at */:
+            case 91 /* CharacterCodes.openBracket */:
+            case 92 /* CharacterCodes.backslash */:
+            case 93 /* CharacterCodes.closeBracket */:
+            case 95 /* CharacterCodes._ */:
+            case 123 /* CharacterCodes.openBrace */:
+            case 125 /* CharacterCodes.closeBrace */:
+                return true;
+        }
+        return false;
+    }
+    function isAllPunctuation(identifier, start, end) {
+        return every(identifier, function (ch) { return charIsPunctuation(ch) && ch !== 95 /* CharacterCodes._ */; }, start, end);
+    }
+    function transitionFromUpperToLower(identifier, index, wordStart) {
+        // Cases this supports:
+        // 1) IDisposable -> I, Disposable
+        // 2) UIElement -> UI, Element
+        // 3) HTMLDocument -> HTML, Document
+        //
+        // etc.
+        // We have a transition from an upper to a lower letter here.  But we only
+        // want to break if all the letters that preceded are uppercase.  i.e. if we
+        // have "Foo" we don't want to break that into "F, oo".  But if we have
+        // "IFoo" or "UIFoo", then we want to break that into "I, Foo" and "UI,
+        // Foo".  i.e. the last uppercase letter belongs to the lowercase letters
+        // that follows.  Note: this will make the following not split properly:
+        // "HELLOthere".  However, these sorts of names do not show up in .Net
+        // programs.
+        return index !== wordStart
+            && index + 1 < identifier.length
+            && isUpperCaseLetter(identifier.charCodeAt(index))
+            && isLowerCaseLetter(identifier.charCodeAt(index + 1))
+            && every(identifier, isUpperCaseLetter, wordStart, index);
+    }
+    function transitionFromLowerToUpper(identifier, word, index) {
+        var lastIsUpper = isUpperCaseLetter(identifier.charCodeAt(index - 1));
+        var currentIsUpper = isUpperCaseLetter(identifier.charCodeAt(index));
+        // See if the casing indicates we're starting a new word. Note: if we're breaking on
+        // words, then just seeing an upper case character isn't enough.  Instead, it has to
+        // be uppercase and the previous character can't be uppercase.
+        //
+        // For example, breaking "AddMetadata" on words would make: Add Metadata
+        //
+        // on characters would be: A dd M etadata
+        //
+        // Break "AM" on words would be: AM
+        //
+        // on characters would be: A M
+        //
+        // We break the search string on characters.  But we break the symbol name on words.
+        return currentIsUpper && (!word || !lastIsUpper);
+    }
+    function everyInRange(start, end, pred) {
+        for (var i = start; i < end; i++) {
+            if (!pred(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function every(s, pred, start, end) {
+        if (start === void 0) { start = 0; }
+        if (end === void 0) { end = s.length; }
+        return everyInRange(start, end, function (i) { return pred(s.charCodeAt(i), i); });
+    }
+})(ts || (ts = {}));
+var ts;
+(function (ts) {
+    function preProcessFile(sourceText, readImportFiles, detectJavaScriptImports) {
+        if (readImportFiles === void 0) { readImportFiles = true; }
+        if (detectJavaScriptImports === void 0) { detectJavaScriptImports = false; }
+        var pragmaContext = {
+            languageVersion: 1 /* ScriptTarget.ES5 */,
+            pragmas: undefined,
+            checkJsDirective: undefined,
+            referencedFiles: [],
+            typeReferenceDirectives: [],
+            libReferenceDirectives: [],
+            amdDependencies: [],
+            hasNoDefaultLib: undefined,
+            moduleName: undefined
+        };
+        var importedFiles = [];
+        var ambientExternalModules;
+        var lastToken;
+        var currentToken;
+        var braceNesting = 0;
+        // assume that text represent an external module if it contains at least one top level import/export
+        // ambient modules that are found inside external modules are interpreted as module augmentations
+        var externalModule = false;
+        function nextToken() {
+            lastToken = currentToken;
+            currentToken = ts.scanner.scan();
+            if (currentToken === 18 /* SyntaxKind.OpenBraceToken */) {
+                braceNesting++;
+            }
+            else if (currentToken === 19 /* SyntaxKind.CloseBraceToken */) {
+                braceNesting--;
+            }
+            return currentToken;
+        }
+        function getFileReference() {
+            var fileName = ts.scanner.getTokenValue();
+            var pos = ts.scanner.getTokenPos();
+            return { fileName: fileName, pos: pos, end: pos + fileName.length };
+        }
+        function recordAmbientExternalModule() {
+            if (!ambientExternalModules) {
+                ambientExternalModules = [];
+            }
+            ambientExternalModules.push({ ref: getFileReference(), depth: braceNesting });
+        }
+        function recordModuleName() {
+            importedFiles.push(getFileReference());
+            markAsExternalModuleIfTopLevel();
+        }
+        function markAsExternalModuleIfTopLevel() {
+            if (braceNesting === 0) {
+                externalModule = true;
+            }
+        }
+        /**
+         * Returns true if at least one token was consumed from the stream
+         */
+        function tryConsumeDeclare() {
+            var token = ts.scanner.getToken();
+            if (token === 136 /* SyntaxKind.DeclareKeyword */) {
+                // declare module "mod"
+                token = nextToken();
+                if (token === 142 /* SyntaxKind.ModuleKeyword */) {
+                    token = nextToken();
+                    if (token === 10 /* SyntaxKind.StringLiteral */) {
+                        recordAmbientExternalModule();
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        /**
+         * Returns true if at least one token was consumed from the stream
+         */
+        function tryConsumeImport() {
+            if (lastToken === 24 /* SyntaxKind.DotToken */) {
+                return false;
+            }
+            var token = ts.scanner.getToken();
+            if (token === 100 /* SyntaxKind.ImportKeyword */) {
+                token = nextToken();
+                if (token === 20 /* SyntaxKind.OpenParenToken */) {
+                    token = nextToken();
+                    if (token === 10 /* SyntaxKind.StringLiteral */ || token === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */) {
+                        // import("mod");
+                        recordModuleName();
+                        return true;
+                    }
+                }
+                else if (token === 10 /* SyntaxKind.StringLiteral */) {
+                    // import "mod";
+                    recordModuleName();
+                    return true;
+                }
+                else {
+                    if (token === 154 /* SyntaxKind.TypeKeyword */) {
+                        var skipTypeKeyword = ts.scanner.lookAhead(function () {
+                            var token = ts.scanner.scan();
+                            return token !== 158 /* SyntaxKind.FromKeyword */ && (token === 41 /* SyntaxKind.AsteriskToken */ ||
+                                token === 18 /* SyntaxKind.OpenBraceToken */ ||
+                                token === 79 /* SyntaxKind.Identifier */ ||
+                                ts.isKeyword(token));
+                        });
+                        if (skipTypeKeyword) {
+                            token = nextToken();
+                        }
+                    }
+                    if (token === 79 /* SyntaxKind.Identifier */ || ts.isKeyword(token)) {
+                        token = nextToken();
+                        if (token === 158 /* SyntaxKind.FromKeyword */) {
+                            token = nextToken();
+                            if (token === 10 /* SyntaxKind.StringLiteral */) {
+                                // import d from "mod";
+                                recordModuleName();
+                                return true;
+                            }
+                        }
+                        else if (token === 63 /* SyntaxKind.EqualsToken */) {
+                            if (tryConsumeRequireCall(/*skipCurrentToken*/ true)) {
+                                return true;
+                            }
+                        }
+                        else if (token === 27 /* SyntaxKind.CommaToken */) {
+                            // consume comma and keep going
+                            token = nextToken();
+                        }
+                        else {
+                            // unknown syntax
+                            return true;
+                        }
+                    }
+                    if (token === 18 /* SyntaxKind.OpenBraceToken */) {
+                        token = nextToken();
+                        // consume "{ a as B, c, d as D}" clauses
+                        // make sure that it stops on EOF
+                        while (token !== 19 /* SyntaxKind.CloseBraceToken */ && token !== 1 /* SyntaxKind.EndOfFileToken */) {
+                            token = nextToken();
+                        }
+                        if (token === 19 /* SyntaxKind.CloseBraceToken */) {
+                            token = nextToken();
+                            if (token === 158 /* SyntaxKind.FromKeyword */) {
+                                token = nextToken();
+                                if (token === 10 /* SyntaxKind.StringLiteral */) {
+                                    // import {a as A} from "mod";
+                                    // import d, {a, b as B} from "mod"
+                                    recordModuleName();
+                                }
+                            }
+                        }
+                    }
+                    else if (token === 41 /* SyntaxKind.AsteriskToken */) {
+                        token = nextToken();
+                        if (token === 128 /* SyntaxKind.AsKeyword */) {
+                            token = nextToken();
+                            if (token === 79 /* SyntaxKind.Identifier */ || ts.isKeyword(token)) {
+                                token = nextToken();
+                                if (token === 158 /* SyntaxKind.FromKeyword */) {
+                                    token = nextToken();
+                                    if (token === 10 /* SyntaxKind.StringLiteral */) {
+                                        // import * as NS from "mod"
+                                        // import d, * as NS from "mod"
+                                        recordModuleName();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        function tryConsumeExport() {
+            var token = ts.scanner.getToken();
+            if (token === 93 /* SyntaxKind.ExportKeyword */) {
+                markAsExternalModuleIfTopLevel();
+                token = nextToken();
+                if (token === 154 /* SyntaxKind.TypeKeyword */) {
+                    var skipTypeKeyword = ts.scanner.lookAhead(function () {
+                        var token = ts.scanner.scan();
+                        return token === 41 /* SyntaxKind.AsteriskToken */ ||
+                            token === 18 /* SyntaxKind.OpenBraceToken */;
+                    });
+                    if (skipTypeKeyword) {
+                        token = nextToken();
+                    }
+                }
+                if (token === 18 /* SyntaxKind.OpenBraceToken */) {
+                    token = nextToken();
+                    // consume "{ a as B, c, d as D}" clauses
+                    // make sure it stops on EOF
+                    while (token !== 19 /* SyntaxKind.CloseBraceToken */ && token !== 1 /* SyntaxKind.EndOfFileToken */) {
+                        token = nextToken();
+                    }
+                    if (token === 19 /* SyntaxKind.CloseBraceToken */) {
+                        token = nextToken();
+                        if (token === 158 /* SyntaxKind.FromKeyword */) {
+                            token = nextToken();
+                            if (token === 10 /* SyntaxKind.StringLiteral */) {
+                                // export {a as A} from "mod";
+                                // export {a, b as B} from "mod"
+                                recordModuleName();
+                            }
+                        }
+                    }
+                }
+                else if (token === 41 /* SyntaxKind.AsteriskToken */) {
+                    token = nextToken();
+                    if (token === 158 /* SyntaxKind.FromKeyword */) {
+                        token = nextToken();
+                        if (token === 10 /* SyntaxKind.StringLiteral */) {
+                            // export * from "mod"
+                            recordModuleName();
+                        }
+                    }
+                }
+                else if (token === 100 /* SyntaxKind.ImportKeyword */) {
+                    token = nextToken();
+                    if (token === 154 /* SyntaxKind.TypeKeyword */) {
+                        var skipTypeKeyword = ts.scanner.lookAhead(function () {
+                            var token = ts.scanner.scan();
+                            return token === 79 /* SyntaxKind.Identifier */ ||
+                                ts.isKeyword(token);
+                        });
+                        if (skipTypeKeyword) {
+                            token = nextToken();
+                        }
+                    }
+                    if (token === 79 /* SyntaxKind.Identifier */ || ts.isKeyword(token)) {
+                        token = nextToken();
+                        if (token === 63 /* SyntaxKind.EqualsToken */) {
+                            if (tryConsumeRequireCall(/*skipCurrentToken*/ true)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        function tryConsumeRequireCall(skipCurrentToken, allowTemplateLiterals) {
+            if (allowTemplateLiterals === void 0) { allowTemplateLiterals = false; }
+            var token = skipCurrentToken ? nextToken() : ts.scanner.getToken();
+            if (token === 147 /* SyntaxKind.RequireKeyword */) {
+                token = nextToken();
+                if (token === 20 /* SyntaxKind.OpenParenToken */) {
+                    token = nextToken();
+                    if (token === 10 /* SyntaxKind.StringLiteral */ ||
+                        allowTemplateLiterals && token === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */) {
+                        //  require("mod");
+                        recordModuleName();
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        function tryConsumeDefine() {
+            var token = ts.scanner.getToken();
+            if (token === 79 /* SyntaxKind.Identifier */ && ts.scanner.getTokenValue() === "define") {
+                token = nextToken();
+                if (token !== 20 /* SyntaxKind.OpenParenToken */) {
+                    return true;
+                }
+                token = nextToken();
+                if (token === 10 /* SyntaxKind.StringLiteral */ || token === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */) {
+                    // looks like define ("modname", ... - skip string literal and comma
+                    token = nextToken();
+                    if (token === 27 /* SyntaxKind.CommaToken */) {
+                        token = nextToken();
+                    }
+                    else {
+                        // unexpected token
+                        return true;
+                    }
+                }
+                // should be start of dependency list
+                if (token !== 22 /* SyntaxKind.OpenBracketToken */) {
+                    return true;
+                }
+                // skip open bracket
+                token = nextToken();
+                // scan until ']' or EOF
+                while (token !== 23 /* SyntaxKind.CloseBracketToken */ && token !== 1 /* SyntaxKind.EndOfFileToken */) {
+                    // record string literals as module names
+                    if (token === 10 /* SyntaxKind.StringLiteral */ || token === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */) {
+                        recordModuleName();
+                    }
+                    token = nextToken();
+                }
+                return true;
+            }
+            return false;
+        }
+        function processImports() {
+            ts.scanner.setText(sourceText);
+            nextToken();
+            // Look for:
+            //    import "mod";
+            //    import d from "mod"
+            //    import {a as A } from "mod";
+            //    import * as NS from "mod"
+            //    import d, {a, b as B} from "mod"
+            //    import i = require("mod");
+            //    import("mod");
+            //    export * from "mod"
+            //    export {a as b} from "mod"
+            //    export import i = require("mod")
+            //    (for JavaScript files) require("mod")
+            // Do not look for:
+            //    AnySymbol.import("mod")
+            //    AnySymbol.nested.import("mod")
+            while (true) {
+                if (ts.scanner.getToken() === 1 /* SyntaxKind.EndOfFileToken */) {
+                    break;
+                }
+                if (ts.scanner.getToken() === 15 /* SyntaxKind.TemplateHead */) {
+                    var stack = [ts.scanner.getToken()];
+                    loop: while (ts.length(stack)) {
+                        var token = ts.scanner.scan();
+                        switch (token) {
+                            case 1 /* SyntaxKind.EndOfFileToken */:
+                                break loop;
+                            case 100 /* SyntaxKind.ImportKeyword */:
+                                tryConsumeImport();
+                                break;
+                            case 15 /* SyntaxKind.TemplateHead */:
+                                stack.push(token);
+                                break;
+                            case 18 /* SyntaxKind.OpenBraceToken */:
+                                if (ts.length(stack)) {
+                                    stack.push(token);
+                                }
+                                break;
+                            case 19 /* SyntaxKind.CloseBraceToken */:
+                                if (ts.length(stack)) {
+                                    if (ts.lastOrUndefined(stack) === 15 /* SyntaxKind.TemplateHead */) {
+                                        if (ts.scanner.reScanTemplateToken(/* isTaggedTemplate */ false) === 17 /* SyntaxKind.TemplateTail */) {
+                                            stack.pop();
+                                        }
+                                    }
+                                    else {
+                                        stack.pop();
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    nextToken();
+                }
+                // check if at least one of alternative have moved scanner forward
+                if (tryConsumeDeclare() ||
+                    tryConsumeImport() ||
+                    tryConsumeExport() ||
+                    (detectJavaScriptImports && (tryConsumeRequireCall(/*skipCurrentToken*/ false, /*allowTemplateLiterals*/ true) ||
+                        tryConsumeDefine()))) {
+                    continue;
+                }
+                else {
+                    nextToken();
+                }
+            }
+            ts.scanner.setText(undefined);
+        }
+        if (readImportFiles) {
+            processImports();
+        }
+        ts.processCommentPragmas(pragmaContext, sourceText);
+        ts.processPragmasIntoFields(pragmaContext, ts.noop);
+        if (externalModule) {
+            // for external modules module all nested ambient modules are augmentations
+            if (ambientExternalModules) {
+                // move all detected ambient modules to imported files since they need to be resolved
+                for (var _i = 0, ambientExternalModules_1 = ambientExternalModules; _i < ambientExternalModules_1.length; _i++) {
+                    var decl = ambientExternalModules_1[_i];
+                    importedFiles.push(decl.ref);
+                }
+            }
+            return { referencedFiles: pragmaContext.referencedFiles, typeReferenceDirectives: pragmaContext.typeReferenceDirectives, libReferenceDirectives: pragmaContext.libReferenceDirectives, importedFiles: importedFiles, isLibFile: !!pragmaContext.hasNoDefaultLib, ambientExternalModules: undefined };
+        }
+        else {
+            // for global scripts ambient modules still can have augmentations - look for ambient modules with depth > 0
+            var ambientModuleNames = void 0;
+            if (ambientExternalModules) {
+                for (var _a = 0, ambientExternalModules_2 = ambientExternalModules; _a < ambientExternalModules_2.length; _a++) {
+                    var decl = ambientExternalModules_2[_a];
+                    if (decl.depth === 0) {
+                        if (!ambientModuleNames) {
+                            ambientModuleNames = [];
+                        }
+                        ambientModuleNames.push(decl.ref.fileName);
+                    }
+                    else {
+                        importedFiles.push(decl.ref);
+                    }
+                }
+            }
+            return { referencedFiles: pragmaContext.referencedFiles, typeReferenceDirectives: pragmaContext.typeReferenceDirectives, libReferenceDirectives: pragmaContext.libReferenceDirectives, importedFiles: importedFiles, isLibFile: !!pragmaContext.hasNoDefaultLib, ambientExternalModules: ambientModuleNames };
+        }
+    }
+    ts.preProcessFile = preProcessFile;
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var Rename;
+    (function (Rename) {
+        function getRenameInfo(program, sourceFile, position, preferences) {
+            var node = ts.getAdjustedRenameLocation(ts.getTouchingPropertyName(sourceFile, position));
+            if (nodeIsEligibleForRename(node)) {
+                var renameInfo = getRenameInfoForNode(node, program.getTypeChecker(), sourceFile, program, preferences);
+                if (renameInfo) {
+                    return renameInfo;
+                }
+            }
+            return getRenameInfoError(ts.Diagnostics.You_cannot_rename_this_element);
+        }
+        Rename.getRenameInfo = getRenameInfo;
+        function getRenameInfoForNode(node, typeChecker, sourceFile, program, preferences) {
+            var symbol = typeChecker.getSymbolAtLocation(node);
+            if (!symbol) {
+                if (ts.isStringLiteralLike(node)) {
+                    var type = ts.getContextualTypeFromParentOrAncestorTypeNode(node, typeChecker);
+                    if (type && ((type.flags & 128 /* TypeFlags.StringLiteral */) || ((type.flags & 1048576 /* TypeFlags.Union */) && ts.every(type.types, function (type) { return !!(type.flags & 128 /* TypeFlags.StringLiteral */); })))) {
+                        return getRenameInfoSuccess(node.text, node.text, "string" /* ScriptElementKind.string */, "", node, sourceFile);
+                    }
+                }
+                else if (ts.isLabelName(node)) {
+                    var name = ts.getTextOfNode(node);
+                    return getRenameInfoSuccess(name, name, "label" /* ScriptElementKind.label */, "" /* ScriptElementKindModifier.none */, node, sourceFile);
+                }
+                return undefined;
+            }
+            // Only allow a symbol to be renamed if it actually has at least one declaration.
+            var declarations = symbol.declarations;
+            if (!declarations || declarations.length === 0)
+                return;
+            // Disallow rename for elements that are defined in the standard TypeScript library.
+            if (declarations.some(function (declaration) { return isDefinedInLibraryFile(program, declaration); })) {
+                return getRenameInfoError(ts.Diagnostics.You_cannot_rename_elements_that_are_defined_in_the_standard_TypeScript_library);
+            }
+            // Cannot rename `default` as in `import { default as foo } from "./someModule";
+            if (ts.isIdentifier(node) && node.originalKeywordKind === 88 /* SyntaxKind.DefaultKeyword */ && symbol.parent && symbol.parent.flags & 1536 /* SymbolFlags.Module */) {
+                return undefined;
+            }
+            if (ts.isStringLiteralLike(node) && ts.tryGetImportFromModuleSpecifier(node)) {
+                return preferences.allowRenameOfImportPath ? getRenameInfoForModule(node, sourceFile, symbol) : undefined;
+            }
+            // Disallow rename for elements that would rename across `*/node_modules/*` packages.
+            var wouldRenameNodeModules = wouldRenameInOtherNodeModules(sourceFile, symbol, typeChecker, preferences);
+            if (wouldRenameNodeModules) {
+                return getRenameInfoError(wouldRenameNodeModules);
+            }
+            var kind = ts.SymbolDisplay.getSymbolKind(typeChecker, symbol, node);
+            var specifierName = (ts.isImportOrExportSpecifierName(node) || ts.isStringOrNumericLiteralLike(node) && node.parent.kind === 164 /* SyntaxKind.ComputedPropertyName */)
+                ? ts.stripQuotes(ts.getTextOfIdentifierOrLiteral(node))
+                : undefined;
+            var displayName = specifierName || typeChecker.symbolToString(symbol);
+            var fullDisplayName = specifierName || typeChecker.getFullyQualifiedName(symbol);
+            return getRenameInfoSuccess(displayName, fullDisplayName, kind, ts.SymbolDisplay.getSymbolModifiers(typeChecker, symbol), node, sourceFile);
+        }
+        function isDefinedInLibraryFile(program, declaration) {
+            var sourceFile = declaration.getSourceFile();
+            return program.isSourceFileDefaultLibrary(sourceFile) && ts.fileExtensionIs(sourceFile.fileName, ".d.ts" /* Extension.Dts */);
+        }
+        function wouldRenameInOtherNodeModules(originalFile, symbol, checker, preferences) {
+            if (!preferences.providePrefixAndSuffixTextForRename && symbol.flags & 2097152 /* SymbolFlags.Alias */) {
+                var importSpecifier = symbol.declarations && ts.find(symbol.declarations, function (decl) { return ts.isImportSpecifier(decl); });
+                if (importSpecifier && !importSpecifier.propertyName) {
+                    symbol = checker.getAliasedSymbol(symbol);
+                }
+            }
+            var declarations = symbol.declarations;
+            if (!declarations) {
+                return undefined;
+            }
+            var originalPackage = getPackagePathComponents(originalFile.path);
+            if (originalPackage === undefined) { // original source file is not in node_modules
+                if (ts.some(declarations, function (declaration) { return ts.isInsideNodeModules(declaration.getSourceFile().path); })) {
+                    return ts.Diagnostics.You_cannot_rename_elements_that_are_defined_in_a_node_modules_folder;
+                }
+                else {
+                    return undefined;
+                }
+            }
+            // original source file is in node_modules
+            for (var _i = 0, declarations_4 = declarations; _i < declarations_4.length; _i++) {
+                var declaration = declarations_4[_i];
+                var declPackage = getPackagePathComponents(declaration.getSourceFile().path);
+                if (declPackage) {
+                    var length_2 = Math.min(originalPackage.length, declPackage.length);
+                    for (var i = 0; i <= length_2; i++) {
+                        if (ts.compareStringsCaseSensitive(originalPackage[i], declPackage[i]) !== 0 /* Comparison.EqualTo */) {
+                            return ts.Diagnostics.You_cannot_rename_elements_that_are_defined_in_another_node_modules_folder;
+                        }
+                    }
+                }
+            }
+            return undefined;
+        }
+        function getPackagePathComponents(filePath) {
+            var components = ts.getPathComponents(filePath);
+            var nodeModulesIdx = components.lastIndexOf("node_modules");
+            if (nodeModulesIdx === -1) {
+                return undefined;
+            }
+            return components.slice(0, nodeModulesIdx + 2);
+        }
+        function getRenameInfoForModule(node, sourceFile, moduleSymbol) {
+            if (!ts.isExternalModuleNameRelative(node.text)) {
+                return getRenameInfoError(ts.Diagnostics.You_cannot_rename_a_module_via_a_global_import);
+            }
+            var moduleSourceFile = moduleSymbol.declarations && ts.find(moduleSymbol.declarations, ts.isSourceFile);
+            if (!moduleSourceFile)
+                return undefined;
+            var withoutIndex = ts.endsWith(node.text, "/index") || ts.endsWith(node.text, "/index.js") ? undefined : ts.tryRemoveSuffix(ts.removeFileExtension(moduleSourceFile.fileName), "/index");
+            var name = withoutIndex === undefined ? moduleSourceFile.fileName : withoutIndex;
+            var kind = withoutIndex === undefined ? "module" /* ScriptElementKind.moduleElement */ : "directory" /* ScriptElementKind.directory */;
+            var indexAfterLastSlash = node.text.lastIndexOf("/") + 1;
+            // Span should only be the last component of the path. + 1 to account for the quote character.
+            var triggerSpan = ts.createTextSpan(node.getStart(sourceFile) + 1 + indexAfterLastSlash, node.text.length - indexAfterLastSlash);
+            return {
+                canRename: true,
+                fileToRename: name,
+                kind: kind,
+                displayName: name,
+                fullDisplayName: name,
+                kindModifiers: "" /* ScriptElementKindModifier.none */,
+                triggerSpan: triggerSpan,
+            };
+        }
+        function getRenameInfoSuccess(displayName, fullDisplayName, kind, kindModifiers, node, sourceFile) {
+            return {
+                canRename: true,
+                fileToRename: undefined,
+                kind: kind,
+                displayName: displayName,
+                fullDisplayName: fullDisplayName,
+                kindModifiers: kindModifiers,
+                triggerSpan: createTriggerSpanForNode(node, sourceFile)
+            };
+        }
+        function getRenameInfoError(diagnostic) {
+            return { canRename: false, localizedErrorMessage: ts.getLocaleSpecificMessage(diagnostic) };
+        }
+        function createTriggerSpanForNode(node, sourceFile) {
+            var start = node.getStart(sourceFile);
+            var width = node.getWidth(sourceFile);
+            if (ts.isStringLiteralLike(node)) {
+                // Exclude the quotes
+                start += 1;
+                width -= 2;
+            }
+            return ts.createTextSpan(start, width);
+        }
+        function nodeIsEligibleForRename(node) {
+            switch (node.kind) {
+                case 79 /* SyntaxKind.Identifier */:
+                case 80 /* SyntaxKind.PrivateIdentifier */:
+                case 10 /* SyntaxKind.StringLiteral */:
+                case 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */:
+                case 108 /* SyntaxKind.ThisKeyword */:
+                    return true;
+                case 8 /* SyntaxKind.NumericLiteral */:
+                    return ts.isLiteralNameOfPropertyDeclarationOrIndexAccess(node);
+                default:
+                    return false;
+            }
+        }
+        Rename.nodeIsEligibleForRename = nodeIsEligibleForRename;
+    })(Rename = ts.Rename || (ts.Rename = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var SmartSelectionRange;
+    (function (SmartSelectionRange) {
+        function getSmartSelectionRange(pos, sourceFile) {
+            var _a, _b;
+            var selectionRange = {
+                textSpan: ts.createTextSpanFromBounds(sourceFile.getFullStart(), sourceFile.getEnd())
+            };
+            var parentNode = sourceFile;
+            outer: while (true) {
+                var children = getSelectionChildren(parentNode);
+                if (!children.length)
+                    break;
+                for (var i = 0; i < children.length; i++) {
+                    var prevNode = children[i - 1];
+                    var node = children[i];
+                    var nextNode = children[i + 1];
+                    if (ts.getTokenPosOfNode(node, sourceFile, /*includeJsDoc*/ true) > pos) {
+                        break outer;
+                    }
+                    var comment = ts.singleOrUndefined(ts.getTrailingCommentRanges(sourceFile.text, node.end));
+                    if (comment && comment.kind === 2 /* SyntaxKind.SingleLineCommentTrivia */) {
+                        pushSelectionCommentRange(comment.pos, comment.end);
+                    }
+                    if (positionShouldSnapToNode(sourceFile, pos, node)) {
+                        if (ts.isFunctionBody(node)
+                            && ts.isFunctionLikeDeclaration(parentNode) && !ts.positionsAreOnSameLine(node.getStart(sourceFile), node.getEnd(), sourceFile)) {
+                            pushSelectionRange(node.getStart(sourceFile), node.getEnd());
+                        }
+                        // 1. Blocks are effectively redundant with SyntaxLists.
+                        // 2. TemplateSpans, along with the SyntaxLists containing them, are a somewhat unintuitive grouping
+                        //    of things that should be considered independently.
+                        // 3. A VariableStatement’s children are just a VaraiableDeclarationList and a semicolon.
+                        // 4. A lone VariableDeclaration in a VaraibleDeclaration feels redundant with the VariableStatement.
+                        // Dive in without pushing a selection range.
+                        if (ts.isBlock(node)
+                            || ts.isTemplateSpan(node) || ts.isTemplateHead(node) || ts.isTemplateTail(node)
+                            || prevNode && ts.isTemplateHead(prevNode)
+                            || ts.isVariableDeclarationList(node) && ts.isVariableStatement(parentNode)
+                            || ts.isSyntaxList(node) && ts.isVariableDeclarationList(parentNode)
+                            || ts.isVariableDeclaration(node) && ts.isSyntaxList(parentNode) && children.length === 1
+                            || ts.isJSDocTypeExpression(node) || ts.isJSDocSignature(node) || ts.isJSDocTypeLiteral(node)) {
+                            parentNode = node;
+                            break;
+                        }
+                        // Synthesize a stop for '${ ... }' since '${' and '}' actually belong to siblings.
+                        if (ts.isTemplateSpan(parentNode) && nextNode && ts.isTemplateMiddleOrTemplateTail(nextNode)) {
+                            var start_1 = node.getFullStart() - "${".length;
+                            var end_2 = nextNode.getStart() + "}".length;
+                            pushSelectionRange(start_1, end_2);
+                        }
+                        // Blocks with braces, brackets, parens, or JSX tags on separate lines should be
+                        // selected from open to close, including whitespace but not including the braces/etc. themselves.
+                        var isBetweenMultiLineBookends = ts.isSyntaxList(node) && isListOpener(prevNode) && isListCloser(nextNode)
+                            && !ts.positionsAreOnSameLine(prevNode.getStart(), nextNode.getStart(), sourceFile);
+                        var start = isBetweenMultiLineBookends ? prevNode.getEnd() : node.getStart();
+                        var end = isBetweenMultiLineBookends ? nextNode.getStart() : getEndPos(sourceFile, node);
+                        if (ts.hasJSDocNodes(node) && ((_a = node.jsDoc) === null || _a === void 0 ? void 0 : _a.length)) {
+                            pushSelectionRange(ts.first(node.jsDoc).getStart(), end);
+                        }
+                        // (#39618 & #49807)
+                        // When the node is a SyntaxList and its first child has a JSDoc comment, then the node's
+                        // `start` (which usually is the result of calling `node.getStart()`) points to the first
+                        // token after the JSDoc comment. So, we have to make sure we'd pushed the selection
+                        // covering the JSDoc comment before diving further.
+                        if (ts.isSyntaxList(node)) {
+                            var firstChild = node.getChildren()[0];
+                            if (firstChild && ts.hasJSDocNodes(firstChild) && ((_b = firstChild.jsDoc) === null || _b === void 0 ? void 0 : _b.length) && firstChild.getStart() !== node.pos) {
+                                start = Math.min(start, ts.first(firstChild.jsDoc).getStart());
+                            }
+                        }
+                        pushSelectionRange(start, end);
+                        // String literals should have a stop both inside and outside their quotes.
+                        if (ts.isStringLiteral(node) || ts.isTemplateLiteral(node)) {
+                            pushSelectionRange(start + 1, end - 1);
+                        }
+                        parentNode = node;
+                        break;
+                    }
+                    // If we made it to the end of the for loop, we’re done.
+                    // In practice, I’ve only seen this happen at the very end
+                    // of a SourceFile.
+                    if (i === children.length - 1) {
+                        break outer;
+                    }
+                }
+            }
+            return selectionRange;
+            function pushSelectionRange(start, end) {
+                // Skip empty ranges
+                if (start !== end) {
+                    var textSpan = ts.createTextSpanFromBounds(start, end);
+                    if (!selectionRange || (
+                    // Skip ranges that are identical to the parent
+                    !ts.textSpansEqual(textSpan, selectionRange.textSpan) &&
+                        // Skip ranges that don’t contain the original position
+                        ts.textSpanIntersectsWithPosition(textSpan, pos))) {
+                        selectionRange = __assign({ textSpan: textSpan }, selectionRange && { parent: selectionRange });
+                    }
+                }
+            }
+            function pushSelectionCommentRange(start, end) {
+                pushSelectionRange(start, end);
+                var pos = start;
+                while (sourceFile.text.charCodeAt(pos) === 47 /* CharacterCodes.slash */) {
+                    pos++;
+                }
+                pushSelectionRange(pos, end);
+            }
+        }
+        SmartSelectionRange.getSmartSelectionRange = getSmartSelectionRange;
+        /**
+         * Like `ts.positionBelongsToNode`, except positions immediately after nodes
+         * count too, unless that position belongs to the next node. In effect, makes
+         * selections able to snap to preceding tokens when the cursor is on the tail
+         * end of them with only whitespace ahead.
+         * @param sourceFile The source file containing the nodes.
+         * @param pos The position to check.
+         * @param node The candidate node to snap to.
+         */
+        function positionShouldSnapToNode(sourceFile, pos, node) {
+            // Can’t use 'ts.positionBelongsToNode()' here because it cleverly accounts
+            // for missing nodes, which can’t really be considered when deciding what
+            // to select.
+            ts.Debug.assert(node.pos <= pos);
+            if (pos < node.end) {
+                return true;
+            }
+            var nodeEnd = node.getEnd();
+            if (nodeEnd === pos) {
+                return ts.getTouchingPropertyName(sourceFile, pos).pos < node.end;
+            }
+            return false;
+        }
+        var isImport = ts.or(ts.isImportDeclaration, ts.isImportEqualsDeclaration);
+        /**
+         * Gets the children of a node to be considered for selection ranging,
+         * transforming them into an artificial tree according to their intuitive
+         * grouping where no grouping actually exists in the parse tree. For example,
+         * top-level imports are grouped into their own SyntaxList so they can be
+         * selected all together, even though in the AST they’re just siblings of each
+         * other as well as of other top-level statements and declarations.
+         */
+        function getSelectionChildren(node) {
+            var _a;
+            // Group top-level imports
+            if (ts.isSourceFile(node)) {
+                return groupChildren(node.getChildAt(0).getChildren(), isImport);
+            }
+            // Mapped types _look_ like ObjectTypes with a single member,
+            // but in fact don’t contain a SyntaxList or a node containing
+            // the “key/value” pair like ObjectTypes do, but it seems intuitive
+            // that the selection would snap to those points. The philosophy
+            // of choosing a selection range is not so much about what the
+            // syntax currently _is_ as what the syntax might easily become
+            // if the user is making a selection; e.g., we synthesize a selection
+            // around the “key/value” pair not because there’s a node there, but
+            // because it allows the mapped type to become an object type with a
+            // few keystrokes.
+            if (ts.isMappedTypeNode(node)) {
+                var _b = node.getChildren(), openBraceToken = _b[0], children = _b.slice(1);
+                var closeBraceToken = ts.Debug.checkDefined(children.pop());
+                ts.Debug.assertEqual(openBraceToken.kind, 18 /* SyntaxKind.OpenBraceToken */);
+                ts.Debug.assertEqual(closeBraceToken.kind, 19 /* SyntaxKind.CloseBraceToken */);
+                // Group `-/+readonly` and `-/+?`
+                var groupedWithPlusMinusTokens = groupChildren(children, function (child) {
+                    return child === node.readonlyToken || child.kind === 146 /* SyntaxKind.ReadonlyKeyword */ ||
+                        child === node.questionToken || child.kind === 57 /* SyntaxKind.QuestionToken */;
+                });
+                // Group type parameter with surrounding brackets
+                var groupedWithBrackets = groupChildren(groupedWithPlusMinusTokens, function (_a) {
+                    var kind = _a.kind;
+                    return kind === 22 /* SyntaxKind.OpenBracketToken */ ||
+                        kind === 165 /* SyntaxKind.TypeParameter */ ||
+                        kind === 23 /* SyntaxKind.CloseBracketToken */;
+                });
+                return [
+                    openBraceToken,
+                    // Pivot on `:`
+                    createSyntaxList(splitChildren(groupedWithBrackets, function (_a) {
+                        var kind = _a.kind;
+                        return kind === 58 /* SyntaxKind.ColonToken */;
+                    })),
+                    closeBraceToken,
+                ];
+            }
+            // Group modifiers and property name, then pivot on `:`.
+            if (ts.isPropertySignature(node)) {
+                var children = groupChildren(node.getChildren(), function (child) {
+                    return child === node.name || ts.contains(node.modifiers, child);
+                });
+                var firstJSDocChild = ((_a = children[0]) === null || _a === void 0 ? void 0 : _a.kind) === 323 /* SyntaxKind.JSDoc */ ? children[0] : undefined;
+                var withJSDocSeparated = firstJSDocChild ? children.slice(1) : children;
+                var splittedChildren = splitChildren(withJSDocSeparated, function (_a) {
+                    var kind = _a.kind;
+                    return kind === 58 /* SyntaxKind.ColonToken */;
+                });
+                return firstJSDocChild ? [firstJSDocChild, createSyntaxList(splittedChildren)] : splittedChildren;
+            }
+            // Group the parameter name with its `...`, then that group with its `?`, then pivot on `=`.
+            if (ts.isParameter(node)) {
+                var groupedDotDotDotAndName_1 = groupChildren(node.getChildren(), function (child) {
+                    return child === node.dotDotDotToken || child === node.name;
+                });
+                var groupedWithQuestionToken = groupChildren(groupedDotDotDotAndName_1, function (child) {
+                    return child === groupedDotDotDotAndName_1[0] || child === node.questionToken;
+                });
+                return splitChildren(groupedWithQuestionToken, function (_a) {
+                    var kind = _a.kind;
+                    return kind === 63 /* SyntaxKind.EqualsToken */;
+                });
+            }
+            // Pivot on '='
+            if (ts.isBindingElement(node)) {
+                return splitChildren(node.getChildren(), function (_a) {
+                    var kind = _a.kind;
+                    return kind === 63 /* SyntaxKind.EqualsToken */;
+                });
+            }
+            return node.getChildren();
+        }
+        /**
+         * Groups sibling nodes together into their own SyntaxList if they
+         * a) are adjacent, AND b) match a predicate function.
+         */
+        function groupChildren(children, groupOn) {
+            var result = [];
+            var group;
+            for (var _i = 0, children_1 = children; _i < children_1.length; _i++) {
+                var child = children_1[_i];
+                if (groupOn(child)) {
+                    group = group || [];
+                    group.push(child);
+                }
+                else {
+                    if (group) {
+                        result.push(createSyntaxList(group));
+                        group = undefined;
+                    }
+                    result.push(child);
+                }
+            }
+            if (group) {
+                result.push(createSyntaxList(group));
+            }
+            return result;
+        }
+        /**
+         * Splits sibling nodes into up to four partitions:
+         * 1) everything left of the first node matched by `pivotOn`,
+         * 2) the first node matched by `pivotOn`,
+         * 3) everything right of the first node matched by `pivotOn`,
+         * 4) a trailing semicolon, if `separateTrailingSemicolon` is enabled.
+         * The left and right groups, if not empty, will each be grouped into their own containing SyntaxList.
+         * @param children The sibling nodes to split.
+         * @param pivotOn The predicate function to match the node to be the pivot. The first node that matches
+         * the predicate will be used; any others that may match will be included into the right-hand group.
+         * @param separateTrailingSemicolon If the last token is a semicolon, it will be returned as a separate
+         * child rather than be included in the right-hand group.
+         */
+        function splitChildren(children, pivotOn, separateTrailingSemicolon) {
+            if (separateTrailingSemicolon === void 0) { separateTrailingSemicolon = true; }
+            if (children.length < 2) {
+                return children;
+            }
+            var splitTokenIndex = ts.findIndex(children, pivotOn);
+            if (splitTokenIndex === -1) {
+                return children;
+            }
+            var leftChildren = children.slice(0, splitTokenIndex);
+            var splitToken = children[splitTokenIndex];
+            var lastToken = ts.last(children);
+            var separateLastToken = separateTrailingSemicolon && lastToken.kind === 26 /* SyntaxKind.SemicolonToken */;
+            var rightChildren = children.slice(splitTokenIndex + 1, separateLastToken ? children.length - 1 : undefined);
+            var result = ts.compact([
+                leftChildren.length ? createSyntaxList(leftChildren) : undefined,
+                splitToken,
+                rightChildren.length ? createSyntaxList(rightChildren) : undefined,
+            ]);
+            return separateLastToken ? result.concat(lastToken) : result;
+        }
+        function createSyntaxList(children) {
+            ts.Debug.assertGreaterThanOrEqual(children.length, 1);
+            return ts.setTextRangePosEnd(ts.parseNodeFactory.createSyntaxList(children), children[0].pos, ts.last(children).end);
+        }
+        function isListOpener(token) {
+            var kind = token && token.kind;
+            return kind === 18 /* SyntaxKind.OpenBraceToken */
+                || kind === 22 /* SyntaxKind.OpenBracketToken */
+                || kind === 20 /* SyntaxKind.OpenParenToken */
+                || kind === 283 /* SyntaxKind.JsxOpeningElement */;
+        }
+        function isListCloser(token) {
+            var kind = token && token.kind;
+            return kind === 19 /* SyntaxKind.CloseBraceToken */
+                || kind === 23 /* SyntaxKind.CloseBracketToken */
+                || kind === 21 /* SyntaxKind.CloseParenToken */
+                || kind === 284 /* SyntaxKind.JsxClosingElement */;
+        }
+        function getEndPos(sourceFile, node) {
+            switch (node.kind) {
+                case 343 /* SyntaxKind.JSDocParameterTag */:
+                case 341 /* SyntaxKind.JSDocCallbackTag */:
+                case 350 /* SyntaxKind.JSDocPropertyTag */:
+                case 348 /* SyntaxKind.JSDocTypedefTag */:
+                case 345 /* SyntaxKind.JSDocThisTag */:
+                    return sourceFile.getLineEndOfPosition(node.getStart());
+                default:
+                    return node.getEnd();
+            }
+        }
+    })(SmartSelectionRange = ts.SmartSelectionRange || (ts.SmartSelectionRange = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var SignatureHelp;
+    (function (SignatureHelp) {
+        var InvocationKind;
+        (function (InvocationKind) {
+            InvocationKind[InvocationKind["Call"] = 0] = "Call";
+            InvocationKind[InvocationKind["TypeArgs"] = 1] = "TypeArgs";
+            InvocationKind[InvocationKind["Contextual"] = 2] = "Contextual";
+        })(InvocationKind || (InvocationKind = {}));
+        function getSignatureHelpItems(program, sourceFile, position, triggerReason, cancellationToken) {
+            var typeChecker = program.getTypeChecker();
+            // Decide whether to show signature help
+            var startingToken = ts.findTokenOnLeftOfPosition(sourceFile, position);
+            if (!startingToken) {
+                // We are at the beginning of the file
+                return undefined;
+            }
+            // Only need to be careful if the user typed a character and signature help wasn't showing.
+            var onlyUseSyntacticOwners = !!triggerReason && triggerReason.kind === "characterTyped";
+            // Bail out quickly in the middle of a string or comment, don't provide signature help unless the user explicitly requested it.
+            if (onlyUseSyntacticOwners && (ts.isInString(sourceFile, position, startingToken) || ts.isInComment(sourceFile, position))) {
+                return undefined;
+            }
+            var isManuallyInvoked = !!triggerReason && triggerReason.kind === "invoked";
+            var argumentInfo = getContainingArgumentInfo(startingToken, position, sourceFile, typeChecker, isManuallyInvoked);
+            if (!argumentInfo)
+                return undefined;
+            cancellationToken.throwIfCancellationRequested();
+            // Extra syntactic and semantic filtering of signature help
+            var candidateInfo = getCandidateOrTypeInfo(argumentInfo, typeChecker, sourceFile, startingToken, onlyUseSyntacticOwners);
+            cancellationToken.throwIfCancellationRequested();
+            if (!candidateInfo) {
+                // We didn't have any sig help items produced by the TS compiler.  If this is a JS
+                // file, then see if we can figure out anything better.
+                return ts.isSourceFileJS(sourceFile) ? createJSSignatureHelpItems(argumentInfo, program, cancellationToken) : undefined;
+            }
+            return typeChecker.runWithCancellationToken(cancellationToken, function (typeChecker) {
+                return candidateInfo.kind === 0 /* CandidateOrTypeKind.Candidate */
+                    ? createSignatureHelpItems(candidateInfo.candidates, candidateInfo.resolvedSignature, argumentInfo, sourceFile, typeChecker)
+                    : createTypeHelpItems(candidateInfo.symbol, argumentInfo, sourceFile, typeChecker);
+            });
+        }
+        SignatureHelp.getSignatureHelpItems = getSignatureHelpItems;
+        var CandidateOrTypeKind;
+        (function (CandidateOrTypeKind) {
+            CandidateOrTypeKind[CandidateOrTypeKind["Candidate"] = 0] = "Candidate";
+            CandidateOrTypeKind[CandidateOrTypeKind["Type"] = 1] = "Type";
+        })(CandidateOrTypeKind || (CandidateOrTypeKind = {}));
+        function getCandidateOrTypeInfo(_a, checker, sourceFile, startingToken, onlyUseSyntacticOwners) {
+            var invocation = _a.invocation, argumentCount = _a.argumentCount;
+            switch (invocation.kind) {
+                case 0 /* InvocationKind.Call */: {
+                    if (onlyUseSyntacticOwners && !isSyntacticOwner(startingToken, invocation.node, sourceFile)) {
+                        return undefined;
+                    }
+                    var candidates = [];
+                    var resolvedSignature = checker.getResolvedSignatureForSignatureHelp(invocation.node, candidates, argumentCount); // TODO: GH#18217
+                    return candidates.length === 0 ? undefined : { kind: 0 /* CandidateOrTypeKind.Candidate */, candidates: candidates, resolvedSignature: resolvedSignature };
+                }
+                case 1 /* InvocationKind.TypeArgs */: {
+                    var called = invocation.called;
+                    if (onlyUseSyntacticOwners && !containsPrecedingToken(startingToken, sourceFile, ts.isIdentifier(called) ? called.parent : called)) {
+                        return undefined;
+                    }
+                    var candidates = ts.getPossibleGenericSignatures(called, argumentCount, checker);
+                    if (candidates.length !== 0)
+                        return { kind: 0 /* CandidateOrTypeKind.Candidate */, candidates: candidates, resolvedSignature: ts.first(candidates) };
+                    var symbol = checker.getSymbolAtLocation(called);
+                    return symbol && { kind: 1 /* CandidateOrTypeKind.Type */, symbol: symbol };
+                }
+                case 2 /* InvocationKind.Contextual */:
+                    return { kind: 0 /* CandidateOrTypeKind.Candidate */, candidates: [invocation.signature], resolvedSignature: invocation.signature };
+                default:
+                    return ts.Debug.assertNever(invocation);
+            }
+        }
+        function isSyntacticOwner(startingToken, node, sourceFile) {
+            if (!ts.isCallOrNewExpression(node))
+                return false;
+            var invocationChildren = node.getChildren(sourceFile);
+            switch (startingToken.kind) {
+                case 20 /* SyntaxKind.OpenParenToken */:
+                    return ts.contains(invocationChildren, startingToken);
+                case 27 /* SyntaxKind.CommaToken */: {
+                    var containingList = ts.findContainingList(startingToken);
+                    return !!containingList && ts.contains(invocationChildren, containingList);
+                }
+                case 29 /* SyntaxKind.LessThanToken */:
+                    return containsPrecedingToken(startingToken, sourceFile, node.expression);
+                default:
+                    return false;
+            }
+        }
+        function createJSSignatureHelpItems(argumentInfo, program, cancellationToken) {
+            if (argumentInfo.invocation.kind === 2 /* InvocationKind.Contextual */)
+                return undefined;
+            // See if we can find some symbol with the call expression name that has call signatures.
+            var expression = getExpressionFromInvocation(argumentInfo.invocation);
+            var name = ts.isPropertyAccessExpression(expression) ? expression.name.text : undefined;
+            var typeChecker = program.getTypeChecker();
+            return name === undefined ? undefined : ts.firstDefined(program.getSourceFiles(), function (sourceFile) {
+                return ts.firstDefined(sourceFile.getNamedDeclarations().get(name), function (declaration) {
+                    var type = declaration.symbol && typeChecker.getTypeOfSymbolAtLocation(declaration.symbol, declaration);
+                    var callSignatures = type && type.getCallSignatures();
+                    if (callSignatures && callSignatures.length) {
+                        return typeChecker.runWithCancellationToken(cancellationToken, function (typeChecker) { return createSignatureHelpItems(callSignatures, callSignatures[0], argumentInfo, sourceFile, typeChecker,
+                        /*useFullPrefix*/ true); });
+                    }
+                });
+            });
+        }
+        function containsPrecedingToken(startingToken, sourceFile, container) {
+            var pos = startingToken.getFullStart();
+            // There’s a possibility that `startingToken.parent` contains only `startingToken` and
+            // missing nodes, none of which are valid to be returned by `findPrecedingToken`. In that
+            // case, the preceding token we want is actually higher up the tree—almost definitely the
+            // next parent, but theoretically the situation with missing nodes might be happening on
+            // multiple nested levels.
+            var currentParent = startingToken.parent;
+            while (currentParent) {
+                var precedingToken = ts.findPrecedingToken(pos, sourceFile, currentParent, /*excludeJsdoc*/ true);
+                if (precedingToken) {
+                    return ts.rangeContainsRange(container, precedingToken);
+                }
+                currentParent = currentParent.parent;
+            }
+            return ts.Debug.fail("Could not find preceding token");
+        }
+        function getArgumentInfoForCompletions(node, position, sourceFile) {
+            var info = getImmediatelyContainingArgumentInfo(node, position, sourceFile);
+            return !info || info.isTypeParameterList || info.invocation.kind !== 0 /* InvocationKind.Call */ ? undefined
+                : { invocation: info.invocation.node, argumentCount: info.argumentCount, argumentIndex: info.argumentIndex };
+        }
+        SignatureHelp.getArgumentInfoForCompletions = getArgumentInfoForCompletions;
+        function getArgumentOrParameterListInfo(node, position, sourceFile) {
+            var info = getArgumentOrParameterListAndIndex(node, sourceFile);
+            if (!info)
+                return undefined;
+            var list = info.list, argumentIndex = info.argumentIndex;
+            var argumentCount = getArgumentCount(list, /*ignoreTrailingComma*/ ts.isInString(sourceFile, position, node));
+            if (argumentIndex !== 0) {
+                ts.Debug.assertLessThan(argumentIndex, argumentCount);
+            }
+            var argumentsSpan = getApplicableSpanForArguments(list, sourceFile);
+            return { list: list, argumentIndex: argumentIndex, argumentCount: argumentCount, argumentsSpan: argumentsSpan };
+        }
+        function getArgumentOrParameterListAndIndex(node, sourceFile) {
+            if (node.kind === 29 /* SyntaxKind.LessThanToken */ || node.kind === 20 /* SyntaxKind.OpenParenToken */) {
+                // Find the list that starts right *after* the < or ( token.
+                // If the user has just opened a list, consider this item 0.
+                return { list: getChildListThatStartsWithOpenerToken(node.parent, node, sourceFile), argumentIndex: 0 };
+            }
+            else {
+                // findListItemInfo can return undefined if we are not in parent's argument list
+                // or type argument list. This includes cases where the cursor is:
+                //   - To the right of the closing parenthesis, non-substitution template, or template tail.
+                //   - Between the type arguments and the arguments (greater than token)
+                //   - On the target of the call (parent.func)
+                //   - On the 'new' keyword in a 'new' expression
+                var list = ts.findContainingList(node);
+                return list && { list: list, argumentIndex: getArgumentIndex(list, node) };
+            }
+        }
+        /**
+         * Returns relevant information for the argument list and the current argument if we are
+         * in the argument of an invocation; returns undefined otherwise.
+         */
+        function getImmediatelyContainingArgumentInfo(node, position, sourceFile) {
+            var parent = node.parent;
+            if (ts.isCallOrNewExpression(parent)) {
+                var invocation = parent;
+                // There are 3 cases to handle:
+                //   1. The token introduces a list, and should begin a signature help session
+                //   2. The token is either not associated with a list, or ends a list, so the session should end
+                //   3. The token is buried inside a list, and should give signature help
+                //
+                // The following are examples of each:
+                //
+                //    Case 1:
+                //          foo<#T, U>(#a, b)    -> The token introduces a list, and should begin a signature help session
+                //    Case 2:
+                //          fo#o<T, U>#(a, b)#   -> The token is either not associated with a list, or ends a list, so the session should end
+                //    Case 3:
+                //          foo<T#, U#>(a#, #b#) -> The token is buried inside a list, and should give signature help
+                // Find out if 'node' is an argument, a type argument, or neither
+                var info = getArgumentOrParameterListInfo(node, position, sourceFile);
+                if (!info)
+                    return undefined;
+                var list = info.list, argumentIndex = info.argumentIndex, argumentCount = info.argumentCount, argumentsSpan = info.argumentsSpan;
+                var isTypeParameterList = !!parent.typeArguments && parent.typeArguments.pos === list.pos;
+                return { isTypeParameterList: isTypeParameterList, invocation: { kind: 0 /* InvocationKind.Call */, node: invocation }, argumentsSpan: argumentsSpan, argumentIndex: argumentIndex, argumentCount: argumentCount };
+            }
+            else if (ts.isNoSubstitutionTemplateLiteral(node) && ts.isTaggedTemplateExpression(parent)) {
+                // Check if we're actually inside the template;
+                // otherwise we'll fall out and return undefined.
+                if (ts.isInsideTemplateLiteral(node, position, sourceFile)) {
+                    return getArgumentListInfoForTemplate(parent, /*argumentIndex*/ 0, sourceFile);
+                }
+                return undefined;
+            }
+            else if (ts.isTemplateHead(node) && parent.parent.kind === 212 /* SyntaxKind.TaggedTemplateExpression */) {
+                var templateExpression = parent;
+                var tagExpression = templateExpression.parent;
+                ts.Debug.assert(templateExpression.kind === 225 /* SyntaxKind.TemplateExpression */);
+                var argumentIndex = ts.isInsideTemplateLiteral(node, position, sourceFile) ? 0 : 1;
+                return getArgumentListInfoForTemplate(tagExpression, argumentIndex, sourceFile);
+            }
+            else if (ts.isTemplateSpan(parent) && ts.isTaggedTemplateExpression(parent.parent.parent)) {
+                var templateSpan = parent;
+                var tagExpression = parent.parent.parent;
+                // If we're just after a template tail, don't show signature help.
+                if (ts.isTemplateTail(node) && !ts.isInsideTemplateLiteral(node, position, sourceFile)) {
+                    return undefined;
+                }
+                var spanIndex = templateSpan.parent.templateSpans.indexOf(templateSpan);
+                var argumentIndex = getArgumentIndexForTemplatePiece(spanIndex, node, position, sourceFile);
+                return getArgumentListInfoForTemplate(tagExpression, argumentIndex, sourceFile);
+            }
+            else if (ts.isJsxOpeningLikeElement(parent)) {
+                // Provide a signature help for JSX opening element or JSX self-closing element.
+                // This is not guarantee that JSX tag-name is resolved into stateless function component. (that is done in "getSignatureHelpItems")
+                // i.e
+                //      export function MainButton(props: ButtonProps, context: any): JSX.Element { ... }
+                //      <MainButton /*signatureHelp*/
+                var attributeSpanStart = parent.attributes.pos;
+                var attributeSpanEnd = ts.skipTrivia(sourceFile.text, parent.attributes.end, /*stopAfterLineBreak*/ false);
+                return {
+                    isTypeParameterList: false,
+                    invocation: { kind: 0 /* InvocationKind.Call */, node: parent },
+                    argumentsSpan: ts.createTextSpan(attributeSpanStart, attributeSpanEnd - attributeSpanStart),
+                    argumentIndex: 0,
+                    argumentCount: 1
+                };
+            }
+            else {
+                var typeArgInfo = ts.getPossibleTypeArgumentsInfo(node, sourceFile);
+                if (typeArgInfo) {
+                    var called = typeArgInfo.called, nTypeArguments = typeArgInfo.nTypeArguments;
+                    var invocation = { kind: 1 /* InvocationKind.TypeArgs */, called: called };
+                    var argumentsSpan = ts.createTextSpanFromBounds(called.getStart(sourceFile), node.end);
+                    return { isTypeParameterList: true, invocation: invocation, argumentsSpan: argumentsSpan, argumentIndex: nTypeArguments, argumentCount: nTypeArguments + 1 };
+                }
+                return undefined;
+            }
+        }
+        function getImmediatelyContainingArgumentOrContextualParameterInfo(node, position, sourceFile, checker) {
+            return tryGetParameterInfo(node, position, sourceFile, checker) || getImmediatelyContainingArgumentInfo(node, position, sourceFile);
+        }
+        function getHighestBinary(b) {
+            return ts.isBinaryExpression(b.parent) ? getHighestBinary(b.parent) : b;
+        }
+        function countBinaryExpressionParameters(b) {
+            return ts.isBinaryExpression(b.left) ? countBinaryExpressionParameters(b.left) + 1 : 2;
+        }
+        function tryGetParameterInfo(startingToken, position, sourceFile, checker) {
+            var info = getContextualSignatureLocationInfo(startingToken, sourceFile, position, checker);
+            if (!info)
+                return undefined;
+            var contextualType = info.contextualType, argumentIndex = info.argumentIndex, argumentCount = info.argumentCount, argumentsSpan = info.argumentsSpan;
+            // for optional function condition.
+            var nonNullableContextualType = contextualType.getNonNullableType();
+            var symbol = nonNullableContextualType.symbol;
+            if (symbol === undefined)
+                return undefined;
+            var signature = ts.lastOrUndefined(nonNullableContextualType.getCallSignatures());
+            if (signature === undefined)
+                return undefined;
+            var invocation = { kind: 2 /* InvocationKind.Contextual */, signature: signature, node: startingToken, symbol: chooseBetterSymbol(symbol) };
+            return { isTypeParameterList: false, invocation: invocation, argumentsSpan: argumentsSpan, argumentIndex: argumentIndex, argumentCount: argumentCount };
+        }
+        function getContextualSignatureLocationInfo(startingToken, sourceFile, position, checker) {
+            if (startingToken.kind !== 20 /* SyntaxKind.OpenParenToken */ && startingToken.kind !== 27 /* SyntaxKind.CommaToken */)
+                return undefined;
+            var parent = startingToken.parent;
+            switch (parent.kind) {
+                case 214 /* SyntaxKind.ParenthesizedExpression */:
+                case 171 /* SyntaxKind.MethodDeclaration */:
+                case 215 /* SyntaxKind.FunctionExpression */:
+                case 216 /* SyntaxKind.ArrowFunction */:
+                    var info = getArgumentOrParameterListInfo(startingToken, position, sourceFile);
+                    if (!info)
+                        return undefined;
+                    var argumentIndex = info.argumentIndex, argumentCount = info.argumentCount, argumentsSpan = info.argumentsSpan;
+                    var contextualType = ts.isMethodDeclaration(parent) ? checker.getContextualTypeForObjectLiteralElement(parent) : checker.getContextualType(parent);
+                    return contextualType && { contextualType: contextualType, argumentIndex: argumentIndex, argumentCount: argumentCount, argumentsSpan: argumentsSpan };
+                case 223 /* SyntaxKind.BinaryExpression */: {
+                    var highestBinary = getHighestBinary(parent);
+                    var contextualType_1 = checker.getContextualType(highestBinary);
+                    var argumentIndex_1 = startingToken.kind === 20 /* SyntaxKind.OpenParenToken */ ? 0 : countBinaryExpressionParameters(parent) - 1;
+                    var argumentCount_1 = countBinaryExpressionParameters(highestBinary);
+                    return contextualType_1 && { contextualType: contextualType_1, argumentIndex: argumentIndex_1, argumentCount: argumentCount_1, argumentsSpan: ts.createTextSpanFromNode(parent) };
+                }
+                default:
+                    return undefined;
+            }
+        }
+        // The type of a function type node has a symbol at that node, but it's better to use the symbol for a parameter or type alias.
+        function chooseBetterSymbol(s) {
+            return s.name === "__type" /* InternalSymbolName.Type */
+                ? ts.firstDefined(s.declarations, function (d) { return ts.isFunctionTypeNode(d) ? d.parent.symbol : undefined; }) || s
+                : s;
+        }
+        function getArgumentIndex(argumentsList, node) {
+            // The list we got back can include commas.  In the presence of errors it may
+            // also just have nodes without commas.  For example "Foo(a b c)" will have 3
+            // args without commas. We want to find what index we're at.  So we count
+            // forward until we hit ourselves, only incrementing the index if it isn't a
+            // comma.
+            //
+            // Note: the subtlety around trailing commas (in getArgumentCount) does not apply
+            // here.  That's because we're only walking forward until we hit the node we're
+            // on.  In that case, even if we're after the trailing comma, we'll still see
+            // that trailing comma in the list, and we'll have generated the appropriate
+            // arg index.
+            var argumentIndex = 0;
+            for (var _i = 0, _a = argumentsList.getChildren(); _i < _a.length; _i++) {
+                var child = _a[_i];
+                if (child === node) {
+                    break;
+                }
+                if (child.kind !== 27 /* SyntaxKind.CommaToken */) {
+                    argumentIndex++;
+                }
+            }
+            return argumentIndex;
+        }
+        function getArgumentCount(argumentsList, ignoreTrailingComma) {
+            // The argument count for a list is normally the number of non-comma children it has.
+            // For example, if you have "Foo(a,b)" then there will be three children of the arg
+            // list 'a' '<comma>' 'b'.  So, in this case the arg count will be 2.  However, there
+            // is a small subtlety.  If you have "Foo(a,)", then the child list will just have
+            // 'a' '<comma>'.  So, in the case where the last child is a comma, we increase the
+            // arg count by one to compensate.
+            //
+            // Note: this subtlety only applies to the last comma.  If you had "Foo(a,," then
+            // we'll have: 'a' '<comma>' '<missing>'
+            // That will give us 2 non-commas.  We then add one for the last comma, giving us an
+            // arg count of 3.
+            var listChildren = argumentsList.getChildren();
+            var argumentCount = ts.countWhere(listChildren, function (arg) { return arg.kind !== 27 /* SyntaxKind.CommaToken */; });
+            if (!ignoreTrailingComma && listChildren.length > 0 && ts.last(listChildren).kind === 27 /* SyntaxKind.CommaToken */) {
+                argumentCount++;
+            }
+            return argumentCount;
+        }
+        // spanIndex is either the index for a given template span.
+        // This does not give appropriate results for a NoSubstitutionTemplateLiteral
+        function getArgumentIndexForTemplatePiece(spanIndex, node, position, sourceFile) {
+            // Because the TemplateStringsArray is the first argument, we have to offset each substitution expression by 1.
+            // There are three cases we can encounter:
+            //      1. We are precisely in the template literal (argIndex = 0).
+            //      2. We are in or to the right of the substitution expression (argIndex = spanIndex + 1).
+            //      3. We are directly to the right of the template literal, but because we look for the token on the left,
+            //          not enough to put us in the substitution expression; we should consider ourselves part of
+            //          the *next* span's expression by offsetting the index (argIndex = (spanIndex + 1) + 1).
+            //
+            /* eslint-disable local/no-double-space */
+            // Example: f  `# abcd $#{#  1 + 1#  }# efghi ${ #"#hello"#  }  #  `
+            //              ^       ^ ^       ^   ^          ^ ^      ^     ^
+            // Case:        1       1 3       2   1          3 2      2     1
+            /* eslint-enable local/no-double-space */
+            ts.Debug.assert(position >= node.getStart(), "Assumed 'position' could not occur before node.");
+            if (ts.isTemplateLiteralToken(node)) {
+                if (ts.isInsideTemplateLiteral(node, position, sourceFile)) {
+                    return 0;
+                }
+                return spanIndex + 2;
+            }
+            return spanIndex + 1;
+        }
+        function getArgumentListInfoForTemplate(tagExpression, argumentIndex, sourceFile) {
+            // argumentCount is either 1 or (numSpans + 1) to account for the template strings array argument.
+            var argumentCount = ts.isNoSubstitutionTemplateLiteral(tagExpression.template) ? 1 : tagExpression.template.templateSpans.length + 1;
+            if (argumentIndex !== 0) {
+                ts.Debug.assertLessThan(argumentIndex, argumentCount);
+            }
+            return {
+                isTypeParameterList: false,
+                invocation: { kind: 0 /* InvocationKind.Call */, node: tagExpression },
+                argumentsSpan: getApplicableSpanForTaggedTemplate(tagExpression, sourceFile),
+                argumentIndex: argumentIndex,
+                argumentCount: argumentCount
+            };
+        }
+        function getApplicableSpanForArguments(argumentsList, sourceFile) {
+            // We use full start and skip trivia on the end because we want to include trivia on
+            // both sides. For example,
+            //
+            //    foo(   /*comment */     a, b, c      /*comment*/     )
+            //        |                                               |
+            //
+            // The applicable span is from the first bar to the second bar (inclusive,
+            // but not including parentheses)
+            var applicableSpanStart = argumentsList.getFullStart();
+            var applicableSpanEnd = ts.skipTrivia(sourceFile.text, argumentsList.getEnd(), /*stopAfterLineBreak*/ false);
+            return ts.createTextSpan(applicableSpanStart, applicableSpanEnd - applicableSpanStart);
+        }
+        function getApplicableSpanForTaggedTemplate(taggedTemplate, sourceFile) {
+            var template = taggedTemplate.template;
+            var applicableSpanStart = template.getStart();
+            var applicableSpanEnd = template.getEnd();
+            // We need to adjust the end position for the case where the template does not have a tail.
+            // Otherwise, we will not show signature help past the expression.
+            // For example,
+            //
+            //      ` ${ 1 + 1 foo(10)
+            //       |       |
+            // This is because a Missing node has no width. However, what we actually want is to include trivia
+            // leading up to the next token in case the user is about to type in a TemplateMiddle or TemplateTail.
+            if (template.kind === 225 /* SyntaxKind.TemplateExpression */) {
+                var lastSpan = ts.last(template.templateSpans);
+                if (lastSpan.literal.getFullWidth() === 0) {
+                    applicableSpanEnd = ts.skipTrivia(sourceFile.text, applicableSpanEnd, /*stopAfterLineBreak*/ false);
+                }
+            }
+            return ts.createTextSpan(applicableSpanStart, applicableSpanEnd - applicableSpanStart);
+        }
+        function getContainingArgumentInfo(node, position, sourceFile, checker, isManuallyInvoked) {
+            var _loop_7 = function (n) {
+                // If the node is not a subspan of its parent, this is a big problem.
+                // There have been crashes that might be caused by this violation.
+                ts.Debug.assert(ts.rangeContainsRange(n.parent, n), "Not a subspan", function () { return "Child: ".concat(ts.Debug.formatSyntaxKind(n.kind), ", parent: ").concat(ts.Debug.formatSyntaxKind(n.parent.kind)); });
+                var argumentInfo = getImmediatelyContainingArgumentOrContextualParameterInfo(n, position, sourceFile, checker);
+                if (argumentInfo) {
+                    return { value: argumentInfo };
+                }
+            };
+            for (var n = node; !ts.isSourceFile(n) && (isManuallyInvoked || !ts.isBlock(n)); n = n.parent) {
+                var state_4 = _loop_7(n);
+                if (typeof state_4 === "object")
+                    return state_4.value;
+            }
+            return undefined;
+        }
+        function getChildListThatStartsWithOpenerToken(parent, openerToken, sourceFile) {
+            var children = parent.getChildren(sourceFile);
+            var indexOfOpenerToken = children.indexOf(openerToken);
+            ts.Debug.assert(indexOfOpenerToken >= 0 && children.length > indexOfOpenerToken + 1);
+            return children[indexOfOpenerToken + 1];
+        }
+        function getExpressionFromInvocation(invocation) {
+            return invocation.kind === 0 /* InvocationKind.Call */ ? ts.getInvokedExpression(invocation.node) : invocation.called;
+        }
+        function getEnclosingDeclarationFromInvocation(invocation) {
+            return invocation.kind === 0 /* InvocationKind.Call */ ? invocation.node : invocation.kind === 1 /* InvocationKind.TypeArgs */ ? invocation.called : invocation.node;
+        }
+        var signatureHelpNodeBuilderFlags = 8192 /* NodeBuilderFlags.OmitParameterModifiers */ | 70221824 /* NodeBuilderFlags.IgnoreErrors */ | 16384 /* NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope */;
+        function createSignatureHelpItems(candidates, resolvedSignature, _a, sourceFile, typeChecker, useFullPrefix) {
+            var _b;
+            var isTypeParameterList = _a.isTypeParameterList, argumentCount = _a.argumentCount, applicableSpan = _a.argumentsSpan, invocation = _a.invocation, argumentIndex = _a.argumentIndex;
+            var enclosingDeclaration = getEnclosingDeclarationFromInvocation(invocation);
+            var callTargetSymbol = invocation.kind === 2 /* InvocationKind.Contextual */ ? invocation.symbol : (typeChecker.getSymbolAtLocation(getExpressionFromInvocation(invocation)) || useFullPrefix && ((_b = resolvedSignature.declaration) === null || _b === void 0 ? void 0 : _b.symbol));
+            var callTargetDisplayParts = callTargetSymbol ? ts.symbolToDisplayParts(typeChecker, callTargetSymbol, useFullPrefix ? sourceFile : undefined, /*meaning*/ undefined) : ts.emptyArray;
+            var items = ts.map(candidates, function (candidateSignature) { return getSignatureHelpItem(candidateSignature, callTargetDisplayParts, isTypeParameterList, typeChecker, enclosingDeclaration, sourceFile); });
+            if (argumentIndex !== 0) {
+                ts.Debug.assertLessThan(argumentIndex, argumentCount);
+            }
+            var selectedItemIndex = 0;
+            var itemsSeen = 0;
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                if (candidates[i] === resolvedSignature) {
+                    selectedItemIndex = itemsSeen;
+                    if (item.length > 1) {
+                        // check to see if any items in the list better match than the first one, as the checker isn't filtering the nested lists
+                        // (those come from tuple parameter expansion)
+                        var count = 0;
+                        for (var _i = 0, item_1 = item; _i < item_1.length; _i++) {
+                            var i_1 = item_1[_i];
+                            if (i_1.isVariadic || i_1.parameters.length >= argumentCount) {
+                                selectedItemIndex = itemsSeen + count;
+                                break;
+                            }
+                            count++;
+                        }
+                    }
+                }
+                itemsSeen += item.length;
+            }
+            ts.Debug.assert(selectedItemIndex !== -1); // If candidates is non-empty it should always include bestSignature. We check for an empty candidates before calling this function.
+            var help = { items: ts.flatMapToMutable(items, ts.identity), applicableSpan: applicableSpan, selectedItemIndex: selectedItemIndex, argumentIndex: argumentIndex, argumentCount: argumentCount };
+            var selected = help.items[selectedItemIndex];
+            if (selected.isVariadic) {
+                var firstRest = ts.findIndex(selected.parameters, function (p) { return !!p.isRest; });
+                if (-1 < firstRest && firstRest < selected.parameters.length - 1) {
+                    // We don't have any code to get this correct; instead, don't highlight a current parameter AT ALL
+                    help.argumentIndex = selected.parameters.length;
+                }
+                else {
+                    help.argumentIndex = Math.min(help.argumentIndex, selected.parameters.length - 1);
+                }
+            }
+            return help;
+        }
+        function createTypeHelpItems(symbol, _a, sourceFile, checker) {
+            var argumentCount = _a.argumentCount, applicableSpan = _a.argumentsSpan, invocation = _a.invocation, argumentIndex = _a.argumentIndex;
+            var typeParameters = checker.getLocalTypeParametersOfClassOrInterfaceOrTypeAlias(symbol);
+            if (!typeParameters)
+                return undefined;
+            var items = [getTypeHelpItem(symbol, typeParameters, checker, getEnclosingDeclarationFromInvocation(invocation), sourceFile)];
+            return { items: items, applicableSpan: applicableSpan, selectedItemIndex: 0, argumentIndex: argumentIndex, argumentCount: argumentCount };
+        }
+        function getTypeHelpItem(symbol, typeParameters, checker, enclosingDeclaration, sourceFile) {
+            var typeSymbolDisplay = ts.symbolToDisplayParts(checker, symbol);
+            var printer = ts.createPrinter({ removeComments: true });
+            var parameters = typeParameters.map(function (t) { return createSignatureHelpParameterForTypeParameter(t, checker, enclosingDeclaration, sourceFile, printer); });
+            var documentation = symbol.getDocumentationComment(checker);
+            var tags = symbol.getJsDocTags(checker);
+            var prefixDisplayParts = __spreadArray(__spreadArray([], typeSymbolDisplay, true), [ts.punctuationPart(29 /* SyntaxKind.LessThanToken */)], false);
+            return { isVariadic: false, prefixDisplayParts: prefixDisplayParts, suffixDisplayParts: [ts.punctuationPart(31 /* SyntaxKind.GreaterThanToken */)], separatorDisplayParts: separatorDisplayParts, parameters: parameters, documentation: documentation, tags: tags };
+        }
+        var separatorDisplayParts = [ts.punctuationPart(27 /* SyntaxKind.CommaToken */), ts.spacePart()];
+        function getSignatureHelpItem(candidateSignature, callTargetDisplayParts, isTypeParameterList, checker, enclosingDeclaration, sourceFile) {
+            var infos = (isTypeParameterList ? itemInfoForTypeParameters : itemInfoForParameters)(candidateSignature, checker, enclosingDeclaration, sourceFile);
+            return ts.map(infos, function (_a) {
+                var isVariadic = _a.isVariadic, parameters = _a.parameters, prefix = _a.prefix, suffix = _a.suffix;
+                var prefixDisplayParts = __spreadArray(__spreadArray([], callTargetDisplayParts, true), prefix, true);
+                var suffixDisplayParts = __spreadArray(__spreadArray([], suffix, true), returnTypeToDisplayParts(candidateSignature, enclosingDeclaration, checker), true);
+                var documentation = candidateSignature.getDocumentationComment(checker);
+                var tags = candidateSignature.getJsDocTags();
+                return { isVariadic: isVariadic, prefixDisplayParts: prefixDisplayParts, suffixDisplayParts: suffixDisplayParts, separatorDisplayParts: separatorDisplayParts, parameters: parameters, documentation: documentation, tags: tags };
+            });
+        }
+        function returnTypeToDisplayParts(candidateSignature, enclosingDeclaration, checker) {
+            return ts.mapToDisplayParts(function (writer) {
+                writer.writePunctuation(":");
+                writer.writeSpace(" ");
+                var predicate = checker.getTypePredicateOfSignature(candidateSignature);
+                if (predicate) {
+                    checker.writeTypePredicate(predicate, enclosingDeclaration, /*flags*/ undefined, writer);
+                }
+                else {
+                    checker.writeType(checker.getReturnTypeOfSignature(candidateSignature), enclosingDeclaration, /*flags*/ undefined, writer);
+                }
+            });
+        }
+        function itemInfoForTypeParameters(candidateSignature, checker, enclosingDeclaration, sourceFile) {
+            var typeParameters = (candidateSignature.target || candidateSignature).typeParameters;
+            var printer = ts.createPrinter({ removeComments: true });
+            var parameters = (typeParameters || ts.emptyArray).map(function (t) { return createSignatureHelpParameterForTypeParameter(t, checker, enclosingDeclaration, sourceFile, printer); });
+            var thisParameter = candidateSignature.thisParameter ? [checker.symbolToParameterDeclaration(candidateSignature.thisParameter, enclosingDeclaration, signatureHelpNodeBuilderFlags)] : [];
+            return checker.getExpandedParameters(candidateSignature).map(function (paramList) {
+                var params = ts.factory.createNodeArray(__spreadArray(__spreadArray([], thisParameter, true), ts.map(paramList, function (param) { return checker.symbolToParameterDeclaration(param, enclosingDeclaration, signatureHelpNodeBuilderFlags); }), true));
+                var parameterParts = ts.mapToDisplayParts(function (writer) {
+                    printer.writeList(2576 /* ListFormat.CallExpressionArguments */, params, sourceFile, writer);
+                });
+                return { isVariadic: false, parameters: parameters, prefix: [ts.punctuationPart(29 /* SyntaxKind.LessThanToken */)], suffix: __spreadArray([ts.punctuationPart(31 /* SyntaxKind.GreaterThanToken */)], parameterParts, true) };
+            });
+        }
+        function itemInfoForParameters(candidateSignature, checker, enclosingDeclaration, sourceFile) {
+            var printer = ts.createPrinter({ removeComments: true });
+            var typeParameterParts = ts.mapToDisplayParts(function (writer) {
+                if (candidateSignature.typeParameters && candidateSignature.typeParameters.length) {
+                    var args = ts.factory.createNodeArray(candidateSignature.typeParameters.map(function (p) { return checker.typeParameterToDeclaration(p, enclosingDeclaration, signatureHelpNodeBuilderFlags); }));
+                    printer.writeList(53776 /* ListFormat.TypeParameters */, args, sourceFile, writer);
+                }
+            });
+            var lists = checker.getExpandedParameters(candidateSignature);
+            var isVariadic = !checker.hasEffectiveRestParameter(candidateSignature) ? function (_) { return false; }
+                : lists.length === 1 ? function (_) { return true; }
+                    : function (pList) { return !!(pList.length && pList[pList.length - 1].checkFlags & 32768 /* CheckFlags.RestParameter */); };
+            return lists.map(function (parameterList) { return ({
+                isVariadic: isVariadic(parameterList),
+                parameters: parameterList.map(function (p) { return createSignatureHelpParameterForParameter(p, checker, enclosingDeclaration, sourceFile, printer); }),
+                prefix: __spreadArray(__spreadArray([], typeParameterParts, true), [ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */)], false),
+                suffix: [ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */)]
+            }); });
+        }
+        function createSignatureHelpParameterForParameter(parameter, checker, enclosingDeclaration, sourceFile, printer) {
+            var displayParts = ts.mapToDisplayParts(function (writer) {
+                var param = checker.symbolToParameterDeclaration(parameter, enclosingDeclaration, signatureHelpNodeBuilderFlags);
+                printer.writeNode(4 /* EmitHint.Unspecified */, param, sourceFile, writer);
+            });
+            var isOptional = checker.isOptionalParameter(parameter.valueDeclaration);
+            var isRest = !!(parameter.checkFlags & 32768 /* CheckFlags.RestParameter */);
+            return { name: parameter.name, documentation: parameter.getDocumentationComment(checker), displayParts: displayParts, isOptional: isOptional, isRest: isRest };
+        }
+        function createSignatureHelpParameterForTypeParameter(typeParameter, checker, enclosingDeclaration, sourceFile, printer) {
+            var displayParts = ts.mapToDisplayParts(function (writer) {
+                var param = checker.typeParameterToDeclaration(typeParameter, enclosingDeclaration, signatureHelpNodeBuilderFlags);
+                printer.writeNode(4 /* EmitHint.Unspecified */, param, sourceFile, writer);
+            });
+            return { name: typeParameter.symbol.name, documentation: typeParameter.symbol.getDocumentationComment(checker), displayParts: displayParts, isOptional: false, isRest: false };
+        }
+    })(SignatureHelp = ts.SignatureHelp || (ts.SignatureHelp = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var InlayHints;
+    (function (InlayHints) {
+        var maxHintsLength = 30;
+        var leadingParameterNameCommentRegexFactory = function (name) {
+            return new RegExp("^\\s?/\\*\\*?\\s?".concat(name, "\\s?\\*\\/\\s?$"));
+        };
+        function shouldShowParameterNameHints(preferences) {
+            return preferences.includeInlayParameterNameHints === "literals" || preferences.includeInlayParameterNameHints === "all";
+        }
+        function shouldShowLiteralParameterNameHintsOnly(preferences) {
+            return preferences.includeInlayParameterNameHints === "literals";
+        }
+        function provideInlayHints(context) {
+            var file = context.file, program = context.program, span = context.span, cancellationToken = context.cancellationToken, preferences = context.preferences;
+            var sourceFileText = file.text;
+            var compilerOptions = program.getCompilerOptions();
+            var checker = program.getTypeChecker();
+            var result = [];
+            visitor(file);
+            return result;
+            function visitor(node) {
+                if (!node || node.getFullWidth() === 0) {
+                    return;
+                }
+                switch (node.kind) {
+                    case 264 /* SyntaxKind.ModuleDeclaration */:
+                    case 260 /* SyntaxKind.ClassDeclaration */:
+                    case 261 /* SyntaxKind.InterfaceDeclaration */:
+                    case 259 /* SyntaxKind.FunctionDeclaration */:
+                    case 228 /* SyntaxKind.ClassExpression */:
+                    case 215 /* SyntaxKind.FunctionExpression */:
+                    case 171 /* SyntaxKind.MethodDeclaration */:
+                    case 216 /* SyntaxKind.ArrowFunction */:
+                        cancellationToken.throwIfCancellationRequested();
+                }
+                if (!ts.textSpanIntersectsWith(span, node.pos, node.getFullWidth())) {
+                    return;
+                }
+                if (ts.isTypeNode(node) && !ts.isExpressionWithTypeArguments(node)) {
+                    return;
+                }
+                if (preferences.includeInlayVariableTypeHints && ts.isVariableDeclaration(node)) {
+                    visitVariableLikeDeclaration(node);
+                }
+                else if (preferences.includeInlayPropertyDeclarationTypeHints && ts.isPropertyDeclaration(node)) {
+                    visitVariableLikeDeclaration(node);
+                }
+                else if (preferences.includeInlayEnumMemberValueHints && ts.isEnumMember(node)) {
+                    visitEnumMember(node);
+                }
+                else if (shouldShowParameterNameHints(preferences) && (ts.isCallExpression(node) || ts.isNewExpression(node))) {
+                    visitCallOrNewExpression(node);
+                }
+                else {
+                    if (preferences.includeInlayFunctionParameterTypeHints && ts.isFunctionLikeDeclaration(node) && ts.hasContextSensitiveParameters(node)) {
+                        visitFunctionLikeForParameterType(node);
+                    }
+                    if (preferences.includeInlayFunctionLikeReturnTypeHints && isSignatureSupportingReturnAnnotation(node)) {
+                        visitFunctionDeclarationLikeForReturnType(node);
+                    }
+                }
+                return ts.forEachChild(node, visitor);
+            }
+            function isSignatureSupportingReturnAnnotation(node) {
+                return ts.isArrowFunction(node) || ts.isFunctionExpression(node) || ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isGetAccessorDeclaration(node);
+            }
+            function addParameterHints(text, position, isFirstVariadicArgument) {
+                result.push({
+                    text: "".concat(isFirstVariadicArgument ? "..." : "").concat(truncation(text, maxHintsLength), ":"),
+                    position: position,
+                    kind: "Parameter" /* InlayHintKind.Parameter */,
+                    whitespaceAfter: true,
+                });
+            }
+            function addTypeHints(text, position) {
+                result.push({
+                    text: ": ".concat(truncation(text, maxHintsLength)),
+                    position: position,
+                    kind: "Type" /* InlayHintKind.Type */,
+                    whitespaceBefore: true,
+                });
+            }
+            function addEnumMemberValueHints(text, position) {
+                result.push({
+                    text: "= ".concat(truncation(text, maxHintsLength)),
+                    position: position,
+                    kind: "Enum" /* InlayHintKind.Enum */,
+                    whitespaceBefore: true,
+                });
+            }
+            function visitEnumMember(member) {
+                if (member.initializer) {
+                    return;
+                }
+                var enumValue = checker.getConstantValue(member);
+                if (enumValue !== undefined) {
+                    addEnumMemberValueHints(enumValue.toString(), member.end);
+                }
+            }
+            function isModuleReferenceType(type) {
+                return type.symbol && (type.symbol.flags & 1536 /* SymbolFlags.Module */);
+            }
+            function visitVariableLikeDeclaration(decl) {
+                if (!decl.initializer || ts.isBindingPattern(decl.name) || ts.isVariableDeclaration(decl) && !isHintableDeclaration(decl)) {
+                    return;
+                }
+                var effectiveTypeAnnotation = ts.getEffectiveTypeAnnotationNode(decl);
+            

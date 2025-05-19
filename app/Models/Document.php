@@ -22,12 +22,16 @@ class Document extends Model
         return $this->belongsTo(Client::class);
     }
 
-    public function transactions(): HasMany{
-        return $this->hasMany(Transaction::class);
-    }
-
     public function document_resets(): HasOne{
         return $this->hasOne(DocumentReset::class)->latestOfMany();
+    }
+
+    public function attachments(): HasMany{
+        return $this->hasMany(DocumentAttachment::class);
+    }
+
+    public function transactions(): HasMany{
+        return $this->hasMany(Transaction::class);
     }
 
     public function dateToCount(): Attribute{

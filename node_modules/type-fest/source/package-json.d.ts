@@ -209,25 +209,11 @@ declare namespace PackageJson {
 	export type Dependency = Partial<Record<string, string>>;
 
 	/**
-	Conditions which provide a way to resolve a package entry point based on the environment.
-	*/
-	export type ExportCondition = LiteralUnion<
-	| 'import'
-	| 'require'
-	| 'node'
-	| 'node-addons'
-	| 'deno'
-	| 'browser'
-	| 'electron'
-	| 'react-native'
-	| 'default',
-	string
-	>;
-
-	/**
 	A mapping of conditions and the paths to which they resolve.
 	*/
-	type ExportConditions = {[condition in ExportCondition]?: Exports};
+	type ExportConditions = { // eslint-disable-line @typescript-eslint/consistent-indexed-object-style
+		[condition: string]: Exports;
+	};
 
 	/**
 	Entry points of a module, optionally with conditions and subpath exports.
@@ -519,7 +505,7 @@ declare namespace PackageJson {
 		Engines that this package runs on.
 		*/
 		engines?: {
-			[EngineName in 'npm' | 'node' | string]?: string; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
+			[EngineName in 'npm' | 'node' | string]?: string;
 		};
 
 		/**

@@ -62,7 +62,9 @@ class TransactionController extends Controller
 
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
-            $file_name = time() . '_' . 'document_file' . '_' . $file->getClientOriginalName();
+            $original_filename = $file->getClientOriginalName();
+            $sanitized_filename = str_replace(' ','_',$original_filename);
+            $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
             $path = 'uploads/transaction_documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
         }
@@ -135,7 +137,9 @@ class TransactionController extends Controller
 
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
-            $file_name = time() . '_' . 'document_file' . '' . $file->getClientOriginalName();
+            $original_filename = $file->getClientOriginalName();
+            $sanitized_filename = str_replace(' ','-',$original_filename);
+            $file_name = time() . '_' . 'document_file' . '' . $sanitized_filename;
             $path = 'uploads/transaction_documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
         }

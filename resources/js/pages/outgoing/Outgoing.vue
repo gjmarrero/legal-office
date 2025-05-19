@@ -20,6 +20,7 @@ const changeFile = ref(true);
 const form = reactive({
     date_dispatched: '',
     recipient: '',
+    recipient_office: '',
     subject: '',
     content: '',
     remarks: '',
@@ -48,6 +49,7 @@ const createDocument = (values, actions) => {
     formData.append('content', form.content);
     formData.append('remarks', form.remarks);
     formData.append('recipient', form.recipient);
+    formData.append('recipient_office', form.recipient_office);
     saving.value = true;
     axios.post('/api/outgoing/create', formData)
         .then((response) => {
@@ -67,6 +69,7 @@ const editDocument = (values, actions) => {
     formData.append('document_file', form.file);
     formData.append('date_dispatched', form.date_dispatched);
     formData.append('recipient', form.recipient);
+    formData.append('recipient_office', form.recipient_office);
     formData.append('subject', form.subject);
     formData.append('content', form.content);
     formData.append('remarks', form.remarks);
@@ -89,6 +92,7 @@ const getDocument = () => {
         .then(({ data }) => {
             form.date_dispatched = data.date_dispatched;
             form.recipient = data.recipient;
+            form.recipient_office = data.recipient_office;
             form.subject = data.subject;
             form.content = data.content;
             form.remarks = data.remarks;
@@ -148,7 +152,7 @@ onMounted(() => {
                                 <input type="hidden" name="_method" value="PUT">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="date">Date Dispatched</label>
                                             <input v-model="form.date_dispatched" type="text"
@@ -157,15 +161,23 @@ onMounted(() => {
                                             <span class="invalid-feedback">{{ errors.date_dispatched }}</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="client">Client Name</label>
+                                            <label for="client">Recipient/Client Name</label>
                                             <input v-model="form.recipient" type="text" class="form-control"
                                                 :class="{ 'is-invalid': errors.recipient }" id="recipient">
                                             <span class="invalid-feedback">{{ errors.recipient }}</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="client">Recipient/Client Office</label>
+                                            <input v-model="form.recipient_office" type="text" class="form-control"
+                                                :class="{ 'is-invalid': errors.recipient_office }" id="recipient_office">
+                                            <span class="invalid-feedback">{{ errors.recipient_office }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="subject">Title</label>
                                             <input v-model="form.subject" type="text" class="form-control"

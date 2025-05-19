@@ -1,0 +1,1094 @@
+            var text = sourceFile.text.substr(start, width);
+            var match = tripleSlashXMLCommentRegEx.exec(text);
+            if (!match) {
+                return false;
+            }
+            // Limiting classification to exactly the elements and attributes
+            // defined in `ts.commentPragmas` would be excessive, but we can avoid
+            // some obvious false positives (e.g. in XML-like doc comments) by
+            // checking the element name.
+            // eslint-disable-next-line local/no-in-operator
+            if (!match[3] || !(match[3] in ts.commentPragmas)) {
+                return false;
+            }
+            var pos = start;
+            pushCommentRange(pos, match[1].length); // ///
+            pos += match[1].length;
+            pushClassification(pos, match[2].length, 10 /* ClassificationType.punctuation */); // <
+            pos += match[2].length;
+            pushClassification(pos, match[3].length, 21 /* ClassificationType.jsxSelfClosingTagName */); // element name
+            pos += match[3].length;
+            var attrText = match[4];
+            var attrPos = pos;
+            while (true) {
+                var attrMatch = attributeRegex.exec(attrText);
+                if (!attrMatch) {
+                    break;
+                }
+                var newAttrPos = pos + attrMatch.index + attrMatch[1].length; // whitespace
+                if (newAttrPos > attrPos) {
+                    pushCommentRange(attrPos, newAttrPos - attrPos);
+                    attrPos = newAttrPos;
+                }
+                pushClassification(attrPos, attrMatch[2].length, 22 /* ClassificationType.jsxAttribute */); // attribute name
+                attrPos += attrMatch[2].length;
+                if (attrMatch[3].length) {
+                    pushCommentRange(attrPos, attrMatch[3].length); // whitespace
+                    attrPos += attrMatch[3].length;
+                }
+                pushClassification(attrPos, attrMatch[4].length, 5 /* ClassificationType.operator */); // =
+                attrPos += attrMatch[4].length;
+                if (attrMatch[5].length) {
+                    pushCommentRange(attrPos, attrMatch[5].length); // whitespace
+                    attrPos += attrMatch[5].length;
+                }
+                pushClassification(attrPos, attrMatch[6].length, 24 /* ClassificationType.jsxAttributeStringLiteralValue */); // attribute value
+                attrPos += attrMatch[6].length;
+            }
+            pos += match[4].length;
+            if (pos > attrPos) {
+                pushCommentRange(attrPos, pos - attrPos);
+            }
+            if (match[5]) {
+                pushClassification(pos, match[5].length, 10 /* ClassificationType.punctuation */); // />
+                pos += match[5].length;
+            }
+            var end = start + width;
+            if (pos < end) {
+                pushCommentRange(pos, end - pos);
+            }
+            return true;
+        }
+        function processJSDocTemplateTag(tag) {
+            for (var _i = 0, _a = tag.getChildren(); _i < _a.length; _i++) {
+                var child = _a[_i];
+                processElement(child);
+            }
+        }
+        function classifyDisabledMergeCode(text, start, end) {
+            // Classify the line that the ||||||| or ======= marker is on as a comment.
+            // Then just lex all further tokens and add them to the result.
+            var i;
+            for (i = start; i < end; i++) {
+                if (ts.isLineBreak(text.charCodeAt(i))) {
+                    break;
+                }
+            }
+            pushClassification(start, i - start, 1 /* ClassificationType.comment */);
+            mergeConflictScanner.setTextPos(i);
+            while (mergeConflictScanner.getTextPos() < end) {
+                classifyDisabledCodeToken();
+            }
+        }
+        function classifyDisabledCodeToken() {
+            var start = mergeConflictScanner.getTextPos();
+            var tokenKind = mergeConflictScanner.scan();
+            var end = mergeConflictScanner.getTextPos();
+            var type = classifyTokenType(tokenKind);
+            if (type) {
+                pushClassification(start, end - start, type);
+            }
+        }
+        /**
+         * Returns true if node should be treated as classified and no further processing is required.
+         * False will mean that node is not classified and traverse routine should recurse into node contents.
+         */
+        function tryClassifyNode(node) {
+            if (ts.isJSDoc(node)) {
+                return true;
+            }
+            if (ts.nodeIsMissing(node)) {
+                return true;
+            }
+            var classifiedElementName = tryClassifyJsxElementName(node);
+            if (!ts.isToken(node) && node.kind !== 11 /* SyntaxKind.JsxText */ && classifiedElementName === undefined) {
+                return false;
+            }
+            var tokenStart = node.kind === 11 /* SyntaxKind.JsxText */ ? node.pos : classifyLeadingTriviaAndGetTokenStart(node);
+            var tokenWidth = node.end - tokenStart;
+            ts.Debug.assert(tokenWidth >= 0);
+            if (tokenWidth > 0) {
+                var type = classifiedElementName || classifyTokenType(node.kind, node);
+                if (type) {
+                    pushClassification(tokenStart, tokenWidth, type);
+                }
+            }
+            return true;
+        }
+        function tryClassifyJsxElementName(token) {
+            switch (token.parent && token.parent.kind) {
+                case 283 /* SyntaxKind.JsxOpeningElement */:
+                    if (token.parent.tagName === token) {
+                        return 19 /* ClassificationType.jsxOpenTagName */;
+                    }
+                    break;
+                case 284 /* SyntaxKind.JsxClosingElement */:
+                    if (token.parent.tagName === token) {
+                        return 20 /* ClassificationType.jsxCloseTagName */;
+                    }
+                    break;
+                case 282 /* SyntaxKind.JsxSelfClosingElement */:
+                    if (token.parent.tagName === token) {
+                        return 21 /* ClassificationType.jsxSelfClosingTagName */;
+                    }
+                    break;
+                case 288 /* SyntaxKind.JsxAttribute */:
+                    if (token.parent.name === token) {
+                        return 22 /* ClassificationType.jsxAttribute */;
+                    }
+                    break;
+            }
+            return undefined;
+        }
+        // for accurate classification, the actual token should be passed in.  however, for
+        // cases like 'disabled merge code' classification, we just get the token kind and
+        // classify based on that instead.
+        function classifyTokenType(tokenKind, token) {
+            if (ts.isKeyword(tokenKind)) {
+                return 3 /* ClassificationType.keyword */;
+            }
+            // Special case `<` and `>`: If they appear in a generic context they are punctuation,
+            // not operators.
+            if (tokenKind === 29 /* SyntaxKind.LessThanToken */ || tokenKind === 31 /* SyntaxKind.GreaterThanToken */) {
+                // If the node owning the token has a type argument list or type parameter list, then
+                // we can effectively assume that a '<' and '>' belong to those lists.
+                if (token && ts.getTypeArgumentOrTypeParameterList(token.parent)) {
+                    return 10 /* ClassificationType.punctuation */;
+                }
+            }
+            if (ts.isPunctuation(tokenKind)) {
+                if (token) {
+                    var parent = token.parent;
+                    if (tokenKind === 63 /* SyntaxKind.EqualsToken */) {
+                        // the '=' in a variable declaration is special cased here.
+                        if (parent.kind === 257 /* SyntaxKind.VariableDeclaration */ ||
+                            parent.kind === 169 /* SyntaxKind.PropertyDeclaration */ ||
+                            parent.kind === 166 /* SyntaxKind.Parameter */ ||
+                            parent.kind === 288 /* SyntaxKind.JsxAttribute */) {
+                            return 5 /* ClassificationType.operator */;
+                        }
+                    }
+                    if (parent.kind === 223 /* SyntaxKind.BinaryExpression */ ||
+                        parent.kind === 221 /* SyntaxKind.PrefixUnaryExpression */ ||
+                        parent.kind === 222 /* SyntaxKind.PostfixUnaryExpression */ ||
+                        parent.kind === 224 /* SyntaxKind.ConditionalExpression */) {
+                        return 5 /* ClassificationType.operator */;
+                    }
+                }
+                return 10 /* ClassificationType.punctuation */;
+            }
+            else if (tokenKind === 8 /* SyntaxKind.NumericLiteral */) {
+                return 4 /* ClassificationType.numericLiteral */;
+            }
+            else if (tokenKind === 9 /* SyntaxKind.BigIntLiteral */) {
+                return 25 /* ClassificationType.bigintLiteral */;
+            }
+            else if (tokenKind === 10 /* SyntaxKind.StringLiteral */) {
+                return token && token.parent.kind === 288 /* SyntaxKind.JsxAttribute */ ? 24 /* ClassificationType.jsxAttributeStringLiteralValue */ : 6 /* ClassificationType.stringLiteral */;
+            }
+            else if (tokenKind === 13 /* SyntaxKind.RegularExpressionLiteral */) {
+                // TODO: we should get another classification type for these literals.
+                return 6 /* ClassificationType.stringLiteral */;
+            }
+            else if (ts.isTemplateLiteralKind(tokenKind)) {
+                // TODO (drosen): we should *also* get another classification type for these literals.
+                return 6 /* ClassificationType.stringLiteral */;
+            }
+            else if (tokenKind === 11 /* SyntaxKind.JsxText */) {
+                return 23 /* ClassificationType.jsxText */;
+            }
+            else if (tokenKind === 79 /* SyntaxKind.Identifier */) {
+                if (token) {
+                    switch (token.parent.kind) {
+                        case 260 /* SyntaxKind.ClassDeclaration */:
+                            if (token.parent.name === token) {
+                                return 11 /* ClassificationType.className */;
+                            }
+                            return;
+                        case 165 /* SyntaxKind.TypeParameter */:
+                            if (token.parent.name === token) {
+                                return 15 /* ClassificationType.typeParameterName */;
+                            }
+                            return;
+                        case 261 /* SyntaxKind.InterfaceDeclaration */:
+                            if (token.parent.name === token) {
+                                return 13 /* ClassificationType.interfaceName */;
+                            }
+                            return;
+                        case 263 /* SyntaxKind.EnumDeclaration */:
+                            if (token.parent.name === token) {
+                                return 12 /* ClassificationType.enumName */;
+                            }
+                            return;
+                        case 264 /* SyntaxKind.ModuleDeclaration */:
+                            if (token.parent.name === token) {
+                                return 14 /* ClassificationType.moduleName */;
+                            }
+                            return;
+                        case 166 /* SyntaxKind.Parameter */:
+                            if (token.parent.name === token) {
+                                return ts.isThisIdentifier(token) ? 3 /* ClassificationType.keyword */ : 17 /* ClassificationType.parameterName */;
+                            }
+                            return;
+                    }
+                    if (ts.isConstTypeReference(token.parent)) {
+                        return 3 /* ClassificationType.keyword */;
+                    }
+                }
+                return 2 /* ClassificationType.identifier */;
+            }
+        }
+        function processElement(element) {
+            if (!element) {
+                return;
+            }
+            // Ignore nodes that don't intersect the original span to classify.
+            if (ts.decodedTextSpanIntersectsWith(spanStart, spanLength, element.pos, element.getFullWidth())) {
+                checkForClassificationCancellation(cancellationToken, element.kind);
+                for (var _i = 0, _a = element.getChildren(sourceFile); _i < _a.length; _i++) {
+                    var child = _a[_i];
+                    if (!tryClassifyNode(child)) {
+                        // Recurse into our child nodes.
+                        processElement(child);
+                    }
+                }
+            }
+        }
+    }
+    ts.getEncodedSyntacticClassifications = getEncodedSyntacticClassifications;
+})(ts || (ts = {}));
+/** @internal */
+var ts;
+(function (ts) {
+    var classifier;
+    (function (classifier) {
+        var v2020;
+        (function (v2020) {
+            var TokenEncodingConsts;
+            (function (TokenEncodingConsts) {
+                TokenEncodingConsts[TokenEncodingConsts["typeOffset"] = 8] = "typeOffset";
+                TokenEncodingConsts[TokenEncodingConsts["modifierMask"] = 255] = "modifierMask";
+            })(TokenEncodingConsts = v2020.TokenEncodingConsts || (v2020.TokenEncodingConsts = {}));
+            var TokenType;
+            (function (TokenType) {
+                TokenType[TokenType["class"] = 0] = "class";
+                TokenType[TokenType["enum"] = 1] = "enum";
+                TokenType[TokenType["interface"] = 2] = "interface";
+                TokenType[TokenType["namespace"] = 3] = "namespace";
+                TokenType[TokenType["typeParameter"] = 4] = "typeParameter";
+                TokenType[TokenType["type"] = 5] = "type";
+                TokenType[TokenType["parameter"] = 6] = "parameter";
+                TokenType[TokenType["variable"] = 7] = "variable";
+                TokenType[TokenType["enumMember"] = 8] = "enumMember";
+                TokenType[TokenType["property"] = 9] = "property";
+                TokenType[TokenType["function"] = 10] = "function";
+                TokenType[TokenType["member"] = 11] = "member";
+            })(TokenType = v2020.TokenType || (v2020.TokenType = {}));
+            var TokenModifier;
+            (function (TokenModifier) {
+                TokenModifier[TokenModifier["declaration"] = 0] = "declaration";
+                TokenModifier[TokenModifier["static"] = 1] = "static";
+                TokenModifier[TokenModifier["async"] = 2] = "async";
+                TokenModifier[TokenModifier["readonly"] = 3] = "readonly";
+                TokenModifier[TokenModifier["defaultLibrary"] = 4] = "defaultLibrary";
+                TokenModifier[TokenModifier["local"] = 5] = "local";
+            })(TokenModifier = v2020.TokenModifier || (v2020.TokenModifier = {}));
+            /** This is mainly used internally for testing */
+            function getSemanticClassifications(program, cancellationToken, sourceFile, span) {
+                var classifications = getEncodedSemanticClassifications(program, cancellationToken, sourceFile, span);
+                ts.Debug.assert(classifications.spans.length % 3 === 0);
+                var dense = classifications.spans;
+                var result = [];
+                for (var i = 0; i < dense.length; i += 3) {
+                    result.push({
+                        textSpan: ts.createTextSpan(dense[i], dense[i + 1]),
+                        classificationType: dense[i + 2]
+                    });
+                }
+                return result;
+            }
+            v2020.getSemanticClassifications = getSemanticClassifications;
+            function getEncodedSemanticClassifications(program, cancellationToken, sourceFile, span) {
+                return {
+                    spans: getSemanticTokens(program, sourceFile, span, cancellationToken),
+                    endOfLineState: 0 /* EndOfLineState.None */
+                };
+            }
+            v2020.getEncodedSemanticClassifications = getEncodedSemanticClassifications;
+            function getSemanticTokens(program, sourceFile, span, cancellationToken) {
+                var resultTokens = [];
+                var collector = function (node, typeIdx, modifierSet) {
+                    resultTokens.push(node.getStart(sourceFile), node.getWidth(sourceFile), ((typeIdx + 1) << 8 /* TokenEncodingConsts.typeOffset */) + modifierSet);
+                };
+                if (program && sourceFile) {
+                    collectTokens(program, sourceFile, span, collector, cancellationToken);
+                }
+                return resultTokens;
+            }
+            function collectTokens(program, sourceFile, span, collector, cancellationToken) {
+                var typeChecker = program.getTypeChecker();
+                var inJSXElement = false;
+                function visit(node) {
+                    switch (node.kind) {
+                        case 264 /* SyntaxKind.ModuleDeclaration */:
+                        case 260 /* SyntaxKind.ClassDeclaration */:
+                        case 261 /* SyntaxKind.InterfaceDeclaration */:
+                        case 259 /* SyntaxKind.FunctionDeclaration */:
+                        case 228 /* SyntaxKind.ClassExpression */:
+                        case 215 /* SyntaxKind.FunctionExpression */:
+                        case 216 /* SyntaxKind.ArrowFunction */:
+                            cancellationToken.throwIfCancellationRequested();
+                    }
+                    if (!node || !ts.textSpanIntersectsWith(span, node.pos, node.getFullWidth()) || node.getFullWidth() === 0) {
+                        return;
+                    }
+                    var prevInJSXElement = inJSXElement;
+                    if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+                        inJSXElement = true;
+                    }
+                    if (ts.isJsxExpression(node)) {
+                        inJSXElement = false;
+                    }
+                    if (ts.isIdentifier(node) && !inJSXElement && !inImportClause(node) && !ts.isInfinityOrNaNString(node.escapedText)) {
+                        var symbol = typeChecker.getSymbolAtLocation(node);
+                        if (symbol) {
+                            if (symbol.flags & 2097152 /* SymbolFlags.Alias */) {
+                                symbol = typeChecker.getAliasedSymbol(symbol);
+                            }
+                            var typeIdx = classifySymbol(symbol, ts.getMeaningFromLocation(node));
+                            if (typeIdx !== undefined) {
+                                var modifierSet = 0;
+                                if (node.parent) {
+                                    var parentIsDeclaration = (ts.isBindingElement(node.parent) || tokenFromDeclarationMapping.get(node.parent.kind) === typeIdx);
+                                    if (parentIsDeclaration && node.parent.name === node) {
+                                        modifierSet = 1 << 0 /* TokenModifier.declaration */;
+                                    }
+                                }
+                                // property declaration in constructor
+                                if (typeIdx === 6 /* TokenType.parameter */ && isRightSideOfQualifiedNameOrPropertyAccess(node)) {
+                                    typeIdx = 9 /* TokenType.property */;
+                                }
+                                typeIdx = reclassifyByType(typeChecker, node, typeIdx);
+                                var decl = symbol.valueDeclaration;
+                                if (decl) {
+                                    var modifiers = ts.getCombinedModifierFlags(decl);
+                                    var nodeFlags = ts.getCombinedNodeFlags(decl);
+                                    if (modifiers & 32 /* ModifierFlags.Static */) {
+                                        modifierSet |= 1 << 1 /* TokenModifier.static */;
+                                    }
+                                    if (modifiers & 512 /* ModifierFlags.Async */) {
+                                        modifierSet |= 1 << 2 /* TokenModifier.async */;
+                                    }
+                                    if (typeIdx !== 0 /* TokenType.class */ && typeIdx !== 2 /* TokenType.interface */) {
+                                        if ((modifiers & 64 /* ModifierFlags.Readonly */) || (nodeFlags & 2 /* NodeFlags.Const */) || (symbol.getFlags() & 8 /* SymbolFlags.EnumMember */)) {
+                                            modifierSet |= 1 << 3 /* TokenModifier.readonly */;
+                                        }
+                                    }
+                                    if ((typeIdx === 7 /* TokenType.variable */ || typeIdx === 10 /* TokenType.function */) && isLocalDeclaration(decl, sourceFile)) {
+                                        modifierSet |= 1 << 5 /* TokenModifier.local */;
+                                    }
+                                    if (program.isSourceFileDefaultLibrary(decl.getSourceFile())) {
+                                        modifierSet |= 1 << 4 /* TokenModifier.defaultLibrary */;
+                                    }
+                                }
+                                else if (symbol.declarations && symbol.declarations.some(function (d) { return program.isSourceFileDefaultLibrary(d.getSourceFile()); })) {
+                                    modifierSet |= 1 << 4 /* TokenModifier.defaultLibrary */;
+                                }
+                                collector(node, typeIdx, modifierSet);
+                            }
+                        }
+                    }
+                    ts.forEachChild(node, visit);
+                    inJSXElement = prevInJSXElement;
+                }
+                visit(sourceFile);
+            }
+            function classifySymbol(symbol, meaning) {
+                var flags = symbol.getFlags();
+                if (flags & 32 /* SymbolFlags.Class */) {
+                    return 0 /* TokenType.class */;
+                }
+                else if (flags & 384 /* SymbolFlags.Enum */) {
+                    return 1 /* TokenType.enum */;
+                }
+                else if (flags & 524288 /* SymbolFlags.TypeAlias */) {
+                    return 5 /* TokenType.type */;
+                }
+                else if (flags & 64 /* SymbolFlags.Interface */) {
+                    if (meaning & 2 /* SemanticMeaning.Type */) {
+                        return 2 /* TokenType.interface */;
+                    }
+                }
+                else if (flags & 262144 /* SymbolFlags.TypeParameter */) {
+                    return 4 /* TokenType.typeParameter */;
+                }
+                var decl = symbol.valueDeclaration || symbol.declarations && symbol.declarations[0];
+                if (decl && ts.isBindingElement(decl)) {
+                    decl = getDeclarationForBindingElement(decl);
+                }
+                return decl && tokenFromDeclarationMapping.get(decl.kind);
+            }
+            function reclassifyByType(typeChecker, node, typeIdx) {
+                // type based classifications
+                if (typeIdx === 7 /* TokenType.variable */ || typeIdx === 9 /* TokenType.property */ || typeIdx === 6 /* TokenType.parameter */) {
+                    var type_1 = typeChecker.getTypeAtLocation(node);
+                    if (type_1) {
+                        var test = function (condition) {
+                            return condition(type_1) || type_1.isUnion() && type_1.types.some(condition);
+                        };
+                        if (typeIdx !== 6 /* TokenType.parameter */ && test(function (t) { return t.getConstructSignatures().length > 0; })) {
+                            return 0 /* TokenType.class */;
+                        }
+                        if (test(function (t) { return t.getCallSignatures().length > 0; }) && !test(function (t) { return t.getProperties().length > 0; }) || isExpressionInCallExpression(node)) {
+                            return typeIdx === 9 /* TokenType.property */ ? 11 /* TokenType.member */ : 10 /* TokenType.function */;
+                        }
+                    }
+                }
+                return typeIdx;
+            }
+            function isLocalDeclaration(decl, sourceFile) {
+                if (ts.isBindingElement(decl)) {
+                    decl = getDeclarationForBindingElement(decl);
+                }
+                if (ts.isVariableDeclaration(decl)) {
+                    return (!ts.isSourceFile(decl.parent.parent.parent) || ts.isCatchClause(decl.parent)) && decl.getSourceFile() === sourceFile;
+                }
+                else if (ts.isFunctionDeclaration(decl)) {
+                    return !ts.isSourceFile(decl.parent) && decl.getSourceFile() === sourceFile;
+                }
+                return false;
+            }
+            function getDeclarationForBindingElement(element) {
+                while (true) {
+                    if (ts.isBindingElement(element.parent.parent)) {
+                        element = element.parent.parent;
+                    }
+                    else {
+                        return element.parent.parent;
+                    }
+                }
+            }
+            function inImportClause(node) {
+                var parent = node.parent;
+                return parent && (ts.isImportClause(parent) || ts.isImportSpecifier(parent) || ts.isNamespaceImport(parent));
+            }
+            function isExpressionInCallExpression(node) {
+                while (isRightSideOfQualifiedNameOrPropertyAccess(node)) {
+                    node = node.parent;
+                }
+                return ts.isCallExpression(node.parent) && node.parent.expression === node;
+            }
+            function isRightSideOfQualifiedNameOrPropertyAccess(node) {
+                return (ts.isQualifiedName(node.parent) && node.parent.right === node) || (ts.isPropertyAccessExpression(node.parent) && node.parent.name === node);
+            }
+            var tokenFromDeclarationMapping = new ts.Map([
+                [257 /* SyntaxKind.VariableDeclaration */, 7 /* TokenType.variable */],
+                [166 /* SyntaxKind.Parameter */, 6 /* TokenType.parameter */],
+                [169 /* SyntaxKind.PropertyDeclaration */, 9 /* TokenType.property */],
+                [264 /* SyntaxKind.ModuleDeclaration */, 3 /* TokenType.namespace */],
+                [263 /* SyntaxKind.EnumDeclaration */, 1 /* TokenType.enum */],
+                [302 /* SyntaxKind.EnumMember */, 8 /* TokenType.enumMember */],
+                [260 /* SyntaxKind.ClassDeclaration */, 0 /* TokenType.class */],
+                [171 /* SyntaxKind.MethodDeclaration */, 11 /* TokenType.member */],
+                [259 /* SyntaxKind.FunctionDeclaration */, 10 /* TokenType.function */],
+                [215 /* SyntaxKind.FunctionExpression */, 10 /* TokenType.function */],
+                [170 /* SyntaxKind.MethodSignature */, 11 /* TokenType.member */],
+                [174 /* SyntaxKind.GetAccessor */, 9 /* TokenType.property */],
+                [175 /* SyntaxKind.SetAccessor */, 9 /* TokenType.property */],
+                [168 /* SyntaxKind.PropertySignature */, 9 /* TokenType.property */],
+                [261 /* SyntaxKind.InterfaceDeclaration */, 2 /* TokenType.interface */],
+                [262 /* SyntaxKind.TypeAliasDeclaration */, 5 /* TokenType.type */],
+                [165 /* SyntaxKind.TypeParameter */, 4 /* TokenType.typeParameter */],
+                [299 /* SyntaxKind.PropertyAssignment */, 9 /* TokenType.property */],
+                [300 /* SyntaxKind.ShorthandPropertyAssignment */, 9 /* TokenType.property */]
+            ]);
+        })(v2020 = classifier.v2020 || (classifier.v2020 = {}));
+    })(classifier = ts.classifier || (ts.classifier = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var Completions;
+    (function (Completions) {
+        var StringCompletions;
+        (function (StringCompletions) {
+            var _a;
+            var kindPrecedence = (_a = {},
+                _a["directory" /* ScriptElementKind.directory */] = 0,
+                _a["script" /* ScriptElementKind.scriptElement */] = 1,
+                _a["external module name" /* ScriptElementKind.externalModuleName */] = 2,
+                _a);
+            function createNameAndKindSet() {
+                var map = new ts.Map();
+                function add(value) {
+                    var existing = map.get(value.name);
+                    if (!existing || kindPrecedence[existing.kind] < kindPrecedence[value.kind]) {
+                        map.set(value.name, value);
+                    }
+                }
+                return {
+                    add: add,
+                    has: map.has.bind(map),
+                    values: map.values.bind(map),
+                };
+            }
+            function getStringLiteralCompletions(sourceFile, position, contextToken, options, host, program, log, preferences) {
+                if (ts.isInReferenceComment(sourceFile, position)) {
+                    var entries = getTripleSlashReferenceCompletion(sourceFile, position, options, host);
+                    return entries && convertPathCompletions(entries);
+                }
+                if (ts.isInString(sourceFile, position, contextToken)) {
+                    if (!contextToken || !ts.isStringLiteralLike(contextToken))
+                        return undefined;
+                    var entries = getStringLiteralCompletionEntries(sourceFile, contextToken, position, program.getTypeChecker(), options, host, preferences);
+                    return convertStringLiteralCompletions(entries, contextToken, sourceFile, host, program, log, options, preferences);
+                }
+            }
+            StringCompletions.getStringLiteralCompletions = getStringLiteralCompletions;
+            function convertStringLiteralCompletions(completion, contextToken, sourceFile, host, program, log, options, preferences) {
+                if (completion === undefined) {
+                    return undefined;
+                }
+                var optionalReplacementSpan = ts.createTextSpanFromStringLiteralLikeContent(contextToken);
+                switch (completion.kind) {
+                    case 0 /* StringLiteralCompletionKind.Paths */:
+                        return convertPathCompletions(completion.paths);
+                    case 1 /* StringLiteralCompletionKind.Properties */: {
+                        var entries = ts.createSortedArray();
+                        Completions.getCompletionEntriesFromSymbols(completion.symbols, entries, contextToken, contextToken, sourceFile, sourceFile, host, program, 99 /* ScriptTarget.ESNext */, log, 4 /* CompletionKind.String */, preferences, options,
+                        /*formatContext*/ undefined); // Target will not be used, so arbitrary
+                        return { isGlobalCompletion: false, isMemberCompletion: true, isNewIdentifierLocation: completion.hasIndexSignature, optionalReplacementSpan: optionalReplacementSpan, entries: entries };
+                    }
+                    case 2 /* StringLiteralCompletionKind.Types */: {
+                        var entries = completion.types.map(function (type) { return ({
+                            name: type.value,
+                            kindModifiers: "" /* ScriptElementKindModifier.none */,
+                            kind: "string" /* ScriptElementKind.string */,
+                            sortText: Completions.SortText.LocationPriority,
+                            replacementSpan: ts.getReplacementSpanForContextToken(contextToken)
+                        }); });
+                        return { isGlobalCompletion: false, isMemberCompletion: false, isNewIdentifierLocation: completion.isNewIdentifier, optionalReplacementSpan: optionalReplacementSpan, entries: entries };
+                    }
+                    default:
+                        return ts.Debug.assertNever(completion);
+                }
+            }
+            function getStringLiteralCompletionDetails(name, sourceFile, position, contextToken, checker, options, host, cancellationToken, preferences) {
+                if (!contextToken || !ts.isStringLiteralLike(contextToken))
+                    return undefined;
+                var completions = getStringLiteralCompletionEntries(sourceFile, contextToken, position, checker, options, host, preferences);
+                return completions && stringLiteralCompletionDetails(name, contextToken, completions, sourceFile, checker, cancellationToken);
+            }
+            StringCompletions.getStringLiteralCompletionDetails = getStringLiteralCompletionDetails;
+            function stringLiteralCompletionDetails(name, location, completion, sourceFile, checker, cancellationToken) {
+                switch (completion.kind) {
+                    case 0 /* StringLiteralCompletionKind.Paths */: {
+                        var match = ts.find(completion.paths, function (p) { return p.name === name; });
+                        return match && Completions.createCompletionDetails(name, kindModifiersFromExtension(match.extension), match.kind, [ts.textPart(name)]);
+                    }
+                    case 1 /* StringLiteralCompletionKind.Properties */: {
+                        var match = ts.find(completion.symbols, function (s) { return s.name === name; });
+                        return match && Completions.createCompletionDetailsForSymbol(match, checker, sourceFile, location, cancellationToken);
+                    }
+                    case 2 /* StringLiteralCompletionKind.Types */:
+                        return ts.find(completion.types, function (t) { return t.value === name; }) ? Completions.createCompletionDetails(name, "" /* ScriptElementKindModifier.none */, "type" /* ScriptElementKind.typeElement */, [ts.textPart(name)]) : undefined;
+                    default:
+                        return ts.Debug.assertNever(completion);
+                }
+            }
+            function convertPathCompletions(pathCompletions) {
+                var isGlobalCompletion = false; // We don't want the editor to offer any other completions, such as snippets, inside a comment.
+                var isNewIdentifierLocation = true; // The user may type in a path that doesn't yet exist, creating a "new identifier" with respect to the collection of identifiers the server is aware of.
+                var entries = pathCompletions.map(function (_a) {
+                    var name = _a.name, kind = _a.kind, span = _a.span, extension = _a.extension;
+                    return ({ name: name, kind: kind, kindModifiers: kindModifiersFromExtension(extension), sortText: Completions.SortText.LocationPriority, replacementSpan: span });
+                });
+                return { isGlobalCompletion: isGlobalCompletion, isMemberCompletion: false, isNewIdentifierLocation: isNewIdentifierLocation, entries: entries };
+            }
+            function kindModifiersFromExtension(extension) {
+                switch (extension) {
+                    case ".d.ts" /* Extension.Dts */: return ".d.ts" /* ScriptElementKindModifier.dtsModifier */;
+                    case ".js" /* Extension.Js */: return ".js" /* ScriptElementKindModifier.jsModifier */;
+                    case ".json" /* Extension.Json */: return ".json" /* ScriptElementKindModifier.jsonModifier */;
+                    case ".jsx" /* Extension.Jsx */: return ".jsx" /* ScriptElementKindModifier.jsxModifier */;
+                    case ".ts" /* Extension.Ts */: return ".ts" /* ScriptElementKindModifier.tsModifier */;
+                    case ".tsx" /* Extension.Tsx */: return ".tsx" /* ScriptElementKindModifier.tsxModifier */;
+                    case ".d.mts" /* Extension.Dmts */: return ".d.mts" /* ScriptElementKindModifier.dmtsModifier */;
+                    case ".mjs" /* Extension.Mjs */: return ".mjs" /* ScriptElementKindModifier.mjsModifier */;
+                    case ".mts" /* Extension.Mts */: return ".mts" /* ScriptElementKindModifier.mtsModifier */;
+                    case ".d.cts" /* Extension.Dcts */: return ".d.cts" /* ScriptElementKindModifier.dctsModifier */;
+                    case ".cjs" /* Extension.Cjs */: return ".cjs" /* ScriptElementKindModifier.cjsModifier */;
+                    case ".cts" /* Extension.Cts */: return ".cts" /* ScriptElementKindModifier.ctsModifier */;
+                    case ".tsbuildinfo" /* Extension.TsBuildInfo */: return ts.Debug.fail("Extension ".concat(".tsbuildinfo" /* Extension.TsBuildInfo */, " is unsupported."));
+                    case undefined: return "" /* ScriptElementKindModifier.none */;
+                    default:
+                        return ts.Debug.assertNever(extension);
+                }
+            }
+            var StringLiteralCompletionKind;
+            (function (StringLiteralCompletionKind) {
+                StringLiteralCompletionKind[StringLiteralCompletionKind["Paths"] = 0] = "Paths";
+                StringLiteralCompletionKind[StringLiteralCompletionKind["Properties"] = 1] = "Properties";
+                StringLiteralCompletionKind[StringLiteralCompletionKind["Types"] = 2] = "Types";
+            })(StringLiteralCompletionKind || (StringLiteralCompletionKind = {}));
+            function getStringLiteralCompletionEntries(sourceFile, node, position, typeChecker, compilerOptions, host, preferences) {
+                var parent = walkUpParentheses(node.parent);
+                switch (parent.kind) {
+                    case 198 /* SyntaxKind.LiteralType */: {
+                        var grandParent_1 = walkUpParentheses(parent.parent);
+                        switch (grandParent_1.kind) {
+                            case 230 /* SyntaxKind.ExpressionWithTypeArguments */:
+                            case 180 /* SyntaxKind.TypeReference */: {
+                                var typeArgument = ts.findAncestor(parent, function (n) { return n.parent === grandParent_1; });
+                                if (typeArgument) {
+                                    return { kind: 2 /* StringLiteralCompletionKind.Types */, types: getStringLiteralTypes(typeChecker.getTypeArgumentConstraint(typeArgument)), isNewIdentifier: false };
+                                }
+                                return undefined;
+                            }
+                            case 196 /* SyntaxKind.IndexedAccessType */:
+                                // Get all apparent property names
+                                // i.e. interface Foo {
+                                //          foo: string;
+                                //          bar: string;
+                                //      }
+                                //      let x: Foo["/*completion position*/"]
+                                var _a = grandParent_1, indexType = _a.indexType, objectType = _a.objectType;
+                                if (!ts.rangeContainsPosition(indexType, position)) {
+                                    return undefined;
+                                }
+                                return stringLiteralCompletionsFromProperties(typeChecker.getTypeFromTypeNode(objectType));
+                            case 202 /* SyntaxKind.ImportType */:
+                                return { kind: 0 /* StringLiteralCompletionKind.Paths */, paths: getStringLiteralCompletionsFromModuleNames(sourceFile, node, compilerOptions, host, typeChecker, preferences) };
+                            case 189 /* SyntaxKind.UnionType */: {
+                                if (!ts.isTypeReferenceNode(grandParent_1.parent)) {
+                                    return undefined;
+                                }
+                                var alreadyUsedTypes_1 = getAlreadyUsedTypesInStringLiteralUnion(grandParent_1, parent);
+                                var types = getStringLiteralTypes(typeChecker.getTypeArgumentConstraint(grandParent_1)).filter(function (t) { return !ts.contains(alreadyUsedTypes_1, t.value); });
+                                return { kind: 2 /* StringLiteralCompletionKind.Types */, types: types, isNewIdentifier: false };
+                            }
+                            default:
+                                return undefined;
+                        }
+                    }
+                    case 299 /* SyntaxKind.PropertyAssignment */:
+                        if (ts.isObjectLiteralExpression(parent.parent) && parent.name === node) {
+                            // Get quoted name of properties of the object literal expression
+                            // i.e. interface ConfigFiles {
+                            //          'jspm:dev': string
+                            //      }
+                            //      let files: ConfigFiles = {
+                            //          '/*completion position*/'
+                            //      }
+                            //
+                            //      function foo(c: ConfigFiles) {}
+                            //      foo({
+                            //          '/*completion position*/'
+                            //      });
+                            return stringLiteralCompletionsForObjectLiteral(typeChecker, parent.parent);
+                        }
+                        return fromContextualType();
+                    case 209 /* SyntaxKind.ElementAccessExpression */: {
+                        var _b = parent, expression = _b.expression, argumentExpression = _b.argumentExpression;
+                        if (node === ts.skipParentheses(argumentExpression)) {
+                            // Get all names of properties on the expression
+                            // i.e. interface A {
+                            //      'prop1': string
+                            // }
+                            // let a: A;
+                            // a['/*completion position*/']
+                            return stringLiteralCompletionsFromProperties(typeChecker.getTypeAtLocation(expression));
+                        }
+                        return undefined;
+                    }
+                    case 210 /* SyntaxKind.CallExpression */:
+                    case 211 /* SyntaxKind.NewExpression */:
+                    case 288 /* SyntaxKind.JsxAttribute */:
+                        if (!isRequireCallArgument(node) && !ts.isImportCall(parent)) {
+                            var argumentInfo = ts.SignatureHelp.getArgumentInfoForCompletions(parent.kind === 288 /* SyntaxKind.JsxAttribute */ ? parent.parent : node, position, sourceFile);
+                            // Get string literal completions from specialized signatures of the target
+                            // i.e. declare function f(a: 'A');
+                            // f("/*completion position*/")
+                            return argumentInfo && getStringLiteralCompletionsFromSignature(argumentInfo.invocation, node, argumentInfo, typeChecker) || fromContextualType();
+                        }
+                    // falls through (is `require("")` or `require(""` or `import("")`)
+                    case 269 /* SyntaxKind.ImportDeclaration */:
+                    case 275 /* SyntaxKind.ExportDeclaration */:
+                    case 280 /* SyntaxKind.ExternalModuleReference */:
+                        // Get all known external module names or complete a path to a module
+                        // i.e. import * as ns from "/*completion position*/";
+                        //      var y = import("/*completion position*/");
+                        //      import x = require("/*completion position*/");
+                        //      var y = require("/*completion position*/");
+                        //      export * from "/*completion position*/";
+                        return { kind: 0 /* StringLiteralCompletionKind.Paths */, paths: getStringLiteralCompletionsFromModuleNames(sourceFile, node, compilerOptions, host, typeChecker, preferences) };
+                    default:
+                        return fromContextualType();
+                }
+                function fromContextualType() {
+                    // Get completion for string literal from string literal type
+                    // i.e. var x: "hi" | "hello" = "/*completion position*/"
+                    return { kind: 2 /* StringLiteralCompletionKind.Types */, types: getStringLiteralTypes(ts.getContextualTypeFromParent(node, typeChecker)), isNewIdentifier: false };
+                }
+            }
+            function walkUpParentheses(node) {
+                switch (node.kind) {
+                    case 193 /* SyntaxKind.ParenthesizedType */:
+                        return ts.walkUpParenthesizedTypes(node);
+                    case 214 /* SyntaxKind.ParenthesizedExpression */:
+                        return ts.walkUpParenthesizedExpressions(node);
+                    default:
+                        return node;
+                }
+            }
+            function getAlreadyUsedTypesInStringLiteralUnion(union, current) {
+                return ts.mapDefined(union.types, function (type) {
+                    return type !== current && ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal) ? type.literal.text : undefined;
+                });
+            }
+            function getStringLiteralCompletionsFromSignature(call, arg, argumentInfo, checker) {
+                var isNewIdentifier = false;
+                var uniques = new ts.Map();
+                var candidates = [];
+                var editingArgument = ts.isJsxOpeningLikeElement(call) ? ts.Debug.checkDefined(ts.findAncestor(arg.parent, ts.isJsxAttribute)) : arg;
+                checker.getResolvedSignatureForStringLiteralCompletions(call, editingArgument, candidates);
+                var types = ts.flatMap(candidates, function (candidate) {
+                    if (!ts.signatureHasRestParameter(candidate) && argumentInfo.argumentCount > candidate.parameters.length)
+                        return;
+                    var type = candidate.getTypeParameterAtPosition(argumentInfo.argumentIndex);
+                    if (ts.isJsxOpeningLikeElement(call)) {
+                        var propType = checker.getTypeOfPropertyOfType(type, editingArgument.name.text);
+                        if (propType) {
+                            type = propType;
+                        }
+                    }
+                    isNewIdentifier = isNewIdentifier || !!(type.flags & 4 /* TypeFlags.String */);
+                    return getStringLiteralTypes(type, uniques);
+                });
+                return ts.length(types) ? { kind: 2 /* StringLiteralCompletionKind.Types */, types: types, isNewIdentifier: isNewIdentifier } : undefined;
+            }
+            function stringLiteralCompletionsFromProperties(type) {
+                return type && {
+                    kind: 1 /* StringLiteralCompletionKind.Properties */,
+                    symbols: ts.filter(type.getApparentProperties(), function (prop) { return !(prop.valueDeclaration && ts.isPrivateIdentifierClassElementDeclaration(prop.valueDeclaration)); }),
+                    hasIndexSignature: ts.hasIndexSignature(type)
+                };
+            }
+            function stringLiteralCompletionsForObjectLiteral(checker, objectLiteralExpression) {
+                var contextualType = checker.getContextualType(objectLiteralExpression);
+                if (!contextualType)
+                    return undefined;
+                var completionsType = checker.getContextualType(objectLiteralExpression, 4 /* ContextFlags.Completions */);
+                var symbols = Completions.getPropertiesForObjectExpression(contextualType, completionsType, objectLiteralExpression, checker);
+                return {
+                    kind: 1 /* StringLiteralCompletionKind.Properties */,
+                    symbols: symbols,
+                    hasIndexSignature: ts.hasIndexSignature(contextualType)
+                };
+            }
+            function getStringLiteralTypes(type, uniques) {
+                if (uniques === void 0) { uniques = new ts.Map(); }
+                if (!type)
+                    return ts.emptyArray;
+                type = ts.skipConstraint(type);
+                return type.isUnion() ? ts.flatMap(type.types, function (t) { return getStringLiteralTypes(t, uniques); }) :
+                    type.isStringLiteral() && !(type.flags & 1024 /* TypeFlags.EnumLiteral */) && ts.addToSeen(uniques, type.value) ? [type] : ts.emptyArray;
+            }
+            function nameAndKind(name, kind, extension) {
+                return { name: name, kind: kind, extension: extension };
+            }
+            function directoryResult(name) {
+                return nameAndKind(name, "directory" /* ScriptElementKind.directory */, /*extension*/ undefined);
+            }
+            function addReplacementSpans(text, textStart, names) {
+                var span = getDirectoryFragmentTextSpan(text, textStart);
+                var wholeSpan = text.length === 0 ? undefined : ts.createTextSpan(textStart, text.length);
+                return names.map(function (_a) {
+                    var name = _a.name, kind = _a.kind, extension = _a.extension;
+                    return Math.max(name.indexOf(ts.directorySeparator), name.indexOf(ts.altDirectorySeparator)) !== -1 ? { name: name, kind: kind, extension: extension, span: wholeSpan } : { name: name, kind: kind, extension: extension, span: span };
+                });
+            }
+            function getStringLiteralCompletionsFromModuleNames(sourceFile, node, compilerOptions, host, typeChecker, preferences) {
+                return addReplacementSpans(node.text, node.getStart(sourceFile) + 1, getStringLiteralCompletionsFromModuleNamesWorker(sourceFile, node, compilerOptions, host, typeChecker, preferences));
+            }
+            function getStringLiteralCompletionsFromModuleNamesWorker(sourceFile, node, compilerOptions, host, typeChecker, preferences) {
+                var literalValue = ts.normalizeSlashes(node.text);
+                var mode = ts.isStringLiteralLike(node) ? ts.getModeForUsageLocation(sourceFile, node) : undefined;
+                var scriptPath = sourceFile.path;
+                var scriptDirectory = ts.getDirectoryPath(scriptPath);
+                return isPathRelativeToScript(literalValue) || !compilerOptions.baseUrl && (ts.isRootedDiskPath(literalValue) || ts.isUrl(literalValue))
+                    ? getCompletionEntriesForRelativeModules(literalValue, scriptDirectory, compilerOptions, host, scriptPath, getIncludeExtensionOption())
+                    : getCompletionEntriesForNonRelativeModules(literalValue, scriptDirectory, mode, compilerOptions, host, getIncludeExtensionOption(), typeChecker);
+                function getIncludeExtensionOption() {
+                    var mode = ts.isStringLiteralLike(node) ? ts.getModeForUsageLocation(sourceFile, node) : undefined;
+                    return preferences.importModuleSpecifierEnding === "js" || mode === ts.ModuleKind.ESNext ? 2 /* IncludeExtensionsOption.ModuleSpecifierCompletion */ : 0 /* IncludeExtensionsOption.Exclude */;
+                }
+            }
+            function getExtensionOptions(compilerOptions, includeExtensionsOption) {
+                if (includeExtensionsOption === void 0) { includeExtensionsOption = 0 /* IncludeExtensionsOption.Exclude */; }
+                return { extensions: ts.flatten(getSupportedExtensionsForModuleResolution(compilerOptions)), includeExtensionsOption: includeExtensionsOption };
+            }
+            function getCompletionEntriesForRelativeModules(literalValue, scriptDirectory, compilerOptions, host, scriptPath, includeExtensions) {
+                var extensionOptions = getExtensionOptions(compilerOptions, includeExtensions);
+                if (compilerOptions.rootDirs) {
+                    return getCompletionEntriesForDirectoryFragmentWithRootDirs(compilerOptions.rootDirs, literalValue, scriptDirectory, extensionOptions, compilerOptions, host, scriptPath);
+                }
+                else {
+                    return ts.arrayFrom(getCompletionEntriesForDirectoryFragment(literalValue, scriptDirectory, extensionOptions, host, scriptPath).values());
+                }
+            }
+            function isEmitResolutionKindUsingNodeModules(compilerOptions) {
+                return ts.getEmitModuleResolutionKind(compilerOptions) === ts.ModuleResolutionKind.NodeJs ||
+                    ts.getEmitModuleResolutionKind(compilerOptions) === ts.ModuleResolutionKind.Node16 ||
+                    ts.getEmitModuleResolutionKind(compilerOptions) === ts.ModuleResolutionKind.NodeNext;
+            }
+            function isEmitModuleResolutionRespectingExportMaps(compilerOptions) {
+                return ts.getEmitModuleResolutionKind(compilerOptions) === ts.ModuleResolutionKind.Node16 ||
+                    ts.getEmitModuleResolutionKind(compilerOptions) === ts.ModuleResolutionKind.NodeNext;
+            }
+            function getSupportedExtensionsForModuleResolution(compilerOptions) {
+                var extensions = ts.getSupportedExtensions(compilerOptions);
+                return isEmitResolutionKindUsingNodeModules(compilerOptions) ?
+                    ts.getSupportedExtensionsWithJsonIfResolveJsonModule(compilerOptions, extensions) :
+                    extensions;
+            }
+            /**
+             * Takes a script path and returns paths for all potential folders that could be merged with its
+             * containing folder via the "rootDirs" compiler option
+             */
+            function getBaseDirectoriesFromRootDirs(rootDirs, basePath, scriptDirectory, ignoreCase) {
+                // Make all paths absolute/normalized if they are not already
+                rootDirs = rootDirs.map(function (rootDirectory) { return ts.normalizePath(ts.isRootedDiskPath(rootDirectory) ? rootDirectory : ts.combinePaths(basePath, rootDirectory)); });
+                // Determine the path to the directory containing the script relative to the root directory it is contained within
+                var relativeDirectory = ts.firstDefined(rootDirs, function (rootDirectory) {
+                    return ts.containsPath(rootDirectory, scriptDirectory, basePath, ignoreCase) ? scriptDirectory.substr(rootDirectory.length) : undefined;
+                }); // TODO: GH#18217
+                // Now find a path for each potential directory that is to be merged with the one containing the script
+                return ts.deduplicate(__spreadArray(__spreadArray([], rootDirs.map(function (rootDirectory) { return ts.combinePaths(rootDirectory, relativeDirectory); }), true), [scriptDirectory], false), ts.equateStringsCaseSensitive, ts.compareStringsCaseSensitive);
+            }
+            function getCompletionEntriesForDirectoryFragmentWithRootDirs(rootDirs, fragment, scriptDirectory, extensionOptions, compilerOptions, host, exclude) {
+                var basePath = compilerOptions.project || host.getCurrentDirectory();
+                var ignoreCase = !(host.useCaseSensitiveFileNames && host.useCaseSensitiveFileNames());
+                var baseDirectories = getBaseDirectoriesFromRootDirs(rootDirs, basePath, scriptDirectory, ignoreCase);
+                return ts.flatMap(baseDirectories, function (baseDirectory) { return ts.arrayFrom(getCompletionEntriesForDirectoryFragment(fragment, baseDirectory, extensionOptions, host, exclude).values()); });
+            }
+            var IncludeExtensionsOption;
+            (function (IncludeExtensionsOption) {
+                IncludeExtensionsOption[IncludeExtensionsOption["Exclude"] = 0] = "Exclude";
+                IncludeExtensionsOption[IncludeExtensionsOption["Include"] = 1] = "Include";
+                IncludeExtensionsOption[IncludeExtensionsOption["ModuleSpecifierCompletion"] = 2] = "ModuleSpecifierCompletion";
+            })(IncludeExtensionsOption || (IncludeExtensionsOption = {}));
+            /**
+             * Given a path ending at a directory, gets the completions for the path, and filters for those entries containing the basename.
+             */
+            function getCompletionEntriesForDirectoryFragment(fragment, scriptPath, extensionOptions, host, exclude, result) {
+                var _a;
+                if (result === void 0) { result = createNameAndKindSet(); }
+                if (fragment === undefined) {
+                    fragment = "";
+                }
+                fragment = ts.normalizeSlashes(fragment);
+                /**
+                 * Remove the basename from the path. Note that we don't use the basename to filter completions;
+                 * the client is responsible for refining completions.
+                 */
+                if (!ts.hasTrailingDirectorySeparator(fragment)) {
+                    fragment = ts.getDirectoryPath(fragment);
+                }
+                if (fragment === "") {
+                    fragment = "." + ts.directorySeparator;
+                }
+                fragment = ts.ensureTrailingDirectorySeparator(fragment);
+                var absolutePath = ts.resolvePath(scriptPath, fragment);
+                var baseDirectory = ts.hasTrailingDirectorySeparator(absolutePath) ? absolutePath : ts.getDirectoryPath(absolutePath);
+                // check for a version redirect
+                var packageJsonPath = ts.findPackageJson(baseDirectory, host);
+                if (packageJsonPath) {
+                    var packageJson = ts.readJson(packageJsonPath, host);
+                    var typesVersions = packageJson.typesVersions;
+                    if (typeof typesVersions === "object") {
+                        var versionPaths = (_a = ts.getPackageJsonTypesVersionsPaths(typesVersions)) === null || _a === void 0 ? void 0 : _a.paths;
+                        if (versionPaths) {
+                            var packageDirectory = ts.getDirectoryPath(packageJsonPath);
+                            var pathInPackage = absolutePath.slice(ts.ensureTrailingDirectorySeparator(packageDirectory).length);
+                            if (addCompletionEntriesFromPaths(result, pathInPackage, packageDirectory, extensionOptions, host, versionPaths)) {
+                                // A true result means one of the `versionPaths` was matched, which will block relative resolution
+                                // to files and folders from here. All reachable paths given the pattern match are already added.
+                                return result;
+                            }
+                        }
+                    }
+                }
+                var ignoreCase = !(host.useCaseSensitiveFileNames && host.useCaseSensitiveFileNames());
+                if (!ts.tryDirectoryExists(host, baseDirectory))
+                    return result;
+                // Enumerate the available files if possible
+                var files = ts.tryReadDirectory(host, baseDirectory, extensionOptions.extensions, /*exclude*/ undefined, /*include*/ ["./*"]);
+                if (files) {
+                    for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
+                        var filePath = files_1[_i];
+                        filePath = ts.normalizePath(filePath);
+                        if (exclude && ts.comparePaths(filePath, exclude, scriptPath, ignoreCase) === 0 /* Comparison.EqualTo */) {
+                            continue;
+                        }
+                        var _b = getFilenameWithExtensionOption(ts.getBaseFileName(filePath), host.getCompilationSettings(), extensionOptions.includeExtensionsOption), name = _b.name, extension = _b.extension;
+                        result.add(nameAndKind(name, "script" /* ScriptElementKind.scriptElement */, extension));
+                    }
+                }
+                // If possible, get folder completion as well
+                var directories = ts.tryGetDirectories(host, baseDirectory);
+                if (directories) {
+                    for (var _c = 0, directories_1 = directories; _c < directories_1.length; _c++) {
+                        var directory = directories_1[_c];
+                        var directoryName = ts.getBaseFileName(ts.normalizePath(directory));
+                        if (directoryName !== "@types") {
+                            result.add(directoryResult(directoryName));
+                        }
+                    }
+                }
+                return result;
+            }
+            function getFilenameWithExtensionOption(name, compilerOptions, includeExtensionsOption) {
+                var outputExtension = ts.moduleSpecifiers.tryGetJSExtensionForFile(name, compilerOptions);
+                if (includeExtensionsOption === 0 /* IncludeExtensionsOption.Exclude */ && !ts.fileExtensionIsOneOf(name, [".json" /* Extension.Json */, ".mts" /* Extension.Mts */, ".cts" /* Extension.Cts */, ".d.mts" /* Extension.Dmts */, ".d.cts" /* Extension.Dcts */, ".mjs" /* Extension.Mjs */, ".cjs" /* Extension.Cjs */])) {
+                    return { name: ts.removeFileExtension(name), extension: ts.tryGetExtensionFromPath(name) };
+                }
+                else if ((ts.fileExtensionIsOneOf(name, [".mts" /* Extension.Mts */, ".cts" /* Extension.Cts */, ".d.mts" /* Extension.Dmts */, ".d.cts" /* Extension.Dcts */, ".mjs" /* Extension.Mjs */, ".cjs" /* Extension.Cjs */]) || includeExtensionsOption === 2 /* IncludeExtensionsOption.ModuleSpecifierCompletion */) && outputExtension) {
+                    return { name: ts.changeExtension(name, outputExtension), extension: outputExtension };
+                }
+                else {
+                    return { name: name, extension: ts.tryGetExtensionFromPath(name) };
+                }
+            }
+            /** @returns whether `fragment` was a match for any `paths` (which should indicate whether any other path completions should be offered) */
+            function addCompletionEntriesFromPaths(result, fragment, baseDirectory, extensionOptions, host, paths) {
+                var getPatternsForKey = function (key) { return paths[key]; };
+                var comparePaths = function (a, b) {
+                    var patternA = ts.tryParsePattern(a);
+                    var patternB = ts.tryParsePattern(b);
+                    var lengthA = typeof patternA === "object" ? patternA.prefix.length : a.length;
+                    var lengthB = typeof patternB === "object" ? patternB.prefix.length : b.length;
+                    return ts.compareValues(lengthB, lengthA);
+                };
+                return addCompletionEntriesFromPathsOrExports(result, fragment, baseDirectory, extensionOptions, host, ts.getOwnKeys(paths), getPatternsForKey, comparePaths);
+            }
+            /** @returns whether `fragment` was a match for any `paths` (which should indicate whether any other path completions should be offered) */
+            function addCompletionEntriesFromPathsOrExports(result, fragment, baseDirectory, extensionOptions, host, keys, getPatternsForKey, comparePaths) {
+                var pathResults = [];
+                var matchedPath;
+                for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                    var key = keys_1[_i];
+                    if (key === ".")
+                        continue;
+                    var keyWithoutLeadingDotSlash = key.replace(/^\.\//, ""); // remove leading "./"
+                    var patterns = getPatternsForKey(key);
+                    if (patterns) {
+                        var pathPattern = ts.tryParsePattern(keyWithoutLeadingDotSlash);
+                        if (!pathPattern)
+                            continue;
+                        var isMatch = typeof pathPattern === "object" && ts.isPatternMatch(pathPattern, fragment);
+                        var isLongestMatch = isMatch && (matchedPath === undefined || comparePaths(key, matchedPath) === -1 /* Comparison.LessThan */);
+                        if (isLongestMatch) {
+                            // If this is a higher priority match than anything we've seen so far, previous results from matches are invalid, e.g.
+                            // for `import {} from "some-package/|"` with a typesVersions:
+                            // {
+                            //   "bar/*": ["bar/*"], // <-- 1. We add 'bar', but 'bar/*' doesn't match yet.
+                            //   "*": ["dist/*"],    // <-- 2. We match here and add files from dist. 'bar' is still ok because it didn't come from a match.
+                            //   "foo/*": ["foo/*"]  // <-- 3. We matched '*' earlier and added results from dist, but if 'foo/*' also matched,
+                            // }                               results in dist would not be visible. 'bar' still stands because it didn't come from a match.
+                            //                                 This is especially important if `dist/foo` is a folder, because if we fail to clear results
+                            //                                 added by the '*' match, after typing `"some-package/foo/|"` we would get file results from both
+                            //                                 ./dist/foo and ./foo, when only the latter will actually be resolvable.
+                            //                                 See pathCompletionsTypesVersionsWildcard6.ts.
+                            matchedPath = key;
+                            pathResults = pathResults.filter(function (r) { return !r.matchedPattern; });
+                        }
+                        if (typeof pathPattern === "string" || matchedPath === undefined || comparePaths(key, matchedPath) !== 1 /* Comparison.GreaterThan */) {
+                            pathResults.push({
+                                matchedPattern: isMatch,
+                                results: getCompletionsForPathMapping(keyWithoutLeadingDotSlash, patterns, fragment, baseDirectory, extensionOptions, host)
+                                    .map(function (_a) {
+                                    var name = _a.name, kind = _a.kind, extension = _a.extension;
+                                    return nameAndKind(name, kind, extension);
+                                }),
+                            });
+                        }
+                    }
+                }
+                pathResults.forEach(function (pathResult) { return pathResult.results.forEach(function (r) { return result.add(r); }); });
+                return matchedPath !== undefined;
+            }
+            /**
+             * Check all of the declared modules and those in node modules. Possible sources of modules:
+             *      Modules that are found by the type checker
+             *      Modules found relative to "baseUrl" compliler options (including patterns from "paths" compiler option)
+             *      Modules from node_modules (i.e. those listed in package.json)
+             *          This includes all files that are found in node_modules/moduleName/ with acceptable file extensions
+             */
+            function getCompletionEntriesForNonRelativeModules(fragment, scriptPath, mode, compilerOptions, host, includeExtensionsOption, typeChecker) {
+                var baseUrl = compilerOptions.baseUrl, paths = compilerOptions.paths;
+                var result = createNameAndKindSet();
+                var extensionOptions = getExtensionOptions(compilerOptions, includeExtensionsOption);
+                if (baseUrl) {
+                    var projectDir = compilerOptions.project || host.getCurrentDirectory();
+                    var absolute = ts.normalizePath(ts.combinePaths(projectDir, baseUrl));
+                    getCompletionEntriesForDirectoryFragment(fragment, absolute, extensionOptions, host, /*exclude*/ undefined, result);
+                    if (paths) {
+                        addCompletionEntriesFromPaths(result, fragment, absolute, extensionOptions, host, paths);
+                    }
+                }
+                var fragmentDirectory = getFragmentDirectory(fragment);
+                for (var _i = 0, _a = getAmbientModuleCompletions(fragment, fragmentDirectory, typeChecker); _i < _a.length; _i++) {
+                    var ambientName = _a[_i];
+                    result.add(nameAndKind(ambientName, "external module name" /* ScriptElementKind.externalModuleName */, /*extension*/ undefined));
+                }
+                getCompletionEntriesFromTypings(host, compilerOptions, scriptPath, fragmentDirectory, extensionOptions, result);
+                if (isEmitResolutionKindUsingNodeModules(compilerOptions)) {
+                    // If looking for a global package name, don't just include everything in `node_modules` because that includes dependencies' own dependencies.
+                    // (But do if we didn't find anything, e.g. 'package.json' missing.)
+                    var foundGlobal = false;
+                    if (fragmentDirectory === undefined) {
+                        for (var _b = 0, _c = enumerateNodeModulesVisibleToScript(host, scriptPath); _b < _c.length; _b++) {
+                            var moduleName = _c[_b];
+                            var moduleResult = nameAndKind(moduleName, "external module name" /* ScriptElementKind.externalModuleName */, /*extension*/ undefined);
+                            if (!result.has(moduleResult.name)) {
+                                foundGlobal = true;
+                                result.add(moduleResult);
+                            }
+                        }
+                    }
+                    if (!foundGlobal) {
+                        var ancestorLookup = function (ancestor) {
+                            var nodeModules = ts.combinePaths(ancestor, "node_modules");
+                            if (ts.tryDirectoryExists(host, nodeModules)) {
+                                getCompletionEntriesForDirectoryFragment(fragment, nodeModules, extensionOptions, host, /*exclude*/ undefined, result);
+                            }
+                        };
+                        if (fragmentDirectory && isEmitModuleResolutionRespectingExportMaps(compilerOptions)) {
+                            var nodeModulesDirectoryLookup_1 = ancestorLookup;
+                            ancestorLookup = function (ancestor) {
+                                var components = ts.getPathComponents(fragment);
+                                components.shift(); // shift off empty root
+                                var packagePath = components.shift();
+                                if (!packagePath) {
+                                    return nodeModulesDirectoryLookup_1(ancestor);
+                                }
+                                if (ts.startsWith(packagePath, "@")) {
+                                    var subName = components.shift();
+                                    if (!subName) {
+                                        return nodeModulesDirectoryLookup_1(ancestor);
+                                    }
+                                    packagePath = ts.combinePaths(packagePath, subName);
+                                }
+                                var packageDirectory = ts.combinePaths(ancestor, "node_modules", packagePath);
+                                var packageFile = ts.combinePaths(packageDirectory, "package.json");
+                                if (ts.tryFileExists(host, packageFile)) {
+                                    var packageJson = ts.readJson(packageFile, host);
+                                    var exports_1 = packageJson.exports;
+                                    if (exports_1) {
+                                        if (typeof exports_1 !== "object" || exports_1 === null) { // eslint-disable-line no-null/no-null
+                                            return; // null exports or entrypoint only, no sub-modules available
+                                        }
+                                        var keys = ts.getOwnKeys(exports_1);
+                                        var fragmentSubpath = components.join("/") + (components.length && ts.hasTrailingDirectorySeparator(fragment) ? "/" : "");
+                                 

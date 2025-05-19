@@ -1,0 +1,3365 @@
+        }
+      }
+    });
+  }
+}
+function attachNodeArrayDebugInfo(array) {
+  if (isDebugInfoEnabled) {
+    if (typeof Object.setPrototypeOf === 'function') {
+      // if we're in es2015, attach the method to a shared prototype for `NodeArray`
+      // so the method doesn't show up in the watch window.
+      if (!nodeArrayProto) {
+        nodeArrayProto = Object.create(Array.prototype);
+        attachNodeArrayDebugInfoWorker(nodeArrayProto);
+      }
+      Object.setPrototypeOf(array, nodeArrayProto);
+    } else {
+      // not running in an es2015 environment, attach the method directly.
+      attachNodeArrayDebugInfoWorker(array);
+    }
+  }
+}
+Debug.attachNodeArrayDebugInfo = attachNodeArrayDebugInfo;
+/**
+ * Injects debug information into frequently used types.
+ */
+function enableDebugInfo() {
+  if (isDebugInfoEnabled)
+    {return;}
+  // avoid recomputing
+  let weakTypeTextMap;
+  let weakNodeTextMap;
+  function getWeakTypeTextMap() {
+    if (weakTypeTextMap === undefined) {
+      if (typeof WeakMap === 'function')
+        {weakTypeTextMap = new WeakMap();}
+    }
+    return weakTypeTextMap;
+  }
+  function getWeakNodeTextMap() {
+    if (weakNodeTextMap === undefined) {
+      if (typeof WeakMap === 'function')
+        {weakNodeTextMap = new WeakMap();}
+    }
+    return weakNodeTextMap;
+  }
+  // Add additional properties in debug mode to assist with debugging.
+  Object.defineProperties(ts.objectAllocator.getSymbolConstructor().prototype, {
+    // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
+    __tsDebuggerDisplay: {
+      value: function() {
+        const symbolHeader = this.flags & 33554432 /* SymbolFlags.Transient */ ? 'TransientSymbol' : 'Symbol';
+        const remainingSymbolFlags = this.flags & ~33554432 /* SymbolFlags.Transient */;
+        return ''.concat(symbolHeader, ' \'')
+            .concat(ts.symbolName(this), '\'')
+            .concat(remainingSymbolFlags ? ' ('.concat(formatSymbolFlags(remainingSymbolFlags), ')') : '');
+      }
+    },
+    __debugFlags: {
+      get: function() {
+        return formatSymbolFlags(this.flags);
+      }
+    }
+  });
+  Object.defineProperties(ts.objectAllocator.getTypeConstructor().prototype, {
+    // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
+    __tsDebuggerDisplay: {
+      value: function() {
+        const typeHeader = this.flags & 98304 /* TypeFlags.Nullable */ ?
+            'NullableType' :
+            this.flags & 384 /* TypeFlags.StringOrNumberLiteral */ ?
+            'LiteralType '.concat(JSON.stringify(this.value)) :
+            this.flags & 2048 /* TypeFlags.BigIntLiteral */ ?
+            'LiteralType '.concat(this.value.negative ? '-' : '').concat(this.value.base10Value, 'n') :
+            this.flags & 8192 /* TypeFlags.UniqueESSymbol */   ? 'UniqueESSymbolType' :
+            this.flags & 32 /* TypeFlags.Enum */               ? 'EnumType' :
+            this.flags & 67359327 /* TypeFlags.Intrinsic */    ? 'IntrinsicType '.concat(this.intrinsicName) :
+            this.flags & 1048576 /* TypeFlags.Union */         ? 'UnionType' :
+            this.flags & 2097152 /* TypeFlags.Intersection */  ? 'IntersectionType' :
+            this.flags & 4194304 /* TypeFlags.Index */         ? 'IndexType' :
+            this.flags & 8388608 /* TypeFlags.IndexedAccess */ ? 'IndexedAccessType' :
+            this.flags & 16777216 /* TypeFlags.Conditional */  ? 'ConditionalType' :
+            this.flags & 33554432 /* TypeFlags.Substitution */ ? 'SubstitutionType' :
+            this.flags & 262144 /* TypeFlags.TypeParameter */  ? 'TypeParameter' :
+            this.flags & 524288 /* TypeFlags.Object */ ? this.objectFlags & 3 /* ObjectFlags.ClassOrInterface */ ?
+                                                         'InterfaceType' :
+                this.objectFlags & 4 /* ObjectFlags.Reference */        ? 'TypeReference' :
+                this.objectFlags & 8 /* ObjectFlags.Tuple */            ? 'TupleType' :
+                this.objectFlags & 16 /* ObjectFlags.Anonymous */       ? 'AnonymousType' :
+                this.objectFlags & 32 /* ObjectFlags.Mapped */          ? 'MappedType' :
+                this.objectFlags & 1024 /* ObjectFlags.ReverseMapped */ ? 'ReverseMappedType' :
+                this.objectFlags & 256 /* ObjectFlags.EvolvingArray */  ? 'EvolvingArrayType' :
+                                                                          'ObjectType' :
+                                                         'Type';
+        const remainingObjectFlags = this.flags & 524288 /* TypeFlags.Object */ ?
+            this.objectFlags & ~1343 /* ObjectFlags.ObjectTypeKindMask */ :
+            0;
+        return ''.concat(typeHeader)
+            .concat(this.symbol ? ' \''.concat(ts.symbolName(this.symbol), '\'') : '')
+            .concat(remainingObjectFlags ? ' ('.concat(formatObjectFlags(remainingObjectFlags), ')') : '');
+      }
+    },
+    __debugFlags: {
+      get: function() {
+        return formatTypeFlags(this.flags);
+      }
+    },
+    __debugObjectFlags: {
+      get: function() {
+        return this.flags & 524288 /* TypeFlags.Object */ ? formatObjectFlags(this.objectFlags) : '';
+      }
+    },
+    __debugTypeToString: {
+      value: function() {
+        // avoid recomputing
+        const map = getWeakTypeTextMap();
+        let text = map === null || map === void 0 ? void 0 : map.get(this);
+        if (text === undefined) {
+          text = this.checker.typeToString(this);
+          map === null || map === void 0 ? void 0 : map.set(this, text);
+        }
+        return text;
+      }
+    },
+  });
+  Object.defineProperties(ts.objectAllocator.getSignatureConstructor().prototype, {
+    __debugFlags: {
+      get: function() {
+        return formatSignatureFlags(this.flags);
+      }
+    },
+    __debugSignatureToString: {
+      value: function() {
+        let _a;
+        return (_a = this.checker) === null || _a === void 0 ? void 0 : _a.signatureToString(this);
+      }
+    }
+  });
+  const nodeConstructors = [
+    ts.objectAllocator.getNodeConstructor(), ts.objectAllocator.getIdentifierConstructor(),
+    ts.objectAllocator.getTokenConstructor(), ts.objectAllocator.getSourceFileConstructor()
+  ];
+  for (let _i = 0, nodeConstructors_1 = nodeConstructors; _i < nodeConstructors_1.length; _i++) {
+    const ctor = nodeConstructors_1[_i];
+    if (!ts.hasProperty(ctor.prototype, '__debugKind')) {
+      Object.defineProperties(ctor.prototype, {
+        // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
+        __tsDebuggerDisplay: {
+          value: function() {
+            const nodeHeader = ts.isGeneratedIdentifier(this) ? 'GeneratedIdentifier' :
+                ts.isIdentifier(this)                       ? 'Identifier \''.concat(ts.idText(this), '\'') :
+                ts.isPrivateIdentifier(this)                ? 'PrivateIdentifier \''.concat(ts.idText(this), '\'') :
+                ts.isStringLiteral(this)                    ? 'StringLiteral '.concat(JSON.stringify(
+                                               this.text.length < 10 ? this.text : this.text.slice(10) + '...')) :
+                ts.isNumericLiteral(this)                   ? 'NumericLiteral '.concat(this.text) :
+                ts.isBigIntLiteral(this)                    ? 'BigIntLiteral '.concat(this.text, 'n') :
+                ts.isTypeParameterDeclaration(this)         ? 'TypeParameterDeclaration' :
+                ts.isParameter(this)                        ? 'ParameterDeclaration' :
+                ts.isConstructorDeclaration(this)           ? 'ConstructorDeclaration' :
+                ts.isGetAccessorDeclaration(this)           ? 'GetAccessorDeclaration' :
+                ts.isSetAccessorDeclaration(this)           ? 'SetAccessorDeclaration' :
+                ts.isCallSignatureDeclaration(this)         ? 'CallSignatureDeclaration' :
+                ts.isConstructSignatureDeclaration(this)    ? 'ConstructSignatureDeclaration' :
+                ts.isIndexSignatureDeclaration(this)        ? 'IndexSignatureDeclaration' :
+                ts.isTypePredicateNode(this)                ? 'TypePredicateNode' :
+                ts.isTypeReferenceNode(this)                ? 'TypeReferenceNode' :
+                ts.isFunctionTypeNode(this)                 ? 'FunctionTypeNode' :
+                ts.isConstructorTypeNode(this)              ? 'ConstructorTypeNode' :
+                ts.isTypeQueryNode(this)                    ? 'TypeQueryNode' :
+                ts.isTypeLiteralNode(this)                  ? 'TypeLiteralNode' :
+                ts.isArrayTypeNode(this)                    ? 'ArrayTypeNode' :
+                ts.isTupleTypeNode(this)                    ? 'TupleTypeNode' :
+                ts.isOptionalTypeNode(this)                 ? 'OptionalTypeNode' :
+                ts.isRestTypeNode(this)                     ? 'RestTypeNode' :
+                ts.isUnionTypeNode(this)                    ? 'UnionTypeNode' :
+                ts.isIntersectionTypeNode(this)             ? 'IntersectionTypeNode' :
+                ts.isConditionalTypeNode(this)              ? 'ConditionalTypeNode' :
+                ts.isInferTypeNode(this)                    ? 'InferTypeNode' :
+                ts.isParenthesizedTypeNode(this)            ? 'ParenthesizedTypeNode' :
+                ts.isThisTypeNode(this)                     ? 'ThisTypeNode' :
+                ts.isTypeOperatorNode(this)                 ? 'TypeOperatorNode' :
+                ts.isIndexedAccessTypeNode(this)            ? 'IndexedAccessTypeNode' :
+                ts.isMappedTypeNode(this)                   ? 'MappedTypeNode' :
+                ts.isLiteralTypeNode(this)                  ? 'LiteralTypeNode' :
+                ts.isNamedTupleMember(this)                 ? 'NamedTupleMember' :
+                ts.isImportTypeNode(this)                   ? 'ImportTypeNode' :
+                                                              formatSyntaxKind(this.kind);
+            return ''.concat(nodeHeader).concat(this.flags ? ' ('.concat(formatNodeFlags(this.flags), ')') : '');
+          }
+        },
+        __debugKind: {
+          get: function() {
+            return formatSyntaxKind(this.kind);
+          }
+        },
+        __debugNodeFlags: {
+          get: function() {
+            return formatNodeFlags(this.flags);
+          }
+        },
+        __debugModifierFlags: {
+          get: function() {
+            return formatModifierFlags(ts.getEffectiveModifierFlagsNoCache(this));
+          }
+        },
+        __debugTransformFlags: {
+          get: function() {
+            return formatTransformFlags(this.transformFlags);
+          }
+        },
+        __debugIsParseTreeNode: {
+          get: function() {
+            return ts.isParseTreeNode(this);
+          }
+        },
+        __debugEmitFlags: {
+          get: function() {
+            return formatEmitFlags(ts.getEmitFlags(this));
+          }
+        },
+        __debugGetText: {
+          value: function(includeTrivia) {
+            if (ts.nodeIsSynthesized(this))
+              {return '';}
+            // avoid recomputing
+            const map = getWeakNodeTextMap();
+            let text = map === null || map === void 0 ? void 0 : map.get(this);
+            if (text === undefined) {
+              const parseNode = ts.getParseTreeNode(this);
+              const sourceFile = parseNode && ts.getSourceFileOfNode(parseNode);
+              text = sourceFile ? ts.getSourceTextOfNodeFromSourceFile(sourceFile, parseNode, includeTrivia) : '';
+              map === null || map === void 0 ? void 0 : map.set(this, text);
+            }
+            return text;
+          }
+        }
+      });
+    }
+  }
+  // attempt to load extended debugging information
+  try {
+    if (ts.sys && ts.sys.require) {
+      const basePath = ts.getDirectoryPath(ts.resolvePath(ts.sys.getExecutingFilePath()));
+      const result = ts.sys.require(basePath, './compiler-debug');
+      if (!result.error) {
+        result.module.init(ts);
+        extendedDebugModule = result.module;
+      }
+    }
+  } catch (_a) {
+    // do nothing
+  }
+  isDebugInfoEnabled = true;
+}
+Debug.enableDebugInfo = enableDebugInfo;
+function formatDeprecationMessage(name, error, errorAfter, since, message) {
+  let deprecationMessage = error ? 'DeprecationError: ' : 'DeprecationWarning: ';
+  deprecationMessage += '\''.concat(name, '\' ');
+  deprecationMessage += since ? 'has been deprecated since v'.concat(since) : 'is deprecated';
+  deprecationMessage += error ? ' and can no longer be used.' :
+      errorAfter              ? ' and will no longer be usable after v'.concat(errorAfter, '.') :
+                                '.';
+  deprecationMessage += message ? ' '.concat(ts.formatStringFromArgs(message, [name], 0)) : '';
+  return deprecationMessage;
+}
+function createErrorDeprecation(name, errorAfter, since, message) {
+  const deprecationMessage = formatDeprecationMessage(name, /* error*/ true, errorAfter, since, message);
+  return function() {
+    throw new TypeError(deprecationMessage);
+  };
+}
+function createWarningDeprecation(name, errorAfter, since, message) {
+  let hasWrittenDeprecation = false;
+  return function() {
+    if (Debug.enableDeprecationWarnings && !hasWrittenDeprecation) {
+      log.warn(formatDeprecationMessage(name, /* error*/ false, errorAfter, since, message));
+      hasWrittenDeprecation = true;
+    }
+  };
+}
+function createDeprecation(name, options) {
+  let _a, _b;
+  if (options === void 0) {
+    options = {};
+  }
+  const version = typeof options.typeScriptVersion === 'string'    ? new ts.Version(options.typeScriptVersion) :
+      (_a = options.typeScriptVersion) !== null && _a !== void 0 ? _a :
+                                                                   getTypeScriptVersion();
+  const errorAfter = typeof options.errorAfter === 'string' ? new ts.Version(options.errorAfter) : options.errorAfter;
+  const warnAfter = typeof options.warnAfter === 'string' ? new ts.Version(options.warnAfter) : options.warnAfter;
+  const since = typeof options.since === 'string'      ? new ts.Version(options.since) :
+      (_b = options.since) !== null && _b !== void 0 ? _b :
+                                                       warnAfter;
+  const error = options.error || errorAfter && version.compareTo(errorAfter) <= 0;
+  const warn = !warnAfter || version.compareTo(warnAfter) >= 0;
+  return error ? createErrorDeprecation(name, errorAfter, since, options.message) :
+      warn     ? createWarningDeprecation(name, errorAfter, since, options.message) :
+                 ts.noop;
+}
+Debug.createDeprecation = createDeprecation;
+function wrapFunction(deprecation, func) {
+  return function() {
+    deprecation();
+    return func.apply(this, arguments);
+  };
+}
+function deprecate(func, options) {
+  let _a;
+  const deprecation = createDeprecation(
+      (_a = options === null || options === void 0 ? void 0 : options.name) !== null && _a !== void 0 ?
+          _a :
+          getFunctionName(func),
+      options);
+  return wrapFunction(deprecation, func);
+}
+Debug.deprecate = deprecate;
+function formatVariance(varianceFlags) {
+  const variance = varianceFlags & 7 /* VarianceFlags.VarianceMask */;
+  let result = variance === 0 /* VarianceFlags.Invariant */ ? 'in out' :
+      variance === 3 /* VarianceFlags.Bivariant */          ? '[bivariant]' :
+      variance === 2 /* VarianceFlags.Contravariant */      ? 'in' :
+      variance === 1 /* VarianceFlags.Covariant */          ? 'out' :
+      variance === 4 /* VarianceFlags.Independent */        ? '[independent]' :
+                                                              '';
+  if (varianceFlags & 8 /* VarianceFlags.Unmeasurable */) {
+    result += ' (unmeasurable)';
+  } else if (varianceFlags & 16 /* VarianceFlags.Unreliable */) {
+    result += ' (unreliable)';
+  }
+  return result;
+}
+Debug.formatVariance = formatVariance;
+const DebugTypeMapper = /** @class */ (function() {
+  function DebugTypeMapper() {
+  }
+  DebugTypeMapper.prototype.__debugToString = function() {
+    let _a;
+    type(this);
+    switch (this.kind) {
+      case 3 /* TypeMapKind.Function */:
+        return ((_a = this.debugInfo) === null || _a === void 0 ? void 0 : _a.call(this)) || '(function mapper)';
+      case 0 /* TypeMapKind.Simple */:
+        return ''.concat(this.source.__debugTypeToString(), ' -> ').concat(this.target.__debugTypeToString());
+      case 1 /* TypeMapKind.Array */:
+        return ts
+            .zipWith(
+                this.sources,
+                this.targets ||
+                    ts.map(
+                        this.sources,
+                        function() {
+                          return 'any';
+                        }),
+                function(s, t) {
+                  return ''.concat(s.__debugTypeToString(), ' -> ')
+                      .concat(typeof t === 'string' ? t : t.__debugTypeToString());
+                })
+            .join(', ');
+      case 2 /* TypeMapKind.Deferred */:
+        return ts
+            .zipWith(
+                this.sources, this.targets,
+                function(s, t) {
+                  return ''.concat(s.__debugTypeToString(), ' -> ').concat(t().__debugTypeToString());
+                })
+            .join(', ');
+      case 5 /* TypeMapKind.Merged */:
+      case 4 /* TypeMapKind.Composite */:
+        return 'm1: '.concat(this.mapper1.__debugToString().split('\n').join('\n    '), '\nm2: ')
+            .concat(this.mapper2.__debugToString().split('\n').join('\n    '));
+      default:
+        return assertNever(this);
+    }
+  };
+  return DebugTypeMapper;
+})();
+Debug.DebugTypeMapper = DebugTypeMapper;
+function attachDebugPrototypeIfDebug(mapper) {
+  if (Debug.isDebugging) {
+    return Object.setPrototypeOf(mapper, DebugTypeMapper.prototype);
+  }
+  return mapper;
+}
+Debug.attachDebugPrototypeIfDebug = attachDebugPrototypeIfDebug;
+})(Debug = ts.Debug || (ts.Debug = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function(ts) {
+// https://semver.org/#spec-item-2
+// > A normal version number MUST take the form X.Y.Z where X, Y, and Z are non-negative
+// > integers, and MUST NOT contain leading zeroes. X is the major version, Y is the minor
+// > version, and Z is the patch version. Each element MUST increase numerically.
+//
+// NOTE: We differ here in that we allow X and X.Y, with missing parts having the default
+// value of `0`.
+const versionRegExp = /^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\-([a-z0-9-.]+))?(?:\+([a-z0-9-.]+))?)?)?$/i;
+// https://semver.org/#spec-item-9
+// > A pre-release version MAY be denoted by appending a hyphen and a series of dot separated
+// > identifiers immediately following the patch version. Identifiers MUST comprise only ASCII
+// > alphanumerics and hyphen [0-9A-Za-z-]. Identifiers MUST NOT be empty. Numeric identifiers
+// > MUST NOT include leading zeroes.
+const prereleaseRegExp = /^(?:0|[1-9]\d*|[a-z-][a-z0-9-]*)(?:\.(?:0|[1-9]\d*|[a-z-][a-z0-9-]*))*$/i;
+const prereleasePartRegExp = /^(?:0|[1-9]\d*|[a-z-][a-z0-9-]*)$/i;
+// https://semver.org/#spec-item-10
+// > Build metadata MAY be denoted by appending a plus sign and a series of dot separated
+// > identifiers immediately following the patch or pre-release version. Identifiers MUST
+// > comprise only ASCII alphanumerics and hyphen [0-9A-Za-z-]. Identifiers MUST NOT be empty.
+const buildRegExp = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*$/i;
+const buildPartRegExp = /^[a-z0-9-]+$/i;
+// https://semver.org/#spec-item-9
+// > Numeric identifiers MUST NOT include leading zeroes.
+const numericIdentifierRegExp = /^(0|[1-9]\d*)$/;
+/**
+ * Describes a precise semantic version number, https://semver.org
+ */
+const Version = /** @class */ (function() {
+  function Version(major, minor, patch, prerelease, build) {
+    if (minor === void 0) {
+      minor = 0;
+    }
+    if (patch === void 0) {
+      patch = 0;
+    }
+    if (prerelease === void 0) {
+      prerelease = '';
+    }
+    if (build === void 0) {
+      build = '';
+    }
+    if (typeof major === 'string') {
+      const result = ts.Debug.checkDefined(tryParseComponents(major), 'Invalid version');
+      (major = result.major, minor = result.minor, patch = result.patch, prerelease = result.prerelease,
+       build = result.build);
+    }
+    ts.Debug.assert(major >= 0, 'Invalid argument: major');
+    ts.Debug.assert(minor >= 0, 'Invalid argument: minor');
+    ts.Debug.assert(patch >= 0, 'Invalid argument: patch');
+    const prereleaseArray = prerelease ? ts.isArray(prerelease) ? prerelease : prerelease.split('.') : ts.emptyArray;
+    const buildArray = build ? ts.isArray(build) ? build : build.split('.') : ts.emptyArray;
+    ts.Debug.assert(ts.every(prereleaseArray, function(s) {
+      return prereleasePartRegExp.test(s);
+    }), 'Invalid argument: prerelease');
+    ts.Debug.assert(ts.every(buildArray, function(s) {
+      return buildPartRegExp.test(s);
+    }), 'Invalid argument: build');
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
+    this.prerelease = prereleaseArray;
+    this.build = buildArray;
+  }
+  Version.tryParse = function(text) {
+    const result = tryParseComponents(text);
+    if (!result)
+      {return undefined;}
+    const major = result.major, minor = result.minor, patch = result.patch, prerelease = result.prerelease,
+        build = result.build;
+    return new Version(major, minor, patch, prerelease, build);
+  };
+  Version.prototype.compareTo = function(other) {
+    // https://semver.org/#spec-item-11
+    // > Precedence is determined by the first difference when comparing each of these
+    // > identifiers from left to right as follows: Major, minor, and patch versions are
+    // > always compared numerically.
+    //
+    // https://semver.org/#spec-item-11
+    // > Precedence for two pre-release versions with the same major, minor, and patch version
+    // > MUST be determined by comparing each dot separated identifier from left to right until
+    // > a difference is found [...]
+    //
+    // https://semver.org/#spec-item-11
+    // > Build metadata does not figure into precedence
+    if (this === other)
+      {return 0 /* Comparison.EqualTo */;}
+    if (other === undefined)
+      {return 1 /* Comparison.GreaterThan */;}
+    return ts.compareValues(this.major, other.major) || ts.compareValues(this.minor, other.minor) ||
+        ts.compareValues(this.patch, other.patch) || comparePrereleaseIdentifiers(this.prerelease, other.prerelease);
+  };
+  Version.prototype.increment = function(field) {
+    switch (field) {
+      case 'major':
+        return new Version(this.major + 1, 0, 0);
+      case 'minor':
+        return new Version(this.major, this.minor + 1, 0);
+      case 'patch':
+        return new Version(this.major, this.minor, this.patch + 1);
+      default:
+        return ts.Debug.assertNever(field);
+    }
+  };
+  Version.prototype.with = function(fields) {
+    const _a = fields.major, major = _a === void 0 ? this.major : _a, _b = fields.minor,
+        minor = _b === void 0 ? this.minor : _b, _c = fields.patch, patch = _c === void 0 ? this.patch : _c,
+        _d = fields.prerelease, prerelease = _d === void 0 ? this.prerelease : _d, _e = fields.build,
+        build = _e === void 0 ? this.build : _e;
+    return new Version(major, minor, patch, prerelease, build);
+  };
+  Version.prototype.toString = function() {
+    let result = ''.concat(this.major, '.').concat(this.minor, '.').concat(this.patch);
+    if (ts.some(this.prerelease))
+      {result += '-'.concat(this.prerelease.join('.'));}
+    if (ts.some(this.build))
+      {result += '+'.concat(this.build.join('.'));}
+    return result;
+  };
+  Version.zero = new Version(0, 0, 0, ['0']);
+  return Version;
+})();
+ts.Version = Version;
+function tryParseComponents(text) {
+  const match = versionRegExp.exec(text);
+  if (!match)
+    {return undefined;}
+  const major = match[1], _a = match[2], minor = _a === void 0 ? '0' : _a, _b = match[3],
+      patch = _b === void 0 ? '0' : _b, _c = match[4], prerelease = _c === void 0 ? '' : _c, _d = match[5],
+      build = _d === void 0 ? '' : _d;
+  if (prerelease && !prereleaseRegExp.test(prerelease))
+    {return undefined;}
+  if (build && !buildRegExp.test(build))
+    {return undefined;}
+  return {
+    major: parseInt(major, 10),
+    minor: parseInt(minor, 10),
+    patch: parseInt(patch, 10),
+    prerelease,
+    build
+  };
+}
+function comparePrereleaseIdentifiers(left, right) {
+  // https://semver.org/#spec-item-11
+  // > When major, minor, and patch are equal, a pre-release version has lower precedence
+  // > than a normal version.
+  if (left === right)
+    {return 0 /* Comparison.EqualTo */;}
+  if (left.length === 0)
+    {return right.length === 0 ? 0 /* Comparison.EqualTo */ : 1 /* Comparison.GreaterThan */;}
+  if (right.length === 0)
+    {return -1 /* Comparison.LessThan */;}
+  // https://semver.org/#spec-item-11
+  // > Precedence for two pre-release versions with the same major, minor, and patch version
+  // > MUST be determined by comparing each dot separated identifier from left to right until
+  // > a difference is found [...]
+  const length = Math.min(left.length, right.length);
+  for (let i = 0; i < length; i++) {
+    const leftIdentifier = left[i];
+    const rightIdentifier = right[i];
+    if (leftIdentifier === rightIdentifier)
+      {continue;}
+    const leftIsNumeric = numericIdentifierRegExp.test(leftIdentifier);
+    const rightIsNumeric = numericIdentifierRegExp.test(rightIdentifier);
+    if (leftIsNumeric || rightIsNumeric) {
+      // https://semver.org/#spec-item-11
+      // > Numeric identifiers always have lower precedence than non-numeric identifiers.
+      if (leftIsNumeric !== rightIsNumeric)
+        {return leftIsNumeric ? -1 /* Comparison.LessThan */ : 1 /* Comparison.GreaterThan */;}
+      // https://semver.org/#spec-item-11
+      // > identifiers consisting of only digits are compared numerically
+      var result = ts.compareValues(+leftIdentifier, +rightIdentifier);
+      if (result)
+        {return result;}
+    } else {
+      // https://semver.org/#spec-item-11
+      // > identifiers with letters or hyphens are compared lexically in ASCII sort order.
+      var result = ts.compareStringsCaseSensitive(leftIdentifier, rightIdentifier);
+      if (result)
+        {return result;}
+    }
+  }
+  // https://semver.org/#spec-item-11
+  // > A larger set of pre-release fields has a higher precedence than a smaller set, if all
+  // > of the preceding identifiers are equal.
+  return ts.compareValues(left.length, right.length);
+}
+/**
+ * Describes a semantic version range, per https://github.com/npm/node-semver#ranges
+ */
+const VersionRange = /** @class */ (function() {
+  function VersionRange(spec) {
+    this._alternatives = spec ? ts.Debug.checkDefined(parseRange(spec), 'Invalid range spec.') : ts.emptyArray;
+  }
+  VersionRange.tryParse = function(text) {
+    const sets = parseRange(text);
+    if (sets) {
+      const range = new VersionRange('');
+      range._alternatives = sets;
+      return range;
+    }
+    return undefined;
+  };
+  /**
+   * Tests whether a version matches the range. This is equivalent to `satisfies(version, range, { includePrerelease: true })`.
+   * in `node-semver`.
+   */
+  VersionRange.prototype.test = function(version) {
+    if (typeof version === 'string')
+      {version = new Version(version);}
+    return testDisjunction(version, this._alternatives);
+  };
+  VersionRange.prototype.toString = function() {
+    return formatDisjunction(this._alternatives);
+  };
+  return VersionRange;
+})();
+ts.VersionRange = VersionRange;
+// https://github.com/npm/node-semver#range-grammar
+//
+// range-set    ::= range ( logical-or range ) *
+// range        ::= hyphen | simple ( ' ' simple ) * | ''
+// logical-or   ::= ( ' ' ) * '||' ( ' ' ) *
+const logicalOrRegExp = /\|\|/g;
+const whitespaceRegExp = /\s+/g;
+// https://github.com/npm/node-semver#range-grammar
+//
+// partial      ::= xr ( '.' xr ( '.' xr qualifier ? )? )?
+// xr           ::= 'x' | 'X' | '*' | nr
+// nr           ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
+// qualifier    ::= ( '-' pre )? ( '+' build )?
+// pre          ::= parts
+// build        ::= parts
+// parts        ::= part ( '.' part ) *
+// part         ::= nr | [-0-9A-Za-z]+
+const partialRegExp =
+    /^([xX*0]|[1-9]\d*)(?:\.([xX*0]|[1-9]\d*)(?:\.([xX*0]|[1-9]\d*)(?:-([a-z0-9-.]+))?(?:\+([a-z0-9-.]+))?)?)?$/i;
+// https://github.com/npm/node-semver#range-grammar
+//
+// hyphen       ::= partial ' - ' partial
+const hyphenRegExp = /^\s*([a-z0-9-+.*]+)\s+-\s+([a-z0-9-+.*]+)\s*$/i;
+// https://github.com/npm/node-semver#range-grammar
+//
+// simple       ::= primitive | partial | tilde | caret
+// primitive    ::= ( '<' | '>' | '>=' | '<=' | '=' ) partial
+// tilde        ::= '~' partial
+// caret        ::= '^' partial
+const rangeRegExp = /^(~|\^|<|<=|>|>=|=)?\s*([a-z0-9-+.*]+)$/i;
+function parseRange(text) {
+  const alternatives = [];
+  for (let _i = 0, _a = ts.trimString(text).split(logicalOrRegExp); _i < _a.length; _i++) {
+    let range = _a[_i];
+    if (!range)
+      {continue;}
+    const comparators = [];
+    range = ts.trimString(range);
+    const match = hyphenRegExp.exec(range);
+    if (match) {
+      if (!parseHyphen(match[1], match[2], comparators))
+        {return undefined;}
+    } else {
+      for (let _b = 0, _c = range.split(whitespaceRegExp); _b < _c.length; _b++) {
+        const simple = _c[_b];
+        const match_1 = rangeRegExp.exec(ts.trimString(simple));
+        if (!match_1 || !parseComparator(match_1[1], match_1[2], comparators))
+          {return undefined;}
+      }
+    }
+    alternatives.push(comparators);
+  }
+  return alternatives;
+}
+function parsePartial(text) {
+  const match = partialRegExp.exec(text);
+  if (!match)
+    {return undefined;}
+  const major = match[1], _a = match[2], minor = _a === void 0 ? '*' : _a, _b = match[3],
+      patch = _b === void 0 ? '*' : _b, prerelease = match[4], build = match[5];
+  const version = new Version(
+      isWildcard(major) ? 0 : parseInt(major, 10), isWildcard(major) || isWildcard(minor) ? 0 : parseInt(minor, 10),
+      isWildcard(major) || isWildcard(minor) || isWildcard(patch) ? 0 : parseInt(patch, 10), prerelease, build);
+  return {version, major, minor, patch};
+}
+function parseHyphen(left, right, comparators) {
+  const leftResult = parsePartial(left);
+  if (!leftResult)
+    {return false;}
+  const rightResult = parsePartial(right);
+  if (!rightResult)
+    {return false;}
+  if (!isWildcard(leftResult.major)) {
+    comparators.push(createComparator('>=', leftResult.version));
+  }
+  if (!isWildcard(rightResult.major)) {
+    comparators.push(
+        isWildcard(rightResult.minor)     ? createComparator('<', rightResult.version.increment('major')) :
+            isWildcard(rightResult.patch) ? createComparator('<', rightResult.version.increment('minor')) :
+                                            createComparator('<=', rightResult.version));
+  }
+  return true;
+}
+function parseComparator(operator, text, comparators) {
+  const result = parsePartial(text);
+  if (!result)
+    {return false;}
+  const version = result.version, major = result.major, minor = result.minor, patch = result.patch;
+  if (!isWildcard(major)) {
+    switch (operator) {
+      case '~':
+        comparators.push(createComparator('>=', version));
+        comparators.push(createComparator('<', version.increment(isWildcard(minor) ? 'major' : 'minor')));
+        break;
+      case '^':
+        comparators.push(createComparator('>=', version));
+        comparators.push(createComparator(
+            '<',
+            version.increment(
+                version.major > 0 || isWildcard(minor)     ? 'major' :
+                    version.minor > 0 || isWildcard(patch) ? 'minor' :
+                                                             'patch')));
+        break;
+      case '<':
+      case '>=':
+        comparators.push(
+            isWildcard(minor) || isWildcard(patch) ? createComparator(operator, version.with({prerelease: '0'})) :
+                                                     createComparator(operator, version));
+        break;
+      case '<=':
+      case '>':
+        comparators.push(
+            isWildcard(minor) ?
+                createComparator(operator === '<=' ? '<' : '>=', version.increment('major').with({prerelease: '0'})) :
+                isWildcard(patch) ?
+                createComparator(operator === '<=' ? '<' : '>=', version.increment('minor').with({prerelease: '0'})) :
+                createComparator(operator, version));
+        break;
+      case '=':
+      case undefined:
+        if (isWildcard(minor) || isWildcard(patch)) {
+          comparators.push(createComparator('>=', version.with({prerelease: '0'})));
+          comparators.push(
+              createComparator('<', version.increment(isWildcard(minor) ? 'major' : 'minor').with({prerelease: '0'})));
+        } else {
+          comparators.push(createComparator('=', version));
+        }
+        break;
+      default:
+        // unrecognized
+        return false;
+    }
+  } else if (operator === '<' || operator === '>') {
+    comparators.push(createComparator('<', Version.zero));
+  }
+  return true;
+}
+function isWildcard(part) {
+  return part === '*' || part === 'x' || part === 'X';
+}
+function createComparator(operator, operand) {
+  return {operator, operand};
+}
+function testDisjunction(version, alternatives) {
+  // an empty disjunction is treated as "*" (all versions)
+  if (alternatives.length === 0)
+    {return true;}
+  for (let _i = 0, alternatives_1 = alternatives; _i < alternatives_1.length; _i++) {
+    const alternative = alternatives_1[_i];
+    if (testAlternative(version, alternative))
+      {return true;}
+  }
+  return false;
+}
+function testAlternative(version, comparators) {
+  for (let _i = 0, comparators_1 = comparators; _i < comparators_1.length; _i++) {
+    const comparator = comparators_1[_i];
+    if (!testComparator(version, comparator.operator, comparator.operand))
+      {return false;}
+  }
+  return true;
+}
+function testComparator(version, operator, operand) {
+  const cmp = version.compareTo(operand);
+  switch (operator) {
+    case '<':
+      return cmp < 0;
+    case '<=':
+      return cmp <= 0;
+    case '>':
+      return cmp > 0;
+    case '>=':
+      return cmp >= 0;
+    case '=':
+      return cmp === 0;
+    default:
+      return ts.Debug.assertNever(operator);
+  }
+}
+function formatDisjunction(alternatives) {
+  return ts.map(alternatives, formatAlternative).join(' || ') || '*';
+}
+function formatAlternative(comparators) {
+  return ts.map(comparators, formatComparator).join(' ');
+}
+function formatComparator(comparator) {
+  return ''.concat(comparator.operator).concat(comparator.operand);
+}
+})(ts || (ts = {}));
+/* @internal*/
+var ts;
+(function(ts) {
+// The following definitions provide the minimum compatible support for the Web Performance User Timings API
+// between browsers and NodeJS:
+
+function hasRequiredAPI(performance, PerformanceObserver) {
+  return typeof performance === 'object' && typeof performance.timeOrigin === 'number' &&
+      typeof performance.mark === 'function' && typeof performance.measure === 'function' &&
+      typeof performance.now === 'function' && typeof performance.clearMarks === 'function' &&
+      typeof performance.clearMeasures === 'function' && typeof PerformanceObserver === 'function';
+}
+function tryGetWebPerformanceHooks() {
+  if (typeof performance === 'object' && typeof PerformanceObserver === 'function' &&
+      hasRequiredAPI(performance, PerformanceObserver)) {
+    return {
+      // For now we always write native performance events when running in the browser. We may
+      // make this conditional in the future if we find that native web performance hooks
+      // in the browser also slow down compilation.
+      shouldWriteNativeEvents: true,
+      performance,
+      PerformanceObserver
+    };
+  }
+}
+function tryGetNodePerformanceHooks() {
+  if (typeof process !== 'undefined' && process.nextTick && !process.browser && typeof module === 'object' &&
+      typeof require === 'function') {
+    try {
+      let performance_1;
+      const _a = require('perf_hooks'), nodePerformance_1 = _a.performance,
+          PerformanceObserver_1 = _a.PerformanceObserver;
+      if (hasRequiredAPI(nodePerformance_1, PerformanceObserver_1)) {
+        performance_1 = nodePerformance_1;
+        // There is a bug in Node's performance.measure prior to 12.16.3/13.13.0 that does not
+        // match the Web Performance API specification. Node's implementation did not allow
+        // optional `start` and `end` arguments for `performance.measure`.
+        // See https://github.com/nodejs/node/pull/32651 for more information.
+        const version_1 = new ts.Version(process.versions.node);
+        const range = new ts.VersionRange('<12.16.3 || 13 <13.13');
+        if (range.test(version_1)) {
+          performance_1 = {
+            get timeOrigin() {
+              return nodePerformance_1.timeOrigin;
+            },
+            now: function() {
+              return nodePerformance_1.now();
+            },
+            mark: function(name) {
+              return nodePerformance_1.mark(name);
+            },
+            measure: function(name, start, end) {
+              if (start === void 0) {
+                start = 'nodeStart';
+              }
+              if (end === undefined) {
+                end = '__performance.measure-fix__';
+                nodePerformance_1.mark(end);
+              }
+              nodePerformance_1.measure(name, start, end);
+              if (end === '__performance.measure-fix__') {
+                nodePerformance_1.clearMarks('__performance.measure-fix__');
+              }
+            },
+            clearMarks: function(name) {
+              return nodePerformance_1.clearMarks(name);
+            },
+            clearMeasures: function(name) {
+              return nodePerformance_1.clearMeasures(name);
+            },
+          };
+        }
+        return {
+          // By default, only write native events when generating a cpu profile or using the v8 profiler.
+          shouldWriteNativeEvents: false,
+          performance: performance_1,
+          PerformanceObserver: PerformanceObserver_1
+        };
+      }
+    } catch (_b) {
+      // ignore errors
+    }
+  }
+}
+// Unlike with the native Map/Set 'tryGet' functions in corePublic.ts, we eagerly evaluate these
+// since we will need them for `timestamp`, below.
+const nativePerformanceHooks = tryGetWebPerformanceHooks() || tryGetNodePerformanceHooks();
+const nativePerformance =
+    nativePerformanceHooks === null || nativePerformanceHooks === void 0 ? void 0 : nativePerformanceHooks.performance;
+function tryGetNativePerformanceHooks() {
+  return nativePerformanceHooks;
+}
+ts.tryGetNativePerformanceHooks = tryGetNativePerformanceHooks;
+/** Gets a timestamp with (at least) ms resolution */
+ts.timestamp = nativePerformance ?
+    function() {
+      return nativePerformance.now();
+    } :
+    Date.now ? Date.now :
+               function() {
+                 return +(new Date());
+               };
+})(ts || (ts = {}));
+/* @internal*/
+/** Performance measurements for the compiler. */
+var ts;
+(function(ts) {
+let performance;
+(function(performance) {
+let perfHooks;
+// when set, indicates the implementation of `Performance` to use for user timing.
+// when unset, indicates user timing is unavailable or disabled.
+let performanceImpl;
+function createTimerIf(condition, measureName, startMarkName, endMarkName) {
+  return condition ? createTimer(measureName, startMarkName, endMarkName) : performance.nullTimer;
+}
+performance.createTimerIf = createTimerIf;
+function createTimer(measureName, startMarkName, endMarkName) {
+  let enterCount = 0;
+  return {enter, exit};
+  function enter() {
+    if (++enterCount === 1) {
+      mark(startMarkName);
+    }
+  }
+  function exit() {
+    if (--enterCount === 0) {
+      mark(endMarkName);
+      measure(measureName, startMarkName, endMarkName);
+    } else if (enterCount < 0) {
+      ts.Debug.fail('enter/exit count does not match.');
+    }
+  }
+}
+performance.createTimer = createTimer;
+performance.nullTimer = {
+  enter: ts.noop,
+  exit: ts.noop
+};
+let enabled = false;
+let timeorigin = ts.timestamp();
+const marks = new ts.Map();
+const counts = new ts.Map();
+const durations = new ts.Map();
+/**
+ * Marks a performance event.
+ *
+ * @param markName The name of the mark.
+ */
+function mark(markName) {
+  let _a;
+  if (enabled) {
+    const count = (_a = counts.get(markName)) !== null && _a !== void 0 ? _a : 0;
+    counts.set(markName, count + 1);
+    marks.set(markName, ts.timestamp());
+    performanceImpl === null || performanceImpl === void 0 ? void 0 : performanceImpl.mark(markName);
+  }
+}
+performance.mark = mark;
+/**
+ * Adds a performance measurement with the specified name.
+ *
+ * @param measureName The name of the performance measurement.
+ * @param startMarkName The name of the starting mark. If not supplied, the point at which the
+ *      profiler was enabled is used.
+ * @param endMarkName The name of the ending mark. If not supplied, the current timestamp is
+ *      used.
+ */
+function measure(measureName, startMarkName, endMarkName) {
+  let _a, _b;
+  if (enabled) {
+    const end = (_a = (endMarkName !== undefined ? marks.get(endMarkName) : undefined)) !== null && _a !== void 0 ?
+        _a :
+        ts.timestamp();
+    const start = (_b = (startMarkName !== undefined ? marks.get(startMarkName) : undefined)) !== null && _b !== void 0 ?
+        _b :
+        timeorigin;
+    const previousDuration = durations.get(measureName) || 0;
+    durations.set(measureName, previousDuration + (end - start));
+    performanceImpl === null || performanceImpl === void 0 ?
+        void 0 :
+        performanceImpl.measure(measureName, startMarkName, endMarkName);
+  }
+}
+performance.measure = measure;
+/**
+ * Gets the number of times a marker was encountered.
+ *
+ * @param markName The name of the mark.
+ */
+function getCount(markName) {
+  return counts.get(markName) || 0;
+}
+performance.getCount = getCount;
+/**
+ * Gets the total duration of all measurements with the supplied name.
+ *
+ * @param measureName The name of the measure whose durations should be accumulated.
+ */
+function getDuration(measureName) {
+  return durations.get(measureName) || 0;
+}
+performance.getDuration = getDuration;
+/**
+ * Iterate over each measure, performing some action
+ *
+ * @param cb The action to perform for each measure
+ */
+function forEachMeasure(cb) {
+  durations.forEach(function(duration, measureName) {
+    return cb(measureName, duration);
+  });
+}
+performance.forEachMeasure = forEachMeasure;
+function forEachMark(cb) {
+  marks.forEach(function(_time, markName) {
+    return cb(markName);
+  });
+}
+performance.forEachMark = forEachMark;
+function clearMeasures(name) {
+  if (name !== undefined)
+    {durations.delete(name);}
+  else
+    {durations.clear();}
+  performanceImpl === null || performanceImpl === void 0 ? void 0 : performanceImpl.clearMeasures(name);
+}
+performance.clearMeasures = clearMeasures;
+function clearMarks(name) {
+  if (name !== undefined) {
+    counts.delete(name);
+    marks.delete(name);
+  } else {
+    counts.clear();
+    marks.clear();
+  }
+  performanceImpl === null || performanceImpl === void 0 ? void 0 : performanceImpl.clearMarks(name);
+}
+performance.clearMarks = clearMarks;
+/**
+ * Indicates whether the performance API is enabled.
+ */
+function isEnabled() {
+  return enabled;
+}
+performance.isEnabled = isEnabled;
+/** Enables (and resets) performance measurements for the compiler. */
+function enable(system) {
+  let _a;
+  if (system === void 0) {
+    system = ts.sys;
+  }
+  if (!enabled) {
+    enabled = true;
+    perfHooks || (perfHooks = ts.tryGetNativePerformanceHooks());
+    if (perfHooks) {
+      timeorigin = perfHooks.performance.timeOrigin;
+      // NodeJS's Web Performance API is currently slower than expected, but we'd still like
+      // to be able to leverage native trace events when node is run with either `--cpu-prof`
+      // or `--prof`, if we're running with our own `--generateCpuProfile` flag, or when
+      // running in debug mode (since its possible to generate a cpu profile while debugging).
+      if (perfHooks.shouldWriteNativeEvents ||
+          ((_a = system === null || system === void 0 ? void 0 : system.cpuProfilingEnabled) === null || _a === void 0 ?
+               void 0 :
+               _a.call(system)) ||
+          (system === null || system === void 0 ? void 0 : system.debugMode)) {
+        performanceImpl = perfHooks.performance;
+      }
+    }
+  }
+  return true;
+}
+performance.enable = enable;
+/** Disables performance measurements for the compiler. */
+function disable() {
+  if (enabled) {
+    marks.clear();
+    counts.clear();
+    durations.clear();
+    performanceImpl = undefined;
+    enabled = false;
+  }
+}
+performance.disable = disable;
+})(performance = ts.performance || (ts.performance = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function(ts) {
+let _a;
+const nullLogger = {
+  logEvent: ts.noop,
+  logErrEvent: ts.noop,
+  logPerfEvent: ts.noop,
+  logInfoEvent: ts.noop,
+  logStartCommand: ts.noop,
+  logStopCommand: ts.noop,
+  logStartUpdateProgram: ts.noop,
+  logStopUpdateProgram: ts.noop,
+  logStartUpdateGraph: ts.noop,
+  logStopUpdateGraph: ts.noop,
+  logStartResolveModule: ts.noop,
+  logStopResolveModule: ts.noop,
+  logStartParseSourceFile: ts.noop,
+  logStopParseSourceFile: ts.noop,
+  logStartReadFile: ts.noop,
+  logStopReadFile: ts.noop,
+  logStartBindFile: ts.noop,
+  logStopBindFile: ts.noop,
+  logStartScheduledOperation: ts.noop,
+  logStopScheduledOperation: ts.noop,
+};
+// Load optional module to enable Event Tracing for Windows
+// See https://github.com/microsoft/typescript-etw for more information
+let etwModule;
+try {
+  const etwModulePath =
+      (_a = process.env.TS_ETW_MODULE_PATH) !== null && _a !== void 0 ? _a : './node_modules/@microsoft/typescript-etw';
+  // require() will throw an exception if the module is not found
+  // It may also return undefined if not installed properly
+  etwModule = require(etwModulePath);
+} catch (e) {
+  etwModule = undefined;
+}
+/** Performance logger that will generate ETW events if possible - check for `logEvent` member, as `etwModule` will be `{}` when browserified */
+ts.perfLogger = etwModule && etwModule.logEvent ? etwModule : nullLogger;
+})(ts || (ts = {}));
+/* Tracing events for the compiler. */
+/* @internal*/
+var ts;
+(function(ts) {
+// enable the above using startTracing()
+// `tracingEnabled` should never be used directly, only through the above
+let tracingEnabled;
+(function(tracingEnabled) {
+let fs;
+let traceCount = 0;
+let traceFd = 0;
+let mode;
+const typeCatalog = [];  // NB: id is index + 1
+let legendPath;
+const legend = [];
+/** Starts tracing for the given project. */
+function startTracing(tracingMode, traceDir, configFilePath) {
+  ts.Debug.assert(!ts.tracing, 'Tracing already started');
+  if (fs === undefined) {
+    try {
+      fs = require('fs');
+    } catch (e) {
+      throw new Error('tracing requires having fs\n(original error: '.concat(e.message || e, ')'));
+    }
+  }
+  mode = tracingMode;
+  typeCatalog.length = 0;
+  if (legendPath === undefined) {
+    legendPath = ts.combinePaths(traceDir, 'legend.json');
+  }
+  // Note that writing will fail later on if it exists and is not a directory
+  if (!fs.existsSync(traceDir)) {
+    fs.mkdirSync(traceDir, {recursive: true});
+  }
+  const countPart = mode === 'build' ? '.'.concat(process.pid, '-').concat(++traceCount) :
+      mode === 'server'            ? '.'.concat(process.pid) :
+                                     '';
+  const tracePath = ts.combinePaths(traceDir, 'trace'.concat(countPart, '.json'));
+  const typesPath = ts.combinePaths(traceDir, 'types'.concat(countPart, '.json'));
+  legend.push({
+    configFilePath,
+    tracePath,
+    typesPath,
+  });
+  traceFd = fs.openSync(tracePath, 'w');
+  ts.tracing = tracingEnabled;  // only when traceFd is properly set
+  // Start with a prefix that contains some metadata that the devtools profiler expects (also avoids a warning on import)
+  const meta = {cat: '__metadata', ph: 'M', ts: 1000 * ts.timestamp(), pid: 1, tid: 1};
+  fs.writeSync(
+      traceFd,
+      '[\n' +
+          [
+            __assign({name: 'process_name', args: {name: 'tsc'}}, meta),
+            __assign({name: 'thread_name', args: {name: 'Main'}}, meta),
+            __assign(__assign({name: 'TracingStartedInBrowser'}, meta), {cat: 'disabled-by-default-devtools.timeline'})
+          ]
+              .map(function(v) {
+                return JSON.stringify(v);
+              })
+              .join(',\n'));
+}
+tracingEnabled.startTracing = startTracing;
+/** Stops tracing for the in-progress project and dumps the type catalog. */
+function stopTracing() {
+  ts.Debug.assert(ts.tracing, 'Tracing is not in progress');
+  ts.Debug.assert(!!typeCatalog.length === (mode !== 'server'));  // Have a type catalog iff not in server mode
+  fs.writeSync(traceFd, '\n]\n');
+  fs.closeSync(traceFd);
+  ts.tracing = undefined;
+  if (typeCatalog.length) {
+    dumpTypes(typeCatalog);
+  } else {
+    // We pre-computed this path for convenience, but clear it
+    // now that the file won't be created.
+    legend[legend.length - 1].typesPath = undefined;
+  }
+}
+tracingEnabled.stopTracing = stopTracing;
+function recordType(type) {
+  if (mode !== 'server') {
+    typeCatalog.push(type);
+  }
+}
+tracingEnabled.recordType = recordType;
+let Phase;
+(function(Phase) {
+Phase['Parse'] = 'parse';
+Phase['Program'] = 'program';
+Phase['Bind'] = 'bind';
+Phase['Check'] = 'check';
+Phase['CheckTypes'] = 'checkTypes';
+Phase['Emit'] = 'emit';
+Phase['Session'] = 'session';
+})(Phase = tracingEnabled.Phase || (tracingEnabled.Phase = {}));
+function instant(phase, name, args) {
+  writeEvent('I', phase, name, args, '"s":"g"');
+}
+tracingEnabled.instant = instant;
+const eventStack = [];
+/**
+ * @param separateBeginAndEnd - used for special cases where we need the trace point even if the event
+ * never terminates (typically for reducing a scenario too big to trace to one that can be completed).
+ * In the future we might implement an exit handler to dump unfinished events which would deprecate
+ * these operations.
+ */
+function push(phase, name, args, separateBeginAndEnd) {
+  if (separateBeginAndEnd === void 0) {
+    separateBeginAndEnd = false;
+  }
+  if (separateBeginAndEnd) {
+    writeEvent('B', phase, name, args);
+  }
+  eventStack.push(
+      {phase, name, args, time: 1000 * ts.timestamp(), separateBeginAndEnd});
+}
+tracingEnabled.push = push;
+function pop(results) {
+  ts.Debug.assert(eventStack.length > 0);
+  writeStackEvent(eventStack.length - 1, 1000 * ts.timestamp(), results);
+  eventStack.length--;
+}
+tracingEnabled.pop = pop;
+function popAll() {
+  const endTime = 1000 * ts.timestamp();
+  for (let i = eventStack.length - 1; i >= 0; i--) {
+    writeStackEvent(i, endTime);
+  }
+  eventStack.length = 0;
+}
+tracingEnabled.popAll = popAll;
+// sample every 10ms
+const sampleInterval = 1000 * 10;
+function writeStackEvent(index, endTime, results) {
+  const _a = eventStack[index], phase = _a.phase, name = _a.name, args = _a.args, time = _a.time,
+      separateBeginAndEnd = _a.separateBeginAndEnd;
+  if (separateBeginAndEnd) {
+    ts.Debug.assert(!results, '`results` are not supported for events with `separateBeginAndEnd`');
+    writeEvent('E', phase, name, args, /* extras*/ undefined, endTime);
+  }
+  // test if [time,endTime) straddles a sampling point
+  else if (sampleInterval - (time % sampleInterval) <= endTime - time) {
+    writeEvent(
+        'X', phase, name, __assign(__assign({}, args), {results}), '"dur":'.concat(endTime - time), time);
+  }
+}
+function writeEvent(eventType, phase, name, args, extras, time) {
+  if (time === void 0) {
+    time = 1000 * ts.timestamp();
+  }
+  // In server mode, there's no easy way to dump type information, so we drop events that would require it.
+  if (mode === 'server' && phase === 'checkTypes' /* Phase.CheckTypes */)
+    {return;}
+  ts.performance.mark('beginTracing');
+  fs.writeSync(
+      traceFd,
+      ',\n{"pid":1,"tid":1,"ph":"'.concat(eventType, '","cat":"')
+          .concat(phase, '","ts":')
+          .concat(time, ',"name":"')
+          .concat(name, '"'));
+  if (extras)
+    {fs.writeSync(traceFd, ','.concat(extras));}
+  if (args)
+    {fs.writeSync(traceFd, ',"args":'.concat(JSON.stringify(args)));}
+  fs.writeSync(traceFd, '}');
+  ts.performance.mark('endTracing');
+  ts.performance.measure('Tracing', 'beginTracing', 'endTracing');
+}
+function getLocation(node) {
+  const file = ts.getSourceFileOfNode(node);
+  return !file ? undefined : {
+    path: file.path,
+    start: indexFromOne(ts.getLineAndCharacterOfPosition(file, node.pos)),
+    end: indexFromOne(ts.getLineAndCharacterOfPosition(file, node.end)),
+  };
+  function indexFromOne(lc) {
+    return {
+      line: lc.line + 1,
+      character: lc.character + 1,
+    };
+  }
+}
+function dumpTypes(types) {
+  let _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
+  ts.performance.mark('beginDumpTypes');
+  const typesPath = legend[legend.length - 1].typesPath;
+  const typesFd = fs.openSync(typesPath, 'w');
+  const recursionIdentityMap = new ts.Map();
+  // Cleverness: no line break here so that the type ID will match the line number
+  fs.writeSync(typesFd, '[');
+  const numTypes = types.length;
+  for (let i = 0; i < numTypes; i++) {
+    const type = types[i];
+    const objectFlags = type.objectFlags;
+    const symbol = (_a = type.aliasSymbol) !== null && _a !== void 0 ? _a : type.symbol;
+    // It's slow to compute the display text, so skip it unless it's really valuable (or cheap)
+    let display = void 0;
+    if ((objectFlags & 16 /* ObjectFlags.Anonymous */) | (type.flags & 2944 /* TypeFlags.Literal */)) {
+      try {
+        display = (_b = type.checker) === null || _b === void 0 ? void 0 : _b.typeToString(type);
+      } catch (_y) {
+        display = undefined;
+      }
+    }
+    let indexedAccessProperties = {};
+    if (type.flags & 8388608 /* TypeFlags.IndexedAccess */) {
+      const indexedAccessType = type;
+      indexedAccessProperties = {
+        indexedAccessObjectType: (_c = indexedAccessType.objectType) === null || _c === void 0 ? void 0 : _c.id,
+        indexedAccessIndexType: (_d = indexedAccessType.indexType) === null || _d === void 0 ? void 0 : _d.id,
+      };
+    }
+    let referenceProperties = {};
+    if (objectFlags & 4 /* ObjectFlags.Reference */) {
+      const referenceType = type;
+      referenceProperties = {
+        instantiatedType: (_e = referenceType.target) === null || _e === void 0 ? void 0 : _e.id,
+        typeArguments: (_f = referenceType.resolvedTypeArguments) === null || _f === void 0 ? void 0 :
+                                                                                              _f.map(function(t) {
+                                                                                                return t.id;
+                                                                                              }),
+        referenceLocation: getLocation(referenceType.node),
+      };
+    }
+    let conditionalProperties = {};
+    if (type.flags & 16777216 /* TypeFlags.Conditional */) {
+      const conditionalType = type;
+      conditionalProperties = {
+        conditionalCheckType: (_g = conditionalType.checkType) === null || _g === void 0 ? void 0 : _g.id,
+        conditionalExtendsType: (_h = conditionalType.extendsType) === null || _h === void 0 ? void 0 : _h.id,
+        conditionalTrueType:
+            (_k = (_j = conditionalType.resolvedTrueType) === null || _j === void 0 ? void 0 : _j.id) !== null &&
+                _k !== void 0 ?
+            _k :
+            -1,
+        conditionalFalseType:
+            (_m = (_l = conditionalType.resolvedFalseType) === null || _l === void 0 ? void 0 : _l.id) !== null &&
+                _m !== void 0 ?
+            _m :
+            -1,
+      };
+    }
+    let substitutionProperties = {};
+    if (type.flags & 33554432 /* TypeFlags.Substitution */) {
+      const substitutionType = type;
+      substitutionProperties = {
+        substitutionBaseType: (_o = substitutionType.baseType) === null || _o === void 0 ? void 0 : _o.id,
+        constraintType: (_p = substitutionType.constraint) === null || _p === void 0 ? void 0 : _p.id,
+      };
+    }
+    let reverseMappedProperties = {};
+    if (objectFlags & 1024 /* ObjectFlags.ReverseMapped */) {
+      const reverseMappedType = type;
+      reverseMappedProperties = {
+        reverseMappedSourceType: (_q = reverseMappedType.source) === null || _q === void 0 ? void 0 : _q.id,
+        reverseMappedMappedType: (_r = reverseMappedType.mappedType) === null || _r === void 0 ? void 0 : _r.id,
+        reverseMappedConstraintType: (_s = reverseMappedType.constraintType) === null || _s === void 0 ? void 0 : _s.id,
+      };
+    }
+    let evolvingArrayProperties = {};
+    if (objectFlags & 256 /* ObjectFlags.EvolvingArray */) {
+      const evolvingArrayType = type;
+      evolvingArrayProperties = {
+        evolvingArrayElementType: evolvingArrayType.elementType.id,
+        evolvingArrayFinalType: (_t = evolvingArrayType.finalArrayType) === null || _t === void 0 ? void 0 : _t.id,
+      };
+    }
+    // We can't print out an arbitrary object, so just assign each one a unique number.
+    // Don't call it an "id" so people don't treat it as a type id.
+    let recursionToken = void 0;
+    const recursionIdentity = type.checker.getRecursionIdentity(type);
+    if (recursionIdentity) {
+      recursionToken = recursionIdentityMap.get(recursionIdentity);
+      if (!recursionToken) {
+        recursionToken = recursionIdentityMap.size;
+        recursionIdentityMap.set(recursionIdentity, recursionToken);
+      }
+    }
+    const descriptor = __assign(
+        __assign(
+            __assign(
+                __assign(
+                    __assign(
+                        __assign(
+                            __assign(
+                                {
+                                  id: type.id,
+                                  intrinsicName: type.intrinsicName,
+                                  symbolName: (symbol === null || symbol === void 0 ? void 0 : symbol.escapedName) &&
+                                      ts.unescapeLeadingUnderscores(symbol.escapedName),
+                                  recursionId: recursionToken,
+                                  isTuple: objectFlags & 8 /* ObjectFlags.Tuple */ ? true : undefined,
+                                  unionTypes: (type.flags & 1048576 /* TypeFlags.Union */) ?
+                                      (_u = type.types) === null || _u === void 0 ? void 0 : _u.map(function(t) {
+                                        return t.id;
+                                      }) :
+                                      undefined,
+                                  intersectionTypes: (type.flags & 2097152 /* TypeFlags.Intersection */) ?
+                                      type.types.map(function(t) {
+                                        return t.id;
+                                      }) :
+                                      undefined,
+                                  aliasTypeArguments: (_v = type.aliasTypeArguments) === null || _v === void 0 ?
+                                      void 0 :
+                                      _v.map(function(t) {
+                                        return t.id;
+                                      }),
+                                  keyofType: (type.flags & 4194304 /* TypeFlags.Index */) ?
+                                      (_w = type.type) === null || _w === void 0 ? void 0 : _w.id :
+                                      undefined
+                                },
+                                indexedAccessProperties),
+                            referenceProperties),
+                        conditionalProperties),
+                    substitutionProperties),
+                reverseMappedProperties),
+            evolvingArrayProperties),
+        {
+          destructuringPattern: getLocation(type.pattern),
+          firstDeclaration: getLocation(
+              (_x = symbol === null || symbol === void 0 ? void 0 : symbol.declarations) === null || _x === void 0 ?
+                  void 0 :
+                  _x[0]),
+          flags: ts.Debug.formatTypeFlags(type.flags).split('|'),
+          display
+        });
+    fs.writeSync(typesFd, JSON.stringify(descriptor));
+    if (i < numTypes - 1) {
+      fs.writeSync(typesFd, ',\n');
+    }
+  }
+  fs.writeSync(typesFd, ']\n');
+  fs.closeSync(typesFd);
+  ts.performance.mark('endDumpTypes');
+  ts.performance.measure('Dump types', 'beginDumpTypes', 'endDumpTypes');
+}
+function dumpLegend() {
+  if (!legendPath) {
+    return;
+  }
+  fs.writeFileSync(legendPath, JSON.stringify(legend));
+}
+tracingEnabled.dumpLegend = dumpLegend;
+})(tracingEnabled || (tracingEnabled = {}));
+// define after tracingEnabled is initialized
+ts.startTracing = tracingEnabled.startTracing;
+ts.dumpTracingLegend = tracingEnabled.dumpLegend;
+})(ts || (ts = {}));
+var ts;
+(function(ts) {
+// token > SyntaxKind.Identifier => token is a keyword
+// Also, If you add a new SyntaxKind be sure to keep the `Markers` section at the bottom in sync
+let SyntaxKind;
+(function(SyntaxKind) {
+SyntaxKind[SyntaxKind['Unknown'] = 0] = 'Unknown';
+SyntaxKind[SyntaxKind['EndOfFileToken'] = 1] = 'EndOfFileToken';
+SyntaxKind[SyntaxKind['SingleLineCommentTrivia'] = 2] = 'SingleLineCommentTrivia';
+SyntaxKind[SyntaxKind['MultiLineCommentTrivia'] = 3] = 'MultiLineCommentTrivia';
+SyntaxKind[SyntaxKind['NewLineTrivia'] = 4] = 'NewLineTrivia';
+SyntaxKind[SyntaxKind['WhitespaceTrivia'] = 5] = 'WhitespaceTrivia';
+// We detect and preserve #! on the first line
+SyntaxKind[SyntaxKind['ShebangTrivia'] = 6] = 'ShebangTrivia';
+// We detect and provide better error recovery when we encounter a git merge marker.  This
+// allows us to edit files with git-conflict markers in them in a much more pleasant manner.
+SyntaxKind[SyntaxKind['ConflictMarkerTrivia'] = 7] = 'ConflictMarkerTrivia';
+// Literals
+SyntaxKind[SyntaxKind['NumericLiteral'] = 8] = 'NumericLiteral';
+SyntaxKind[SyntaxKind['BigIntLiteral'] = 9] = 'BigIntLiteral';
+SyntaxKind[SyntaxKind['StringLiteral'] = 10] = 'StringLiteral';
+SyntaxKind[SyntaxKind['JsxText'] = 11] = 'JsxText';
+SyntaxKind[SyntaxKind['JsxTextAllWhiteSpaces'] = 12] = 'JsxTextAllWhiteSpaces';
+SyntaxKind[SyntaxKind['RegularExpressionLiteral'] = 13] = 'RegularExpressionLiteral';
+SyntaxKind[SyntaxKind['NoSubstitutionTemplateLiteral'] = 14] = 'NoSubstitutionTemplateLiteral';
+// Pseudo-literals
+SyntaxKind[SyntaxKind['TemplateHead'] = 15] = 'TemplateHead';
+SyntaxKind[SyntaxKind['TemplateMiddle'] = 16] = 'TemplateMiddle';
+SyntaxKind[SyntaxKind['TemplateTail'] = 17] = 'TemplateTail';
+// Punctuation
+SyntaxKind[SyntaxKind['OpenBraceToken'] = 18] = 'OpenBraceToken';
+SyntaxKind[SyntaxKind['CloseBraceToken'] = 19] = 'CloseBraceToken';
+SyntaxKind[SyntaxKind['OpenParenToken'] = 20] = 'OpenParenToken';
+SyntaxKind[SyntaxKind['CloseParenToken'] = 21] = 'CloseParenToken';
+SyntaxKind[SyntaxKind['OpenBracketToken'] = 22] = 'OpenBracketToken';
+SyntaxKind[SyntaxKind['CloseBracketToken'] = 23] = 'CloseBracketToken';
+SyntaxKind[SyntaxKind['DotToken'] = 24] = 'DotToken';
+SyntaxKind[SyntaxKind['DotDotDotToken'] = 25] = 'DotDotDotToken';
+SyntaxKind[SyntaxKind['SemicolonToken'] = 26] = 'SemicolonToken';
+SyntaxKind[SyntaxKind['CommaToken'] = 27] = 'CommaToken';
+SyntaxKind[SyntaxKind['QuestionDotToken'] = 28] = 'QuestionDotToken';
+SyntaxKind[SyntaxKind['LessThanToken'] = 29] = 'LessThanToken';
+SyntaxKind[SyntaxKind['LessThanSlashToken'] = 30] = 'LessThanSlashToken';
+SyntaxKind[SyntaxKind['GreaterThanToken'] = 31] = 'GreaterThanToken';
+SyntaxKind[SyntaxKind['LessThanEqualsToken'] = 32] = 'LessThanEqualsToken';
+SyntaxKind[SyntaxKind['GreaterThanEqualsToken'] = 33] = 'GreaterThanEqualsToken';
+SyntaxKind[SyntaxKind['EqualsEqualsToken'] = 34] = 'EqualsEqualsToken';
+SyntaxKind[SyntaxKind['ExclamationEqualsToken'] = 35] = 'ExclamationEqualsToken';
+SyntaxKind[SyntaxKind['EqualsEqualsEqualsToken'] = 36] = 'EqualsEqualsEqualsToken';
+SyntaxKind[SyntaxKind['ExclamationEqualsEqualsToken'] = 37] = 'ExclamationEqualsEqualsToken';
+SyntaxKind[SyntaxKind['EqualsGreaterThanToken'] = 38] = 'EqualsGreaterThanToken';
+SyntaxKind[SyntaxKind['PlusToken'] = 39] = 'PlusToken';
+SyntaxKind[SyntaxKind['MinusToken'] = 40] = 'MinusToken';
+SyntaxKind[SyntaxKind['AsteriskToken'] = 41] = 'AsteriskToken';
+SyntaxKind[SyntaxKind['AsteriskAsteriskToken'] = 42] = 'AsteriskAsteriskToken';
+SyntaxKind[SyntaxKind['SlashToken'] = 43] = 'SlashToken';
+SyntaxKind[SyntaxKind['PercentToken'] = 44] = 'PercentToken';
+SyntaxKind[SyntaxKind['PlusPlusToken'] = 45] = 'PlusPlusToken';
+SyntaxKind[SyntaxKind['MinusMinusToken'] = 46] = 'MinusMinusToken';
+SyntaxKind[SyntaxKind['LessThanLessThanToken'] = 47] = 'LessThanLessThanToken';
+SyntaxKind[SyntaxKind['GreaterThanGreaterThanToken'] = 48] = 'GreaterThanGreaterThanToken';
+SyntaxKind[SyntaxKind['GreaterThanGreaterThanGreaterThanToken'] = 49] = 'GreaterThanGreaterThanGreaterThanToken';
+SyntaxKind[SyntaxKind['AmpersandToken'] = 50] = 'AmpersandToken';
+SyntaxKind[SyntaxKind['BarToken'] = 51] = 'BarToken';
+SyntaxKind[SyntaxKind['CaretToken'] = 52] = 'CaretToken';
+SyntaxKind[SyntaxKind['ExclamationToken'] = 53] = 'ExclamationToken';
+SyntaxKind[SyntaxKind['TildeToken'] = 54] = 'TildeToken';
+SyntaxKind[SyntaxKind['AmpersandAmpersandToken'] = 55] = 'AmpersandAmpersandToken';
+SyntaxKind[SyntaxKind['BarBarToken'] = 56] = 'BarBarToken';
+SyntaxKind[SyntaxKind['QuestionToken'] = 57] = 'QuestionToken';
+SyntaxKind[SyntaxKind['ColonToken'] = 58] = 'ColonToken';
+SyntaxKind[SyntaxKind['AtToken'] = 59] = 'AtToken';
+SyntaxKind[SyntaxKind['QuestionQuestionToken'] = 60] = 'QuestionQuestionToken';
+/** Only the JSDoc scanner produces BacktickToken. The normal scanner produces NoSubstitutionTemplateLiteral and related kinds. */
+SyntaxKind[SyntaxKind['BacktickToken'] = 61] = 'BacktickToken';
+/** Only the JSDoc scanner produces HashToken. The normal scanner produces PrivateIdentifier. */
+SyntaxKind[SyntaxKind['HashToken'] = 62] = 'HashToken';
+// Assignments
+SyntaxKind[SyntaxKind['EqualsToken'] = 63] = 'EqualsToken';
+SyntaxKind[SyntaxKind['PlusEqualsToken'] = 64] = 'PlusEqualsToken';
+SyntaxKind[SyntaxKind['MinusEqualsToken'] = 65] = 'MinusEqualsToken';
+SyntaxKind[SyntaxKind['AsteriskEqualsToken'] = 66] = 'AsteriskEqualsToken';
+SyntaxKind[SyntaxKind['AsteriskAsteriskEqualsToken'] = 67] = 'AsteriskAsteriskEqualsToken';
+SyntaxKind[SyntaxKind['SlashEqualsToken'] = 68] = 'SlashEqualsToken';
+SyntaxKind[SyntaxKind['PercentEqualsToken'] = 69] = 'PercentEqualsToken';
+SyntaxKind[SyntaxKind['LessThanLessThanEqualsToken'] = 70] = 'LessThanLessThanEqualsToken';
+SyntaxKind[SyntaxKind['GreaterThanGreaterThanEqualsToken'] = 71] = 'GreaterThanGreaterThanEqualsToken';
+SyntaxKind[SyntaxKind['GreaterThanGreaterThanGreaterThanEqualsToken'] = 72] =
+    'GreaterThanGreaterThanGreaterThanEqualsToken';
+SyntaxKind[SyntaxKind['AmpersandEqualsToken'] = 73] = 'AmpersandEqualsToken';
+SyntaxKind[SyntaxKind['BarEqualsToken'] = 74] = 'BarEqualsToken';
+SyntaxKind[SyntaxKind['BarBarEqualsToken'] = 75] = 'BarBarEqualsToken';
+SyntaxKind[SyntaxKind['AmpersandAmpersandEqualsToken'] = 76] = 'AmpersandAmpersandEqualsToken';
+SyntaxKind[SyntaxKind['QuestionQuestionEqualsToken'] = 77] = 'QuestionQuestionEqualsToken';
+SyntaxKind[SyntaxKind['CaretEqualsToken'] = 78] = 'CaretEqualsToken';
+// Identifiers and PrivateIdentifiers
+SyntaxKind[SyntaxKind['Identifier'] = 79] = 'Identifier';
+SyntaxKind[SyntaxKind['PrivateIdentifier'] = 80] = 'PrivateIdentifier';
+// Reserved words
+SyntaxKind[SyntaxKind['BreakKeyword'] = 81] = 'BreakKeyword';
+SyntaxKind[SyntaxKind['CaseKeyword'] = 82] = 'CaseKeyword';
+SyntaxKind[SyntaxKind['CatchKeyword'] = 83] = 'CatchKeyword';
+SyntaxKind[SyntaxKind['ClassKeyword'] = 84] = 'ClassKeyword';
+SyntaxKind[SyntaxKind['ConstKeyword'] = 85] = 'ConstKeyword';
+SyntaxKind[SyntaxKind['ContinueKeyword'] = 86] = 'ContinueKeyword';
+SyntaxKind[SyntaxKind['DebuggerKeyword'] = 87] = 'DebuggerKeyword';
+SyntaxKind[SyntaxKind['DefaultKeyword'] = 88] = 'DefaultKeyword';
+SyntaxKind[SyntaxKind['DeleteKeyword'] = 89] = 'DeleteKeyword';
+SyntaxKind[SyntaxKind['DoKeyword'] = 90] = 'DoKeyword';
+SyntaxKind[SyntaxKind['ElseKeyword'] = 91] = 'ElseKeyword';
+SyntaxKind[SyntaxKind['EnumKeyword'] = 92] = 'EnumKeyword';
+SyntaxKind[SyntaxKind['ExportKeyword'] = 93] = 'ExportKeyword';
+SyntaxKind[SyntaxKind['ExtendsKeyword'] = 94] = 'ExtendsKeyword';
+SyntaxKind[SyntaxKind['FalseKeyword'] = 95] = 'FalseKeyword';
+SyntaxKind[SyntaxKind['FinallyKeyword'] = 96] = 'FinallyKeyword';
+SyntaxKind[SyntaxKind['ForKeyword'] = 97] = 'ForKeyword';
+SyntaxKind[SyntaxKind['FunctionKeyword'] = 98] = 'FunctionKeyword';
+SyntaxKind[SyntaxKind['IfKeyword'] = 99] = 'IfKeyword';
+SyntaxKind[SyntaxKind['ImportKeyword'] = 100] = 'ImportKeyword';
+SyntaxKind[SyntaxKind['InKeyword'] = 101] = 'InKeyword';
+SyntaxKind[SyntaxKind['InstanceOfKeyword'] = 102] = 'InstanceOfKeyword';
+SyntaxKind[SyntaxKind['NewKeyword'] = 103] = 'NewKeyword';
+SyntaxKind[SyntaxKind['NullKeyword'] = 104] = 'NullKeyword';
+SyntaxKind[SyntaxKind['ReturnKeyword'] = 105] = 'ReturnKeyword';
+SyntaxKind[SyntaxKind['SuperKeyword'] = 106] = 'SuperKeyword';
+SyntaxKind[SyntaxKind['SwitchKeyword'] = 107] = 'SwitchKeyword';
+SyntaxKind[SyntaxKind['ThisKeyword'] = 108] = 'ThisKeyword';
+SyntaxKind[SyntaxKind['ThrowKeyword'] = 109] = 'ThrowKeyword';
+SyntaxKind[SyntaxKind['TrueKeyword'] = 110] = 'TrueKeyword';
+SyntaxKind[SyntaxKind['TryKeyword'] = 111] = 'TryKeyword';
+SyntaxKind[SyntaxKind['TypeOfKeyword'] = 112] = 'TypeOfKeyword';
+SyntaxKind[SyntaxKind['VarKeyword'] = 113] = 'VarKeyword';
+SyntaxKind[SyntaxKind['VoidKeyword'] = 114] = 'VoidKeyword';
+SyntaxKind[SyntaxKind['WhileKeyword'] = 115] = 'WhileKeyword';
+SyntaxKind[SyntaxKind['WithKeyword'] = 116] = 'WithKeyword';
+// Strict mode reserved words
+SyntaxKind[SyntaxKind['ImplementsKeyword'] = 117] = 'ImplementsKeyword';
+SyntaxKind[SyntaxKind['InterfaceKeyword'] = 118] = 'InterfaceKeyword';
+SyntaxKind[SyntaxKind['LetKeyword'] = 119] = 'LetKeyword';
+SyntaxKind[SyntaxKind['PackageKeyword'] = 120] = 'PackageKeyword';
+SyntaxKind[SyntaxKind['PrivateKeyword'] = 121] = 'PrivateKeyword';
+SyntaxKind[SyntaxKind['ProtectedKeyword'] = 122] = 'ProtectedKeyword';
+SyntaxKind[SyntaxKind['PublicKeyword'] = 123] = 'PublicKeyword';
+SyntaxKind[SyntaxKind['StaticKeyword'] = 124] = 'StaticKeyword';
+SyntaxKind[SyntaxKind['YieldKeyword'] = 125] = 'YieldKeyword';
+// Contextual keywords
+SyntaxKind[SyntaxKind['AbstractKeyword'] = 126] = 'AbstractKeyword';
+SyntaxKind[SyntaxKind['AccessorKeyword'] = 127] = 'AccessorKeyword';
+SyntaxKind[SyntaxKind['AsKeyword'] = 128] = 'AsKeyword';
+SyntaxKind[SyntaxKind['AssertsKeyword'] = 129] = 'AssertsKeyword';
+SyntaxKind[SyntaxKind['AssertKeyword'] = 130] = 'AssertKeyword';
+SyntaxKind[SyntaxKind['AnyKeyword'] = 131] = 'AnyKeyword';
+SyntaxKind[SyntaxKind['AsyncKeyword'] = 132] = 'AsyncKeyword';
+SyntaxKind[SyntaxKind['AwaitKeyword'] = 133] = 'AwaitKeyword';
+SyntaxKind[SyntaxKind['BooleanKeyword'] = 134] = 'BooleanKeyword';
+SyntaxKind[SyntaxKind['ConstructorKeyword'] = 135] = 'ConstructorKeyword';
+SyntaxKind[SyntaxKind['DeclareKeyword'] = 136] = 'DeclareKeyword';
+SyntaxKind[SyntaxKind['GetKeyword'] = 137] = 'GetKeyword';
+SyntaxKind[SyntaxKind['InferKeyword'] = 138] = 'InferKeyword';
+SyntaxKind[SyntaxKind['IntrinsicKeyword'] = 139] = 'IntrinsicKeyword';
+SyntaxKind[SyntaxKind['IsKeyword'] = 140] = 'IsKeyword';
+SyntaxKind[SyntaxKind['KeyOfKeyword'] = 141] = 'KeyOfKeyword';
+SyntaxKind[SyntaxKind['ModuleKeyword'] = 142] = 'ModuleKeyword';
+SyntaxKind[SyntaxKind['NamespaceKeyword'] = 143] = 'NamespaceKeyword';
+SyntaxKind[SyntaxKind['NeverKeyword'] = 144] = 'NeverKeyword';
+SyntaxKind[SyntaxKind['OutKeyword'] = 145] = 'OutKeyword';
+SyntaxKind[SyntaxKind['ReadonlyKeyword'] = 146] = 'ReadonlyKeyword';
+SyntaxKind[SyntaxKind['RequireKeyword'] = 147] = 'RequireKeyword';
+SyntaxKind[SyntaxKind['NumberKeyword'] = 148] = 'NumberKeyword';
+SyntaxKind[SyntaxKind['ObjectKeyword'] = 149] = 'ObjectKeyword';
+SyntaxKind[SyntaxKind['SatisfiesKeyword'] = 150] = 'SatisfiesKeyword';
+SyntaxKind[SyntaxKind['SetKeyword'] = 151] = 'SetKeyword';
+SyntaxKind[SyntaxKind['StringKeyword'] = 152] = 'StringKeyword';
+SyntaxKind[SyntaxKind['SymbolKeyword'] = 153] = 'SymbolKeyword';
+SyntaxKind[SyntaxKind['TypeKeyword'] = 154] = 'TypeKeyword';
+SyntaxKind[SyntaxKind['UndefinedKeyword'] = 155] = 'UndefinedKeyword';
+SyntaxKind[SyntaxKind['UniqueKeyword'] = 156] = 'UniqueKeyword';
+SyntaxKind[SyntaxKind['UnknownKeyword'] = 157] = 'UnknownKeyword';
+SyntaxKind[SyntaxKind['FromKeyword'] = 158] = 'FromKeyword';
+SyntaxKind[SyntaxKind['GlobalKeyword'] = 159] = 'GlobalKeyword';
+SyntaxKind[SyntaxKind['BigIntKeyword'] = 160] = 'BigIntKeyword';
+SyntaxKind[SyntaxKind['OverrideKeyword'] = 161] = 'OverrideKeyword';
+SyntaxKind[SyntaxKind['OfKeyword'] = 162] = 'OfKeyword';
+// Parse tree nodes
+// Names
+SyntaxKind[SyntaxKind['QualifiedName'] = 163] = 'QualifiedName';
+SyntaxKind[SyntaxKind['ComputedPropertyName'] = 164] = 'ComputedPropertyName';
+// Signature elements
+SyntaxKind[SyntaxKind['TypeParameter'] = 165] = 'TypeParameter';
+SyntaxKind[SyntaxKind['Parameter'] = 166] = 'Parameter';
+SyntaxKind[SyntaxKind['Decorator'] = 167] = 'Decorator';
+// TypeMember
+SyntaxKind[SyntaxKind['PropertySignature'] = 168] = 'PropertySignature';
+SyntaxKind[SyntaxKind['PropertyDeclaration'] = 169] = 'PropertyDeclaration';
+SyntaxKind[SyntaxKind['MethodSignature'] = 170] = 'MethodSignature';
+SyntaxKind[SyntaxKind['MethodDeclaration'] = 171] = 'MethodDeclaration';
+SyntaxKind[SyntaxKind['ClassStaticBlockDeclaration'] = 172] = 'ClassStaticBlockDeclaration';
+SyntaxKind[SyntaxKind['Constructor'] = 173] = 'Constructor';
+SyntaxKind[SyntaxKind['GetAccessor'] = 174] = 'GetAccessor';
+SyntaxKind[SyntaxKind['SetAccessor'] = 175] = 'SetAccessor';
+SyntaxKind[SyntaxKind['CallSignature'] = 176] = 'CallSignature';
+SyntaxKind[SyntaxKind['ConstructSignature'] = 177] = 'ConstructSignature';
+SyntaxKind[SyntaxKind['IndexSignature'] = 178] = 'IndexSignature';
+// Type
+SyntaxKind[SyntaxKind['TypePredicate'] = 179] = 'TypePredicate';
+SyntaxKind[SyntaxKind['TypeReference'] = 180] = 'TypeReference';
+SyntaxKind[SyntaxKind['FunctionType'] = 181] = 'FunctionType';
+SyntaxKind[SyntaxKind['ConstructorType'] = 182] = 'ConstructorType';
+SyntaxKind[SyntaxKind['TypeQuery'] = 183] = 'TypeQuery';
+SyntaxKind[SyntaxKind['TypeLiteral'] = 184] = 'TypeLiteral';
+SyntaxKind[SyntaxKind['ArrayType'] = 185] = 'ArrayType';
+SyntaxKind[SyntaxKind['TupleType'] = 186] = 'TupleType';
+SyntaxKind[SyntaxKind['OptionalType'] = 187] = 'OptionalType';
+SyntaxKind[SyntaxKind['RestType'] = 188] = 'RestType';
+SyntaxKind[SyntaxKind['UnionType'] = 189] = 'UnionType';
+SyntaxKind[SyntaxKind['IntersectionType'] = 190] = 'IntersectionType';
+SyntaxKind[SyntaxKind['ConditionalType'] = 191] = 'ConditionalType';
+SyntaxKind[SyntaxKind['InferType'] = 192] = 'InferType';
+SyntaxKind[SyntaxKind['ParenthesizedType'] = 193] = 'ParenthesizedType';
+SyntaxKind[SyntaxKind['ThisType'] = 194] = 'ThisType';
+SyntaxKind[SyntaxKind['TypeOperator'] = 195] = 'TypeOperator';
+SyntaxKind[SyntaxKind['IndexedAccessType'] = 196] = 'IndexedAccessType';
+SyntaxKind[SyntaxKind['MappedType'] = 197] = 'MappedType';
+SyntaxKind[SyntaxKind['LiteralType'] = 198] = 'LiteralType';
+SyntaxKind[SyntaxKind['NamedTupleMember'] = 199] = 'NamedTupleMember';
+SyntaxKind[SyntaxKind['TemplateLiteralType'] = 200] = 'TemplateLiteralType';
+SyntaxKind[SyntaxKind['TemplateLiteralTypeSpan'] = 201] = 'TemplateLiteralTypeSpan';
+SyntaxKind[SyntaxKind['ImportType'] = 202] = 'ImportType';
+// Binding patterns
+SyntaxKind[SyntaxKind['ObjectBindingPattern'] = 203] = 'ObjectBindingPattern';
+SyntaxKind[SyntaxKind['ArrayBindingPattern'] = 204] = 'ArrayBindingPattern';
+SyntaxKind[SyntaxKind['BindingElement'] = 205] = 'BindingElement';
+// Expression
+SyntaxKind[SyntaxKind['ArrayLiteralExpression'] = 206] = 'ArrayLiteralExpression';
+SyntaxKind[SyntaxKind['ObjectLiteralExpression'] = 207] = 'ObjectLiteralExpression';
+SyntaxKind[SyntaxKind['PropertyAccessExpression'] = 208] = 'PropertyAccessExpression';
+SyntaxKind[SyntaxKind['ElementAccessExpression'] = 209] = 'ElementAccessExpression';
+SyntaxKind[SyntaxKind['CallExpression'] = 210] = 'CallExpression';
+SyntaxKind[SyntaxKind['NewExpression'] = 211] = 'NewExpression';
+SyntaxKind[SyntaxKind['TaggedTemplateExpression'] = 212] = 'TaggedTemplateExpression';
+SyntaxKind[SyntaxKind['TypeAssertionExpression'] = 213] = 'TypeAssertionExpression';
+SyntaxKind[SyntaxKind['ParenthesizedExpression'] = 214] = 'ParenthesizedExpression';
+SyntaxKind[SyntaxKind['FunctionExpression'] = 215] = 'FunctionExpression';
+SyntaxKind[SyntaxKind['ArrowFunction'] = 216] = 'ArrowFunction';
+SyntaxKind[SyntaxKind['DeleteExpression'] = 217] = 'DeleteExpression';
+SyntaxKind[SyntaxKind['TypeOfExpression'] = 218] = 'TypeOfExpression';
+SyntaxKind[SyntaxKind['VoidExpression'] = 219] = 'VoidExpression';
+SyntaxKind[SyntaxKind['AwaitExpression'] = 220] = 'AwaitExpression';
+SyntaxKind[SyntaxKind['PrefixUnaryExpression'] = 221] = 'PrefixUnaryExpression';
+SyntaxKind[SyntaxKind['PostfixUnaryExpression'] = 222] = 'PostfixUnaryExpression';
+SyntaxKind[SyntaxKind['BinaryExpression'] = 223] = 'BinaryExpression';
+SyntaxKind[SyntaxKind['ConditionalExpression'] = 224] = 'ConditionalExpression';
+SyntaxKind[SyntaxKind['TemplateExpression'] = 225] = 'TemplateExpression';
+SyntaxKind[SyntaxKind['YieldExpression'] = 226] = 'YieldExpression';
+SyntaxKind[SyntaxKind['SpreadElement'] = 227] = 'SpreadElement';
+SyntaxKind[SyntaxKind['ClassExpression'] = 228] = 'ClassExpression';
+SyntaxKind[SyntaxKind['OmittedExpression'] = 229] = 'OmittedExpression';
+SyntaxKind[SyntaxKind['ExpressionWithTypeArguments'] = 230] = 'ExpressionWithTypeArguments';
+SyntaxKind[SyntaxKind['AsExpression'] = 231] = 'AsExpression';
+SyntaxKind[SyntaxKind['NonNullExpression'] = 232] = 'NonNullExpression';
+SyntaxKind[SyntaxKind['MetaProperty'] = 233] = 'MetaProperty';
+SyntaxKind[SyntaxKind['SyntheticExpression'] = 234] = 'SyntheticExpression';
+SyntaxKind[SyntaxKind['SatisfiesExpression'] = 235] = 'SatisfiesExpression';
+// Misc
+SyntaxKind[SyntaxKind['TemplateSpan'] = 236] = 'TemplateSpan';
+SyntaxKind[SyntaxKind['SemicolonClassElement'] = 237] = 'SemicolonClassElement';
+// Element
+SyntaxKind[SyntaxKind['Block'] = 238] = 'Block';
+SyntaxKind[SyntaxKind['EmptyStatement'] = 239] = 'EmptyStatement';
+SyntaxKind[SyntaxKind['VariableStatement'] = 240] = 'VariableStatement';
+SyntaxKind[SyntaxKind['ExpressionStatement'] = 241] = 'ExpressionStatement';
+SyntaxKind[SyntaxKind['IfStatement'] = 242] = 'IfStatement';
+SyntaxKind[SyntaxKind['DoStatement'] = 243] = 'DoStatement';
+SyntaxKind[SyntaxKind['WhileStatement'] = 244] = 'WhileStatement';
+SyntaxKind[SyntaxKind['ForStatement'] = 245] = 'ForStatement';
+SyntaxKind[SyntaxKind['ForInStatement'] = 246] = 'ForInStatement';
+SyntaxKind[SyntaxKind['ForOfStatement'] = 247] = 'ForOfStatement';
+SyntaxKind[SyntaxKind['ContinueStatement'] = 248] = 'ContinueStatement';
+SyntaxKind[SyntaxKind['BreakStatement'] = 249] = 'BreakStatement';
+SyntaxKind[SyntaxKind['ReturnStatement'] = 250] = 'ReturnStatement';
+SyntaxKind[SyntaxKind['WithStatement'] = 251] = 'WithStatement';
+SyntaxKind[SyntaxKind['SwitchStatement'] = 252] = 'SwitchStatement';
+SyntaxKind[SyntaxKind['LabeledStatement'] = 253] = 'LabeledStatement';
+SyntaxKind[SyntaxKind['ThrowStatement'] = 254] = 'ThrowStatement';
+SyntaxKind[SyntaxKind['TryStatement'] = 255] = 'TryStatement';
+SyntaxKind[SyntaxKind['DebuggerStatement'] = 256] = 'DebuggerStatement';
+SyntaxKind[SyntaxKind['VariableDeclaration'] = 257] = 'VariableDeclaration';
+SyntaxKind[SyntaxKind['VariableDeclarationList'] = 258] = 'VariableDeclarationList';
+SyntaxKind[SyntaxKind['FunctionDeclaration'] = 259] = 'FunctionDeclaration';
+SyntaxKind[SyntaxKind['ClassDeclaration'] = 260] = 'ClassDeclaration';
+SyntaxKind[SyntaxKind['InterfaceDeclaration'] = 261] = 'InterfaceDeclaration';
+SyntaxKind[SyntaxKind['TypeAliasDeclaration'] = 262] = 'TypeAliasDeclaration';
+SyntaxKind[SyntaxKind['EnumDeclaration'] = 263] = 'EnumDeclaration';
+SyntaxKind[SyntaxKind['ModuleDeclaration'] = 264] = 'ModuleDeclaration';
+SyntaxKind[SyntaxKind['ModuleBlock'] = 265] = 'ModuleBlock';
+SyntaxKind[SyntaxKind['CaseBlock'] = 266] = 'CaseBlock';
+SyntaxKind[SyntaxKind['NamespaceExportDeclaration'] = 267] = 'NamespaceExportDeclaration';
+SyntaxKind[SyntaxKind['ImportEqualsDeclaration'] = 268] = 'ImportEqualsDeclaration';
+SyntaxKind[SyntaxKind['ImportDeclaration'] = 269] = 'ImportDeclaration';
+SyntaxKind[SyntaxKind['ImportClause'] = 270] = 'ImportClause';
+SyntaxKind[SyntaxKind['NamespaceImport'] = 271] = 'NamespaceImport';
+SyntaxKind[SyntaxKind['NamedImports'] = 272] = 'NamedImports';
+SyntaxKind[SyntaxKind['ImportSpecifier'] = 273] = 'ImportSpecifier';
+SyntaxKind[SyntaxKind['ExportAssignment'] = 274] = 'ExportAssignment';
+SyntaxKind[SyntaxKind['ExportDeclaration'] = 275] = 'ExportDeclaration';
+SyntaxKind[SyntaxKind['NamedExports'] = 276] = 'NamedExports';
+SyntaxKind[SyntaxKind['NamespaceExport'] = 277] = 'NamespaceExport';
+SyntaxKind[SyntaxKind['ExportSpecifier'] = 278] = 'ExportSpecifier';
+SyntaxKind[SyntaxKind['MissingDeclaration'] = 279] = 'MissingDeclaration';
+// Module references
+SyntaxKind[SyntaxKind['ExternalModuleReference'] = 280] = 'ExternalModuleReference';
+// JSX
+SyntaxKind[SyntaxKind['JsxElement'] = 281] = 'JsxElement';
+SyntaxKind[SyntaxKind['JsxSelfClosingElement'] = 282] = 'JsxSelfClosingElement';
+SyntaxKind[SyntaxKind['JsxOpeningElement'] = 283] = 'JsxOpeningElement';
+SyntaxKind[SyntaxKind['JsxClosingElement'] = 284] = 'JsxClosingElement';
+SyntaxKind[SyntaxKind['JsxFragment'] = 285] = 'JsxFragment';
+SyntaxKind[SyntaxKind['JsxOpeningFragment'] = 286] = 'JsxOpeningFragment';
+SyntaxKind[SyntaxKind['JsxClosingFragment'] = 287] = 'JsxClosingFragment';
+SyntaxKind[SyntaxKind['JsxAttribute'] = 288] = 'JsxAttribute';
+SyntaxKind[SyntaxKind['JsxAttributes'] = 289] = 'JsxAttributes';
+SyntaxKind[SyntaxKind['JsxSpreadAttribute'] = 290] = 'JsxSpreadAttribute';
+SyntaxKind[SyntaxKind['JsxExpression'] = 291] = 'JsxExpression';
+// Clauses
+SyntaxKind[SyntaxKind['CaseClause'] = 292] = 'CaseClause';
+SyntaxKind[SyntaxKind['DefaultClause'] = 293] = 'DefaultClause';
+SyntaxKind[SyntaxKind['HeritageClause'] = 294] = 'HeritageClause';
+SyntaxKind[SyntaxKind['CatchClause'] = 295] = 'CatchClause';
+SyntaxKind[SyntaxKind['AssertClause'] = 296] = 'AssertClause';
+SyntaxKind[SyntaxKind['AssertEntry'] = 297] = 'AssertEntry';
+SyntaxKind[SyntaxKind['ImportTypeAssertionContainer'] = 298] = 'ImportTypeAssertionContainer';
+// Property assignments
+SyntaxKind[SyntaxKind['PropertyAssignment'] = 299] = 'PropertyAssignment';
+SyntaxKind[SyntaxKind['ShorthandPropertyAssignment'] = 300] = 'ShorthandPropertyAssignment';
+SyntaxKind[SyntaxKind['SpreadAssignment'] = 301] = 'SpreadAssignment';
+// Enum
+SyntaxKind[SyntaxKind['EnumMember'] = 302] = 'EnumMember';
+// Unparsed
+SyntaxKind[SyntaxKind['UnparsedPrologue'] = 303] = 'UnparsedPrologue';
+SyntaxKind[SyntaxKind['UnparsedPrepend'] = 304] = 'UnparsedPrepend';
+SyntaxKind[SyntaxKind['UnparsedText'] = 305] = 'UnparsedText';
+SyntaxKind[SyntaxKind['UnparsedInternalText'] = 306] = 'UnparsedInternalText';
+SyntaxKind[SyntaxKind['UnparsedSyntheticReference'] = 307] = 'UnparsedSyntheticReference';
+// Top-level nodes
+SyntaxKind[SyntaxKind['SourceFile'] = 308] = 'SourceFile';
+SyntaxKind[SyntaxKind['Bundle'] = 309] = 'Bundle';
+SyntaxKind[SyntaxKind['UnparsedSource'] = 310] = 'UnparsedSource';
+SyntaxKind[SyntaxKind['InputFiles'] = 311] = 'InputFiles';
+// JSDoc nodes
+SyntaxKind[SyntaxKind['JSDocTypeExpression'] = 312] = 'JSDocTypeExpression';
+SyntaxKind[SyntaxKind['JSDocNameReference'] = 313] = 'JSDocNameReference';
+SyntaxKind[SyntaxKind['JSDocMemberName'] = 314] = 'JSDocMemberName';
+SyntaxKind[SyntaxKind['JSDocAllType'] = 315] = 'JSDocAllType';
+SyntaxKind[SyntaxKind['JSDocUnknownType'] = 316] = 'JSDocUnknownType';
+SyntaxKind[SyntaxKind['JSDocNullableType'] = 317] = 'JSDocNullableType';
+SyntaxKind[SyntaxKind['JSDocNonNullableType'] = 318] = 'JSDocNonNullableType';
+SyntaxKind[SyntaxKind['JSDocOptionalType'] = 319] = 'JSDocOptionalType';
+SyntaxKind[SyntaxKind['JSDocFunctionType'] = 320] = 'JSDocFunctionType';
+SyntaxKind[SyntaxKind['JSDocVariadicType'] = 321] = 'JSDocVariadicType';
+SyntaxKind[SyntaxKind['JSDocNamepathType'] = 322] = 'JSDocNamepathType';
+SyntaxKind[SyntaxKind['JSDoc'] = 323] = 'JSDoc';
+/** @deprecated Use SyntaxKind.JSDoc */
+SyntaxKind[SyntaxKind['JSDocComment'] = 323] = 'JSDocComment';
+SyntaxKind[SyntaxKind['JSDocText'] = 324] = 'JSDocText';
+SyntaxKind[SyntaxKind['JSDocTypeLiteral'] = 325] = 'JSDocTypeLiteral';
+SyntaxKind[SyntaxKind['JSDocSignature'] = 326] = 'JSDocSignature';
+SyntaxKind[SyntaxKind['JSDocLink'] = 327] = 'JSDocLink';
+SyntaxKind[SyntaxKind['JSDocLinkCode'] = 328] = 'JSDocLinkCode';
+SyntaxKind[SyntaxKind['JSDocLinkPlain'] = 329] = 'JSDocLinkPlain';
+SyntaxKind[SyntaxKind['JSDocTag'] = 330] = 'JSDocTag';
+SyntaxKind[SyntaxKind['JSDocAugmentsTag'] = 331] = 'JSDocAugmentsTag';
+SyntaxKind[SyntaxKind['JSDocImplementsTag'] = 332] = 'JSDocImplementsTag';
+SyntaxKind[SyntaxKind['JSDocAuthorTag'] = 333] = 'JSDocAuthorTag';
+SyntaxKind[SyntaxKind['JSDocDeprecatedTag'] = 334] = 'JSDocDeprecatedTag';
+SyntaxKind[SyntaxKind['JSDocClassTag'] = 335] = 'JSDocClassTag';
+SyntaxKind[SyntaxKind['JSDocPublicTag'] = 336] = 'JSDocPublicTag';
+SyntaxKind[SyntaxKind['JSDocPrivateTag'] = 337] = 'JSDocPrivateTag';
+SyntaxKind[SyntaxKind['JSDocProtectedTag'] = 338] = 'JSDocProtectedTag';
+SyntaxKind[SyntaxKind['JSDocReadonlyTag'] = 339] = 'JSDocReadonlyTag';
+SyntaxKind[SyntaxKind['JSDocOverrideTag'] = 340] = 'JSDocOverrideTag';
+SyntaxKind[SyntaxKind['JSDocCallbackTag'] = 341] = 'JSDocCallbackTag';
+SyntaxKind[SyntaxKind['JSDocEnumTag'] = 342] = 'JSDocEnumTag';
+SyntaxKind[SyntaxKind['JSDocParameterTag'] = 343] = 'JSDocParameterTag';
+SyntaxKind[SyntaxKind['JSDocReturnTag'] = 344] = 'JSDocReturnTag';
+SyntaxKind[SyntaxKind['JSDocThisTag'] = 345] = 'JSDocThisTag';
+SyntaxKind[SyntaxKind['JSDocTypeTag'] = 346] = 'JSDocTypeTag';
+SyntaxKind[SyntaxKind['JSDocTemplateTag'] = 347] = 'JSDocTemplateTag';
+SyntaxKind[SyntaxKind['JSDocTypedefTag'] = 348] = 'JSDocTypedefTag';
+SyntaxKind[SyntaxKind['JSDocSeeTag'] = 349] = 'JSDocSeeTag';
+SyntaxKind[SyntaxKind['JSDocPropertyTag'] = 350] = 'JSDocPropertyTag';
+// Synthesized list
+SyntaxKind[SyntaxKind['SyntaxList'] = 351] = 'SyntaxList';
+// Transformation nodes
+SyntaxKind[SyntaxKind['NotEmittedStatement'] = 352] = 'NotEmittedStatement';
+SyntaxKind[SyntaxKind['PartiallyEmittedExpression'] = 353] = 'PartiallyEmittedExpression';
+SyntaxKind[SyntaxKind['CommaListExpression'] = 354] = 'CommaListExpression';
+SyntaxKind[SyntaxKind['MergeDeclarationMarker'] = 355] = 'MergeDeclarationMarker';
+SyntaxKind[SyntaxKind['EndOfDeclarationMarker'] = 356] = 'EndOfDeclarationMarker';
+SyntaxKind[SyntaxKind['SyntheticReferenceExpression'] = 357] = 'SyntheticReferenceExpression';
+// Enum value count
+SyntaxKind[SyntaxKind['Count'] = 358] = 'Count';
+// Markers
+SyntaxKind[SyntaxKind['FirstAssignment'] = 63] = 'FirstAssignment';
+SyntaxKind[SyntaxKind['LastAssignment'] = 78] = 'LastAssignment';
+SyntaxKind[SyntaxKind['FirstCompoundAssignment'] = 64] = 'FirstCompoundAssignment';
+SyntaxKind[SyntaxKind['LastCompoundAssignment'] = 78] = 'LastCompoundAssignment';
+SyntaxKind[SyntaxKind['FirstReservedWord'] = 81] = 'FirstReservedWord';
+SyntaxKind[SyntaxKind['LastReservedWord'] = 116] = 'LastReservedWord';
+SyntaxKind[SyntaxKind['FirstKeyword'] = 81] = 'FirstKeyword';
+SyntaxKind[SyntaxKind['LastKeyword'] = 162] = 'LastKeyword';
+SyntaxKind[SyntaxKind['FirstFutureReservedWord'] = 117] = 'FirstFutureReservedWord';
+SyntaxKind[SyntaxKind['LastFutureReservedWord'] = 125] = 'LastFutureReservedWord';
+SyntaxKind[SyntaxKind['FirstTypeNode'] = 179] = 'FirstTypeNode';
+SyntaxKind[SyntaxKind['LastTypeNode'] = 202] = 'LastTypeNode';
+SyntaxKind[SyntaxKind['FirstPunctuation'] = 18] = 'FirstPunctuation';
+SyntaxKind[SyntaxKind['LastPunctuation'] = 78] = 'LastPunctuation';
+SyntaxKind[SyntaxKind['FirstToken'] = 0] = 'FirstToken';
+SyntaxKind[SyntaxKind['LastToken'] = 162] = 'LastToken';
+SyntaxKind[SyntaxKind['FirstTriviaToken'] = 2] = 'FirstTriviaToken';
+SyntaxKind[SyntaxKind['LastTriviaToken'] = 7] = 'LastTriviaToken';
+SyntaxKind[SyntaxKind['FirstLiteralToken'] = 8] = 'FirstLiteralToken';
+SyntaxKind[SyntaxKind['LastLiteralToken'] = 14] = 'LastLiteralToken';
+SyntaxKind[SyntaxKind['FirstTemplateToken'] = 14] = 'FirstTemplateToken';
+SyntaxKind[SyntaxKind['LastTemplateToken'] = 17] = 'LastTemplateToken';
+SyntaxKind[SyntaxKind['FirstBinaryOperator'] = 29] = 'FirstBinaryOperator';
+SyntaxKind[SyntaxKind['LastBinaryOperator'] = 78] = 'LastBinaryOperator';
+SyntaxKind[SyntaxKind['FirstStatement'] = 240] = 'FirstStatement';
+SyntaxKind[SyntaxKind['LastStatement'] = 256] = 'LastStatement';
+SyntaxKind[SyntaxKind['FirstNode'] = 163] = 'FirstNode';
+SyntaxKind[SyntaxKind['FirstJSDocNode'] = 312] = 'FirstJSDocNode';
+SyntaxKind[SyntaxKind['LastJSDocNode'] = 350] = 'LastJSDocNode';
+SyntaxKind[SyntaxKind['FirstJSDocTagNode'] = 330] = 'FirstJSDocTagNode';
+SyntaxKind[SyntaxKind['LastJSDocTagNode'] = 350] = 'LastJSDocTagNode';
+/* @internal */ SyntaxKind[SyntaxKind['FirstContextualKeyword'] = 126] = 'FirstContextualKeyword';
+/* @internal */ SyntaxKind[SyntaxKind['LastContextualKeyword'] = 162] = 'LastContextualKeyword';
+})(SyntaxKind = ts.SyntaxKind || (ts.SyntaxKind = {}));
+let NodeFlags;
+(function(NodeFlags) {
+NodeFlags[NodeFlags['None'] = 0] = 'None';
+NodeFlags[NodeFlags['Let'] = 1] = 'Let';
+NodeFlags[NodeFlags['Const'] = 2] = 'Const';
+NodeFlags[NodeFlags['NestedNamespace'] = 4] = 'NestedNamespace';
+NodeFlags[NodeFlags['Synthesized'] = 8] = 'Synthesized';
+NodeFlags[NodeFlags['Namespace'] = 16] = 'Namespace';
+NodeFlags[NodeFlags['OptionalChain'] = 32] = 'OptionalChain';
+NodeFlags[NodeFlags['ExportContext'] = 64] = 'ExportContext';
+NodeFlags[NodeFlags['ContainsThis'] = 128] = 'ContainsThis';
+NodeFlags[NodeFlags['HasImplicitReturn'] = 256] = 'HasImplicitReturn';
+NodeFlags[NodeFlags['HasExplicitReturn'] = 512] = 'HasExplicitReturn';
+NodeFlags[NodeFlags['GlobalAugmentation'] = 1024] = 'GlobalAugmentation';
+NodeFlags[NodeFlags['HasAsyncFunctions'] = 2048] = 'HasAsyncFunctions';
+NodeFlags[NodeFlags['DisallowInContext'] = 4096] = 'DisallowInContext';
+NodeFlags[NodeFlags['YieldContext'] = 8192] = 'YieldContext';
+NodeFlags[NodeFlags['DecoratorContext'] = 16384] = 'DecoratorContext';
+NodeFlags[NodeFlags['AwaitContext'] = 32768] = 'AwaitContext';
+NodeFlags[NodeFlags['DisallowConditionalTypesContext'] = 65536] = 'DisallowConditionalTypesContext';
+NodeFlags[NodeFlags['ThisNodeHasError'] = 131072] = 'ThisNodeHasError';
+NodeFlags[NodeFlags['JavaScriptFile'] = 262144] = 'JavaScriptFile';
+NodeFlags[NodeFlags['ThisNodeOrAnySubNodesHasError'] = 524288] = 'ThisNodeOrAnySubNodesHasError';
+NodeFlags[NodeFlags['HasAggregatedChildData'] = 1048576] = 'HasAggregatedChildData';
+// These flags will be set when the parser encounters a dynamic import expression or 'import.meta' to avoid
+// walking the tree if the flags are not set. However, these flags are just a approximation
+// (hence why it's named "PossiblyContainsDynamicImport") because once set, the flags never get cleared.
+// During editing, if a dynamic import is removed, incremental parsing will *NOT* clear this flag.
+// This means that the tree will always be traversed during module resolution, or when looking for external module indicators.
+// However, the removal operation should not occur often and in the case of the
+// removal, it is likely that users will add the import anyway.
+// The advantage of this approach is its simplicity. For the case of batch compilation,
+// we guarantee that users won't have to pay the price of walking the tree if a dynamic import isn't used.
+/* @internal */ NodeFlags[NodeFlags['PossiblyContainsDynamicImport'] = 2097152] = 'PossiblyContainsDynamicImport';
+/* @internal */ NodeFlags[NodeFlags['PossiblyContainsImportMeta'] = 4194304] = 'PossiblyContainsImportMeta';
+NodeFlags[NodeFlags['JSDoc'] = 8388608] = 'JSDoc';
+/* @internal */ NodeFlags[NodeFlags['Ambient'] = 16777216] = 'Ambient';
+/* @internal */ NodeFlags[NodeFlags['InWithStatement'] = 33554432] = 'InWithStatement';
+NodeFlags[NodeFlags['JsonFile'] = 67108864] = 'JsonFile';
+/* @internal */ NodeFlags[NodeFlags['TypeCached'] = 134217728] = 'TypeCached';
+/* @internal */ NodeFlags[NodeFlags['Deprecated'] = 268435456] = 'Deprecated';
+NodeFlags[NodeFlags['BlockScoped'] = 3] = 'BlockScoped';
+NodeFlags[NodeFlags['ReachabilityCheckFlags'] = 768] = 'ReachabilityCheckFlags';
+NodeFlags[NodeFlags['ReachabilityAndEmitFlags'] = 2816] = 'ReachabilityAndEmitFlags';
+// Parsing context flags
+NodeFlags[NodeFlags['ContextFlags'] = 50720768] = 'ContextFlags';
+// Exclude these flags when parsing a Type
+NodeFlags[NodeFlags['TypeExcludesFlags'] = 40960] = 'TypeExcludesFlags';
+// Represents all flags that are potentially set once and
+// never cleared on SourceFiles which get re-used in between incremental parses.
+// See the comment above on `PossiblyContainsDynamicImport` and `PossiblyContainsImportMeta`.
+/* @internal */ NodeFlags[NodeFlags['PermanentlySetIncrementalFlags'] = 6291456] = 'PermanentlySetIncrementalFlags';
+})(NodeFlags = ts.NodeFlags || (ts.NodeFlags = {}));
+let ModifierFlags;
+(function(ModifierFlags) {
+ModifierFlags[ModifierFlags['None'] = 0] = 'None';
+ModifierFlags[ModifierFlags['Export'] = 1] = 'Export';
+ModifierFlags[ModifierFlags['Ambient'] = 2] = 'Ambient';
+ModifierFlags[ModifierFlags['Public'] = 4] = 'Public';
+ModifierFlags[ModifierFlags['Private'] = 8] = 'Private';
+ModifierFlags[ModifierFlags['Protected'] = 16] = 'Protected';
+ModifierFlags[ModifierFlags['Static'] = 32] = 'Static';
+ModifierFlags[ModifierFlags['Readonly'] = 64] = 'Readonly';
+ModifierFlags[ModifierFlags['Accessor'] = 128] = 'Accessor';
+ModifierFlags[ModifierFlags['Abstract'] = 256] = 'Abstract';
+ModifierFlags[ModifierFlags['Async'] = 512] = 'Async';
+ModifierFlags[ModifierFlags['Default'] = 1024] = 'Default';
+ModifierFlags[ModifierFlags['Const'] = 2048] = 'Const';
+ModifierFlags[ModifierFlags['HasComputedJSDocModifiers'] = 4096] = 'HasComputedJSDocModifiers';
+ModifierFlags[ModifierFlags['Deprecated'] = 8192] = 'Deprecated';
+ModifierFlags[ModifierFlags['Override'] = 16384] = 'Override';
+ModifierFlags[ModifierFlags['In'] = 32768] = 'In';
+ModifierFlags[ModifierFlags['Out'] = 65536] = 'Out';
+ModifierFlags[ModifierFlags['Decorator'] = 131072] = 'Decorator';
+ModifierFlags[ModifierFlags['HasComputedFlags'] = 536870912] = 'HasComputedFlags';
+ModifierFlags[ModifierFlags['AccessibilityModifier'] = 28] = 'AccessibilityModifier';
+// Accessibility modifiers and 'readonly' can be attached to a parameter in a constructor to make it a property.
+ModifierFlags[ModifierFlags['ParameterPropertyModifier'] = 16476] = 'ParameterPropertyModifier';
+ModifierFlags[ModifierFlags['NonPublicAccessibilityModifier'] = 24] = 'NonPublicAccessibilityModifier';
+ModifierFlags[ModifierFlags['TypeScriptModifier'] = 117086] = 'TypeScriptModifier';
+ModifierFlags[ModifierFlags['ExportDefault'] = 1025] = 'ExportDefault';
+ModifierFlags[ModifierFlags['All'] = 258047] = 'All';
+ModifierFlags[ModifierFlags['Modifier'] = 126975] = 'Modifier';
+})(ModifierFlags = ts.ModifierFlags || (ts.ModifierFlags = {}));
+let JsxFlags;
+(function(JsxFlags) {
+JsxFlags[JsxFlags['None'] = 0] = 'None';
+/** An element from a named property of the JSX.IntrinsicElements interface */
+JsxFlags[JsxFlags['IntrinsicNamedElement'] = 1] = 'IntrinsicNamedElement';
+/** An element inferred from the string index signature of the JSX.IntrinsicElements interface */
+JsxFlags[JsxFlags['IntrinsicIndexedElement'] = 2] = 'IntrinsicIndexedElement';
+JsxFlags[JsxFlags['IntrinsicElement'] = 3] = 'IntrinsicElement';
+})(JsxFlags = ts.JsxFlags || (ts.JsxFlags = {}));
+/* @internal */
+let RelationComparisonResult;
+(function(RelationComparisonResult) {
+RelationComparisonResult[RelationComparisonResult['Succeeded'] = 1] = 'Succeeded';
+RelationComparisonResult[RelationComparisonResult['Failed'] = 2] = 'Failed';
+RelationComparisonResult[RelationComparisonResult['Reported'] = 4] = 'Reported';
+RelationComparisonResult[RelationComparisonResult['ReportsUnmeasurable'] = 8] = 'ReportsUnmeasurable';
+RelationComparisonResult[RelationComparisonResult['ReportsUnreliable'] = 16] = 'ReportsUnreliable';
+RelationComparisonResult[RelationComparisonResult['ReportsMask'] = 24] = 'ReportsMask';
+})(RelationComparisonResult = ts.RelationComparisonResult || (ts.RelationComparisonResult = {}));
+let GeneratedIdentifierFlags;
+(function(GeneratedIdentifierFlags) {
+// Kinds
+GeneratedIdentifierFlags[GeneratedIdentifierFlags['None'] = 0] = 'None';
+/* @internal*/ GeneratedIdentifierFlags[GeneratedIdentifierFlags['Auto'] = 1] = 'Auto';
+/* @internal*/ GeneratedIdentifierFlags[GeneratedIdentifierFlags['Loop'] = 2] = 'Loop';
+/* @internal*/ GeneratedIdentifierFlags[GeneratedIdentifierFlags['Unique'] = 3] = 'Unique';
+/* @internal*/ GeneratedIdentifierFlags[GeneratedIdentifierFlags['Node'] = 4] = 'Node';
+/* @internal*/ GeneratedIdentifierFlags[GeneratedIdentifierFlags['KindMask'] = 7] = 'KindMask';
+// Flags
+GeneratedIdentifierFlags[GeneratedIdentifierFlags['ReservedInNestedScopes'] = 8] = 'ReservedInNestedScopes';
+GeneratedIdentifierFlags[GeneratedIdentifierFlags['Optimistic'] = 16] = 'Optimistic';
+GeneratedIdentifierFlags[GeneratedIdentifierFlags['FileLevel'] = 32] = 'FileLevel';
+GeneratedIdentifierFlags[GeneratedIdentifierFlags['AllowNameSubstitution'] = 64] = 'AllowNameSubstitution';
+})(GeneratedIdentifierFlags = ts.GeneratedIdentifierFlags || (ts.GeneratedIdentifierFlags = {}));
+let TokenFlags;
+(function(TokenFlags) {
+TokenFlags[TokenFlags['None'] = 0] = 'None';
+/* @internal */
+TokenFlags[TokenFlags['PrecedingLineBreak'] = 1] = 'PrecedingLineBreak';
+/* @internal */
+TokenFlags[TokenFlags['PrecedingJSDocComment'] = 2] = 'PrecedingJSDocComment';
+/* @internal */
+TokenFlags[TokenFlags['Unterminated'] = 4] = 'Unterminated';
+/* @internal */
+TokenFlags[TokenFlags['ExtendedUnicodeEscape'] = 8] = 'ExtendedUnicodeEscape';
+TokenFlags[TokenFlags['Scientific'] = 16] = 'Scientific';
+TokenFlags[TokenFlags['Octal'] = 32] = 'Octal';
+TokenFlags[TokenFlags['HexSpecifier'] = 64] = 'HexSpecifier';
+TokenFlags[TokenFlags['BinarySpecifier'] = 128] = 'BinarySpecifier';
+TokenFlags[TokenFlags['OctalSpecifier'] = 256] = 'OctalSpecifier';
+/* @internal */
+TokenFlags[TokenFlags['ContainsSeparator'] = 512] = 'ContainsSeparator';
+/* @internal */
+TokenFlags[TokenFlags['UnicodeEscape'] = 1024] = 'UnicodeEscape';
+/* @internal */
+TokenFlags[TokenFlags['ContainsInvalidEscape'] = 2048] = 'ContainsInvalidEscape';
+/* @internal */
+TokenFlags[TokenFlags['BinaryOrOctalSpecifier'] = 384] = 'BinaryOrOctalSpecifier';
+/* @internal */
+TokenFlags[TokenFlags['NumericLiteralFlags'] = 1008] = 'NumericLiteralFlags';
+/* @internal */
+TokenFlags[TokenFlags['TemplateLiteralLikeFlags'] = 2048] = 'TemplateLiteralLikeFlags';
+})(TokenFlags = ts.TokenFlags || (ts.TokenFlags = {}));
+// NOTE: Ensure this is up-to-date with src/debug/debug.ts
+let FlowFlags;
+(function(FlowFlags) {
+FlowFlags[FlowFlags['Unreachable'] = 1] = 'Unreachable';
+FlowFlags[FlowFlags['Start'] = 2] = 'Start';
+FlowFlags[FlowFlags['BranchLabel'] = 4] = 'BranchLabel';
+FlowFlags[FlowFlags['LoopLabel'] = 8] = 'LoopLabel';
+FlowFlags[FlowFlags['Assignment'] = 16] = 'Assignment';
+FlowFlags[FlowFlags['TrueCondition'] = 32] = 'TrueCondition';
+FlowFlags[FlowFlags['FalseCondition'] = 64] = 'FalseCondition';
+FlowFlags[FlowFlags['SwitchClause'] = 128] = 'SwitchClause';
+FlowFlags[FlowFlags['ArrayMutation'] = 256] = 'ArrayMutation';
+FlowFlags[FlowFlags['Call'] = 512] = 'Call';
+FlowFlags[FlowFlags['ReduceLabel'] = 1024] = 'ReduceLabel';
+FlowFlags[FlowFlags['Referenced'] = 2048] = 'Referenced';
+FlowFlags[FlowFlags['Shared'] = 4096] = 'Shared';
+FlowFlags[FlowFlags['Label'] = 12] = 'Label';
+FlowFlags[FlowFlags['Condition'] = 96] = 'Condition';
+})(FlowFlags = ts.FlowFlags || (ts.FlowFlags = {}));
+/* @internal */
+let CommentDirectiveType;
+(function(CommentDirectiveType) {
+CommentDirectiveType[CommentDirectiveType['ExpectError'] = 0] = 'ExpectError';
+CommentDirectiveType[CommentDirectiveType['Ignore'] = 1] = 'Ignore';
+})(CommentDirectiveType = ts.CommentDirectiveType || (ts.CommentDirectiveType = {}));
+const OperationCanceledException = /** @class */ (function() {
+  function OperationCanceledException() {
+  }
+  return OperationCanceledException;
+})();
+ts.OperationCanceledException = OperationCanceledException;
+/* @internal*/
+let FileIncludeKind;
+(function(FileIncludeKind) {
+FileIncludeKind[FileIncludeKind['RootFile'] = 0] = 'RootFile';
+FileIncludeKind[FileIncludeKind['SourceFromProjectReference'] = 1] = 'SourceFromProjectReference';
+FileIncludeKind[FileIncludeKind['OutputFromProjectReference'] = 2] = 'OutputFromProjectReference';
+FileIncludeKind[FileIncludeKind['Import'] = 3] = 'Import';
+FileIncludeKind[FileIncludeKind['ReferenceFile'] = 4] = 'ReferenceFile';
+FileIncludeKind[FileIncludeKind['TypeReferenceDirective'] = 5] = 'TypeReferenceDirective';
+FileIncludeKind[FileIncludeKind['LibFile'] = 6] = 'LibFile';
+FileIncludeKind[FileIncludeKind['LibReferenceDirective'] = 7] = 'LibReferenceDirective';
+FileIncludeKind[FileIncludeKind['AutomaticTypeDirectiveFile'] = 8] = 'AutomaticTypeDirectiveFile';
+})(FileIncludeKind = ts.FileIncludeKind || (ts.FileIncludeKind = {}));
+/* @internal*/
+let FilePreprocessingDiagnosticsKind;
+(function(FilePreprocessingDiagnosticsKind) {
+FilePreprocessingDiagnosticsKind[FilePreprocessingDiagnosticsKind['FilePreprocessingReferencedDiagnostic'] = 0] =
+    'FilePreprocessingReferencedDiagnostic';
+FilePreprocessingDiagnosticsKind[FilePreprocessingDiagnosticsKind['FilePreprocessingFileExplainingDiagnostic'] = 1] =
+    'FilePreprocessingFileExplainingDiagnostic';
+})(FilePreprocessingDiagnosticsKind =
+       ts.FilePreprocessingDiagnosticsKind || (ts.FilePreprocessingDiagnosticsKind = {}));
+/* @internal */
+let StructureIsReused;
+(function(StructureIsReused) {
+StructureIsReused[StructureIsReused['Not'] = 0] = 'Not';
+StructureIsReused[StructureIsReused['SafeModules'] = 1] = 'SafeModules';
+StructureIsReused[StructureIsReused['Completely'] = 2] = 'Completely';
+})(StructureIsReused = ts.StructureIsReused || (ts.StructureIsReused = {}));
+/** Return code used by getEmitOutput function to indicate status of the function */
+let ExitStatus;
+(function(ExitStatus) {
+// Compiler ran successfully.  Either this was a simple do-nothing compilation (for example,
+// when -version or -help was provided, or this was a normal compilation, no diagnostics
+// were produced, and all outputs were generated successfully.
+ExitStatus[ExitStatus['Success'] = 0] = 'Success';
+// Diagnostics were produced and because of them no code was generated.
+ExitStatus[ExitStatus['DiagnosticsPresent_OutputsSkipped'] = 1] = 'DiagnosticsPresent_OutputsSkipped';
+// Diagnostics were produced and outputs were generated in spite of them.
+ExitStatus[ExitStatus['DiagnosticsPresent_OutputsGenerated'] = 2] = 'DiagnosticsPresent_OutputsGenerated';
+// When build skipped because passed in project is invalid
+ExitStatus[ExitStatus['InvalidProject_OutputsSkipped'] = 3] = 'InvalidProject_OutputsSkipped';
+// When build is skipped because project references form cycle
+ExitStatus[ExitStatus['ProjectReferenceCycle_OutputsSkipped'] = 4] = 'ProjectReferenceCycle_OutputsSkipped';
+/** @deprecated Use ProjectReferenceCycle_OutputsSkipped instead. */
+ExitStatus[ExitStatus['ProjectReferenceCycle_OutputsSkupped'] = 4] = 'ProjectReferenceCycle_OutputsSkupped';
+})(ExitStatus = ts.ExitStatus || (ts.ExitStatus = {}));
+/* @internal */
+let MemberOverrideStatus;
+(function(MemberOverrideStatus) {
+MemberOverrideStatus[MemberOverrideStatus['Ok'] = 0] = 'Ok';
+MemberOverrideStatus[MemberOverrideStatus['NeedsOverride'] = 1] = 'NeedsOverride';
+MemberOverrideStatus[MemberOverrideStatus['HasInvalidOverride'] = 2] = 'HasInvalidOverride';
+})(MemberOverrideStatus = ts.MemberOverrideStatus || (ts.MemberOverrideStatus = {}));
+/* @internal */
+let UnionReduction;
+(function(UnionReduction) {
+UnionReduction[UnionReduction['None'] = 0] = 'None';
+UnionReduction[UnionReduction['Literal'] = 1] = 'Literal';
+UnionReduction[UnionReduction['Subtype'] = 2] = 'Subtype';
+})(UnionReduction = ts.UnionReduction || (ts.UnionReduction = {}));
+/* @internal */
+let ContextFlags;
+(function(ContextFlags) {
+ContextFlags[ContextFlags['None'] = 0] = 'None';
+ContextFlags[ContextFlags['Signature'] = 1] = 'Signature';
+ContextFlags[ContextFlags['NoConstraints'] = 2] = 'NoConstraints';
+ContextFlags[ContextFlags['Completions'] = 4] = 'Completions';
+ContextFlags[ContextFlags['SkipBindingPatterns'] = 8] = 'SkipBindingPatterns';
+})(ContextFlags = ts.ContextFlags || (ts.ContextFlags = {}));
+// NOTE: If modifying this enum, must modify `TypeFormatFlags` too!
+let NodeBuilderFlags;
+(function(NodeBuilderFlags) {
+NodeBuilderFlags[NodeBuilderFlags['None'] = 0] = 'None';
+// Options
+NodeBuilderFlags[NodeBuilderFlags['NoTruncation'] = 1] = 'NoTruncation';
+NodeBuilderFlags[NodeBuilderFlags['WriteArrayAsGenericType'] = 2] = 'WriteArrayAsGenericType';
+NodeBuilderFlags[NodeBuilderFlags['GenerateNamesForShadowedTypeParams'] = 4] = 'GenerateNamesForShadowedTypeParams';
+NodeBuilderFlags[NodeBuilderFlags['UseStructuralFallback'] = 8] = 'UseStructuralFallback';
+NodeBuilderFlags[NodeBuilderFlags['ForbidIndexedAccessSymbolReferences'] = 16] = 'ForbidIndexedAccessSymbolReferences';
+NodeBuilderFlags[NodeBuilderFlags['WriteTypeArgumentsOfSignature'] = 32] = 'WriteTypeArgumentsOfSignature';
+NodeBuilderFlags[NodeBuilderFlags['UseFullyQualifiedType'] = 64] = 'UseFullyQualifiedType';
+NodeBuilderFlags[NodeBuilderFlags['UseOnlyExternalAliasing'] = 128] = 'UseOnlyExternalAliasing';
+NodeBuilderFlags[NodeBuilderFlags['SuppressAnyReturnType'] = 256] = 'SuppressAnyReturnType';
+NodeBuilderFlags[NodeBuilderFlags['WriteTypeParametersInQualifiedName'] = 512] = 'WriteTypeParametersInQualifiedName';
+NodeBuilderFlags[NodeBuilderFlags['MultilineObjectLiterals'] = 1024] = 'MultilineObjectLiterals';
+NodeBuilderFlags[NodeBuilderFlags['WriteClassExpressionAsTypeLiteral'] = 2048] = 'WriteClassExpressionAsTypeLiteral';
+NodeBuilderFlags[NodeBuilderFlags['UseTypeOfFunction'] = 4096] = 'UseTypeOfFunction';
+NodeBuilderFlags[NodeBuilderFlags['OmitParameterModifiers'] = 8192] = 'OmitParameterModifiers';
+NodeBuilderFlags[NodeBuilderFlags['UseAliasDefinedOutsideCurrentScope'] = 16384] = 'UseAliasDefinedOutsideCurrentScope';
+NodeBuilderFlags[NodeBuilderFlags['UseSingleQuotesForStringLiteralType'] = 268435456] =
+    'UseSingleQuotesForStringLiteralType';
+NodeBuilderFlags[NodeBuilderFlags['NoTypeReduction'] = 536870912] = 'NoTypeReduction';
+NodeBuilderFlags[NodeBuilderFlags['OmitThisParameter'] = 33554432] = 'OmitThisParameter';
+// Error handling
+NodeBuilderFlags[NodeBuilderFlags['AllowThisInObjectLiteral'] = 32768] = 'AllowThisInObjectLiteral';
+NodeBuilderFlags[NodeBuilderFlags['AllowQualifiedNameInPlaceOfIdentifier'] = 65536] =
+    'AllowQualifiedNameInPlaceOfIdentifier';
+/** @deprecated AllowQualifedNameInPlaceOfIdentifier. Use AllowQualifiedNameInPlaceOfIdentifier instead. */
+NodeBuilderFlags[NodeBuilderFlags['AllowQualifedNameInPlaceOfIdentifier'] = 65536] =
+    'AllowQualifedNameInPlaceOfIdentifier';
+NodeBuilderFlags[NodeBuilderFlags['AllowAnonymousIdentifier'] = 131072] = 'AllowAnonymousIdentifier';
+NodeBuilderFlags[NodeBuilderFlags['AllowEmptyUnionOrIntersection'] = 262144] = 'AllowEmptyUnionOrIntersection';
+NodeBuilderFlags[NodeBuilderFlags['AllowEmptyTuple'] = 524288] = 'AllowEmptyTuple';
+NodeBuilderFlags[NodeBuilderFlags['AllowUniqueESSymbolType'] = 1048576] = 'AllowUniqueESSymbolType';
+NodeBuilderFlags[NodeBuilderFlags['AllowEmptyIndexInfoType'] = 2097152] = 'AllowEmptyIndexInfoType';
+/* @internal */ NodeBuilderFlags[NodeBuilderFlags['WriteComputedProps'] = 1073741824] = 'WriteComputedProps';
+// Errors (cont.)
+NodeBuilderFlags[NodeBuilderFlags['AllowNodeModulesRelativePaths'] = 67108864] = 'AllowNodeModulesRelativePaths';
+/* @internal */ NodeBuilderFlags[NodeBuilderFlags['DoNotIncludeSymbolChain'] = 134217728] = 'DoNotIncludeSymbolChain';
+NodeBuilderFlags[NodeBuilderFlags['IgnoreErrors'] = 70221824] = 'IgnoreErrors';
+// State
+NodeBuilderFlags[NodeBuilderFlags['InObjectTypeLiteral'] = 4194304] = 'InObjectTypeLiteral';
+NodeBuilderFlags[NodeBuilderFlags['InTypeAlias'] = 8388608] = 'InTypeAlias';
+NodeBuilderFlags[NodeBuilderFlags['InInitialEntityName'] = 16777216] = 'InInitialEntityName';
+})(NodeBuilderFlags = ts.NodeBuilderFlags || (ts.NodeBuilderFlags = {}));
+// Ensure the shared flags between this and `NodeBuilderFlags` stay in alignment
+let TypeFormatFlags;
+(function(TypeFormatFlags) {
+TypeFormatFlags[TypeFormatFlags['None'] = 0] = 'None';
+TypeFormatFlags[TypeFormatFlags['NoTruncation'] = 1] = 'NoTruncation';
+TypeFormatFlags[TypeFormatFlags['WriteArrayAsGenericType'] = 2] = 'WriteArrayAsGenericType';
+// hole because there's a hole in node builder flags
+TypeFormatFlags[TypeFormatFlags['UseStructuralFallback'] = 8] = 'UseStructuralFallback';
+// hole because there's a hole in node builder flags
+TypeFormatFlags[TypeFormatFlags['WriteTypeArgumentsOfSignature'] = 32] = 'WriteTypeArgumentsOfSignature';
+TypeFormatFlags[TypeFormatFlags['UseFullyQualifiedType'] = 64] = 'UseFullyQualifiedType';
+// hole because `UseOnlyExternalAliasing` is here in node builder flags, but functions which take old flags use `SymbolFormatFlags` instead
+TypeFormatFlags[TypeFormatFlags['SuppressAnyReturnType'] = 256] = 'SuppressAnyReturnType';
+// hole because `WriteTypeParametersInQualifiedName` is here in node builder flags, but functions which take old flags use `SymbolFormatFlags` for this instead
+TypeFormatFlags[TypeFormatFlags['MultilineObjectLiterals'] = 1024] = 'MultilineObjectLiterals';
+TypeFormatFlags[TypeFormatFlags['WriteClassExpressionAsTypeLiteral'] = 2048] = 'WriteClassExpressionAsTypeLiteral';
+TypeFormatFlags[TypeFormatFlags['UseTypeOfFunction'] = 4096] = 'UseTypeOfFunction';
+TypeFormatFlags[TypeFormatFlags['OmitParameterModifiers'] = 8192] = 'OmitParameterModifiers';
+TypeFormatFlags[TypeFormatFlags['UseAliasDefinedOutsideCurrentScope'] = 16384] = 'UseAliasDefinedOutsideCurrentScope';
+TypeFormatFlags[TypeFormatFlags['UseSingleQuotesForStringLiteralType'] = 268435456] =
+    'UseSingleQuotesForStringLiteralType';
+TypeFormatFlags[TypeFormatFlags['NoTypeReduction'] = 536870912] = 'NoTypeReduction';
+TypeFormatFlags[TypeFormatFlags['OmitThisParameter'] = 33554432] = 'OmitThisParameter';
+// Error Handling
+TypeFormatFlags[TypeFormatFlags['AllowUniqueESSymbolType'] = 1048576] = 'AllowUniqueESSymbolType';
+// TypeFormatFlags exclusive
+TypeFormatFlags[TypeFormatFlags['AddUndefined'] = 131072] = 'AddUndefined';
+TypeFormatFlags[TypeFormatFlags['WriteArrowStyleSignature'] = 262144] = 'WriteArrowStyleSignature';
+// State
+TypeFormatFlags[TypeFormatFlags['InArrayType'] = 524288] = 'InArrayType';
+TypeFormatFlags[TypeFormatFlags['InElementType'] = 2097152] = 'InElementType';
+TypeFormatFlags[TypeFormatFlags['InFirstTypeArgument'] = 4194304] = 'InFirstTypeArgument';
+TypeFormatFlags[TypeFormatFlags['InTypeAlias'] = 8388608] = 'InTypeAlias';
+/** @deprecated */ TypeFormatFlags[TypeFormatFlags['WriteOwnNameForAnyLike'] = 0] = 'WriteOwnNameForAnyLike';
+TypeFormatFlags[TypeFormatFlags['NodeBuilderFlagsMask'] = 848330091] = 'NodeBuilderFlagsMask';
+})(TypeFormatFlags = ts.TypeFormatFlags || (ts.TypeFormatFlags = {}));
+let SymbolFormatFlags;
+(function(SymbolFormatFlags) {
+SymbolFormatFlags[SymbolFormatFlags['None'] = 0] = 'None';
+// Write symbols's type argument if it is instantiated symbol
+// eg. class C<T> { p: T }   <-- Show p as C<T>.p here
+//     var a: C<number>;
+//     var p = a.p; <--- Here p is property of C<number> so show it as C<number>.p instead of just C.p
+SymbolFormatFlags[SymbolFormatFlags['WriteTypeParametersOrArguments'] = 1] = 'WriteTypeParametersOrArguments';
+// Use only external alias information to get the symbol name in the given context
+// eg.  module m { export class c { } } import x = m.c;
+// When this flag is specified m.c will be used to refer to the class instead of alias symbol x
+SymbolFormatFlags[SymbolFormatFlags['UseOnlyExternalAliasing'] = 2] = 'UseOnlyExternalAliasing';
+// Build symbol name using any nodes needed, instead of just components of an entity name
+SymbolFormatFlags[SymbolFormatFlags['AllowAnyNodeKind'] = 4] = 'AllowAnyNodeKind';
+// Prefer aliases which are not directly visible
+SymbolFormatFlags[SymbolFormatFlags['UseAliasDefinedOutsideCurrentScope'] = 8] = 'UseAliasDefinedOutsideCurrentScope';
+// { [E.A]: 1 }
+/* @internal */ SymbolFormatFlags[SymbolFormatFlags['WriteComputedProps'] = 16] = 'WriteComputedProps';
+// Skip building an accessible symbol chain
+/* @internal */ SymbolFormatFlags[SymbolFormatFlags['DoNotIncludeSymbolChain'] = 32] = 'DoNotIncludeSymbolChain';
+})(SymbolFormatFlags = ts.SymbolFormatFlags || (ts.SymbolFormatFlags = {}));
+/* @internal */
+let SymbolAccessibility;
+(function(SymbolAccessibility) {
+SymbolAccessibility[SymbolAccessibility['Accessible'] = 0] = 'Accessible';
+SymbolAccessibility[SymbolAccessibility['NotAccessible'] = 1] = 'NotAccessible';
+SymbolAccessibility[SymbolAccessibility['CannotBeNamed'] = 2] = 'CannotBeNamed';
+})(SymbolAccessibility = ts.SymbolAccessibility || (ts.SymbolAccessibility = {}));
+/* @internal */
+let SyntheticSymbolKind;
+(function(SyntheticSymbolKind) {
+SyntheticSymbolKind[SyntheticSymbolKind['UnionOrIntersection'] = 0] = 'UnionOrIntersection';
+SyntheticSymbolKind[SyntheticSymbolKind['Spread'] = 1] = 'Spread';
+})(SyntheticSymbolKind = ts.SyntheticSymbolKind || (ts.SyntheticSymbolKind = {}));
+let TypePredicateKind;
+(function(TypePredicateKind) {
+TypePredicateKind[TypePredicateKind['This'] = 0] = 'This';
+TypePredicateKind[TypePredicateKind['Identifier'] = 1] = 'Identifier';
+TypePredicateKind[TypePredicateKind['AssertsThis'] = 2] = 'AssertsThis';
+TypePredicateKind[TypePredicateKind['AssertsIdentifier'] = 3] = 'AssertsIdentifier';
+})(TypePredicateKind = ts.TypePredicateKind || (ts.TypePredicateKind = {}));
+/** Indicates how to serialize the name for a TypeReferenceNode when emitting decorator metadata */
+/* @internal */
+let TypeReferenceSerializationKind;
+(function(TypeReferenceSerializationKind) {
+// The TypeReferenceNode could not be resolved.
+// The type name should be emitted using a safe fallback.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['Unknown'] = 0] = 'Unknown';
+// The TypeReferenceNode resolves to a type with a constructor
+// function that can be reached at runtime (e.g. a `class`
+// declaration or a `var` declaration for the static side
+// of a type, such as the global `Promise` type in lib.d.ts).
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['TypeWithConstructSignatureAndValue'] = 1] =
+    'TypeWithConstructSignatureAndValue';
+// The TypeReferenceNode resolves to a Void-like, Nullable, or Never type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['VoidNullableOrNeverType'] = 2] =
+    'VoidNullableOrNeverType';
+// The TypeReferenceNode resolves to a Number-like type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['NumberLikeType'] = 3] = 'NumberLikeType';
+// The TypeReferenceNode resolves to a BigInt-like type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['BigIntLikeType'] = 4] = 'BigIntLikeType';
+// The TypeReferenceNode resolves to a String-like type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['StringLikeType'] = 5] = 'StringLikeType';
+// The TypeReferenceNode resolves to a Boolean-like type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['BooleanType'] = 6] = 'BooleanType';
+// The TypeReferenceNode resolves to an Array-like type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['ArrayLikeType'] = 7] = 'ArrayLikeType';
+// The TypeReferenceNode resolves to the ESSymbol type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['ESSymbolType'] = 8] = 'ESSymbolType';
+// The TypeReferenceNode resolved to the global Promise constructor symbol.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['Promise'] = 9] = 'Promise';
+// The TypeReferenceNode resolves to a Function type or a type with call signatures.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['TypeWithCallSignature'] = 10] = 'TypeWithCallSignature';
+// The TypeReferenceNode resolves to any other type.
+TypeReferenceSerializationKind[TypeReferenceSerializationKind['ObjectType'] = 11] = 'ObjectType';
+})(TypeReferenceSerializationKind = ts.TypeReferenceSerializationKind || (ts.TypeReferenceSerializationKind = {}));
+let SymbolFlags;
+(function(SymbolFlags) {
+SymbolFlags[SymbolFlags['None'] = 0] = 'None';
+SymbolFlags[SymbolFlags['FunctionScopedVariable'] = 1] = 'FunctionScopedVariable';
+SymbolFlags[SymbolFlags['BlockScopedVariable'] = 2] = 'BlockScopedVariable';
+SymbolFlags[SymbolFlags['Property'] = 4] = 'Property';
+SymbolFlags[SymbolFlags['EnumMember'] = 8] = 'EnumMember';
+SymbolFlags[SymbolFlags['Function'] = 16] = 'Function';
+SymbolFlags[SymbolFlags['Class'] = 32] = 'Class';
+SymbolFlags[SymbolFlags['Interface'] = 64] = 'Interface';
+SymbolFlags[SymbolFlags['ConstEnum'] = 128] = 'ConstEnum';
+SymbolFlags[SymbolFlags['RegularEnum'] = 256] = 'RegularEnum';
+SymbolFlags[SymbolFlags['ValueModule'] = 512] = 'ValueModule';
+SymbolFlags[SymbolFlags['NamespaceModule'] = 1024] = 'NamespaceModule';
+SymbolFlags[SymbolFlags['TypeLiteral'] = 2048] = 'TypeLiteral';
+SymbolFlags[SymbolFlags['ObjectLiteral'] = 4096] = 'ObjectLiteral';
+SymbolFlags[SymbolFlags['Method'] = 8192] = 'Method';
+SymbolFlags[SymbolFlags['Constructor'] = 16384] = 'Constructor';
+SymbolFlags[SymbolFlags['GetAccessor'] = 32768] = 'GetAccessor';
+SymbolFlags[SymbolFlags['SetAccessor'] = 65536] = 'SetAccessor';
+SymbolFlags[SymbolFlags['Signature'] = 131072] = 'Signature';
+SymbolFlags[SymbolFlags['TypeParameter'] = 262144] = 'TypeParameter';
+SymbolFlags[SymbolFlags['TypeAlias'] = 524288] = 'TypeAlias';
+SymbolFlags[SymbolFlags['ExportValue'] = 1048576] = 'ExportValue';
+SymbolFlags[SymbolFlags['Alias'] = 2097152] = 'Alias';
+SymbolFlags[SymbolFlags['Prototype'] = 4194304] = 'Prototype';
+SymbolFlags[SymbolFlags['ExportStar'] = 8388608] = 'ExportStar';
+SymbolFlags[SymbolFlags['Optional'] = 16777216] = 'Optional';
+SymbolFlags[SymbolFlags['Transient'] = 33554432] = 'Transient';
+SymbolFlags[SymbolFlags['Assignment'] = 67108864] = 'Assignment';
+SymbolFlags[SymbolFlags['ModuleExports'] = 134217728] = 'ModuleExports';
+/* @internal */
+SymbolFlags[SymbolFlags['All'] = 67108863] = 'All';
+SymbolFlags[SymbolFlags['Enum'] = 384] = 'Enum';
+SymbolFlags[SymbolFlags['Variable'] = 3] = 'Variable';
+SymbolFlags[SymbolFlags['Value'] = 111551] = 'Value';
+SymbolFlags[SymbolFlags['Type'] = 788968] = 'Type';
+SymbolFlags[SymbolFlags['Namespace'] = 1920] = 'Namespace';
+SymbolFlags[SymbolFlags['Module'] = 1536] = 'Module';
+SymbolFlags[SymbolFlags['Accessor'] = 98304] = 'Accessor';
+// Variables can be redeclared, but can not redeclare a block-scoped declaration with the
+// same name, or any other value that is not a variable, e.g. ValueModule or Class
+SymbolFlags[SymbolFlags['FunctionScopedVariableExcludes'] = 111550] = 'FunctionScopedVariableExcludes';
+// Block-scoped declarations are not allowed to be re-declared
+// they can not merge with anything in the value space
+SymbolFlags[SymbolFlags['BlockScopedVariableExcludes'] = 111551] = 'BlockScopedVariableExcludes';
+SymbolFlags[SymbolFlags['ParameterExcludes'] = 111551] = 'ParameterExcludes';
+SymbolFlags[SymbolFlags['PropertyExcludes'] = 0] = 'PropertyExcludes';
+SymbolFlags[SymbolFlags['EnumMemberExcludes'] = 900095] = 'EnumMemberExcludes';
+SymbolFlags[SymbolFlags['FunctionExcludes'] = 110991] = 'FunctionExcludes';
+SymbolFlags[SymbolFlags['ClassExcludes'] = 899503] = 'ClassExcludes';
+SymbolFlags[SymbolFlags['InterfaceExcludes'] = 788872] = 'InterfaceExcludes';
+SymbolFlags[SymbolFlags['RegularEnumExcludes'] = 899327] = 'RegularEnumExcludes';
+SymbolFlags[SymbolFlags['ConstEnumExcludes'] = 899967] = 'ConstEnumExcludes';
+SymbolFlags[SymbolFlags['ValueModuleExcludes'] = 110735] = 'ValueModuleExcludes';
+SymbolFlags[SymbolFlags['NamespaceModuleExcludes'] = 0] = 'NamespaceModuleExcludes';
+SymbolFlags[SymbolFlags['MethodExcludes'] = 103359] = 'MethodExcludes';
+SymbolFlags[SymbolFlags['GetAccessorExcludes'] = 46015] = 'GetAccessorExcludes';
+SymbolFlags[SymbolFlags['SetAccessorExcludes'] = 78783] = 'SetAccessorExcludes';
+SymbolFlags[SymbolFlags['AccessorExcludes'] = 13247] = 'AccessorExcludes';
+SymbolFlags[SymbolFlags['TypeParameterExcludes'] = 526824] = 'TypeParameterExcludes';
+SymbolFlags[SymbolFlags['TypeAliasExcludes'] = 788968] = 'TypeAliasExcludes';
+SymbolFlags[SymbolFlags['AliasExcludes'] = 2097152] = 'AliasExcludes';
+SymbolFlags[SymbolFlags['ModuleMember'] = 2623475] = 'ModuleMember';
+SymbolFlags[SymbolFlags['ExportHasLocal'] = 944] = 'ExportHasLocal';
+SymbolFlags[SymbolFlags['BlockScoped'] = 418] = 'BlockScoped';
+SymbolFlags[SymbolFlags['PropertyOrAccessor'] = 98308] = 'PropertyOrAccessor';
+SymbolFlags[SymbolFlags['ClassMember'] = 106500] = 'ClassMember';
+/* @internal */
+SymbolFlags[SymbolFlags['ExportSupportsDefaultModifier'] = 112] = 'ExportSupportsDefaultModifier';
+/* @internal */
+SymbolFlags[SymbolFlags['ExportDoesNotSupportDefaultModifier'] = -113] = 'ExportDoesNotSupportDefaultModifier';
+/* @internal */
+// The set of things we consider semantically classifiable.  Used to speed up the LS during
+// classification.
+SymbolFlags[SymbolFlags['Classifiable'] = 2885600] = 'Classifiable';
+/* @internal */
+SymbolFlags[SymbolFlags['LateBindingContainer'] = 6256] = 'LateBindingContainer';
+})(SymbolFlags = ts.SymbolFlags || (ts.SymbolFlags = {}));
+/* @internal */
+let EnumKind;
+(function(EnumKind) {
+EnumKind[EnumKind['Numeric'] = 0] = 'Numeric';
+EnumKind[EnumKind['Literal'] = 1] = 'Literal';  // Literal enum (each member has a TypeFlags.EnumLiteral type)
+})(EnumKind = ts.EnumKind || (ts.EnumKind = {}));
+/* @internal */
+let CheckFlags;
+(function(CheckFlags) {
+CheckFlags[CheckFlags['Instantiated'] = 1] = 'Instantiated';
+CheckFlags[CheckFlags['SyntheticProperty'] = 2] = 'SyntheticProperty';
+CheckFlags[CheckFlags['SyntheticMethod'] = 4] = 'SyntheticMethod';
+CheckFlags[CheckFlags['Readonly'] = 8] = 'Readonly';
+CheckFlags[CheckFlags['ReadPartial'] = 16] = 'ReadPartial';
+CheckFlags[CheckFlags['WritePartial'] = 32] = 'WritePartial';
+CheckFlags[CheckFlags['HasNonUniformType'] = 64] = 'HasNonUniformType';
+CheckFlags[CheckFlags['HasLiteralType'] = 128] = 'HasLiteralType';
+CheckFlags[CheckFlags['ContainsPublic'] = 256] = 'ContainsPublic';
+CheckFlags[CheckFlags['ContainsProtected'] = 512] = 'ContainsProtected';
+CheckFlags[CheckFlags['ContainsPrivate'] = 1024] = 'ContainsPrivate';
+CheckFlags[CheckFlags['ContainsStatic'] = 2048] = 'ContainsStatic';
+CheckFlags[CheckFlags['Late'] = 4096] = 'Late';
+CheckFlags[CheckFlags['ReverseMapped'] = 8192] = 'ReverseMapped';
+CheckFlags[CheckFlags['OptionalParameter'] = 16384] = 'OptionalParameter';
+CheckFlags[CheckFlags['RestParameter'] = 32768] = 'RestParameter';
+CheckFlags[CheckFlags['DeferredType'] = 65536] = 'DeferredType';
+CheckFlags[CheckFlags['HasNeverType'] = 131072] = 'HasNeverType';
+CheckFlags[CheckFlags['Mapped'] = 262144] = 'Mapped';
+CheckFlags[CheckFlags['StripOptional'] = 524288] = 'StripOptional';
+CheckFlags[CheckFlags['Unresolved'] = 1048576] = 'Unresolved';
+CheckFlags[CheckFlags['Synthetic'] = 6] = 'Synthetic';
+CheckFlags[CheckFlags['Discriminant'] = 192] = 'Discriminant';
+CheckFlags[CheckFlags['Partial'] = 48] = 'Partial';
+})(CheckFlags = ts.CheckFlags || (ts.CheckFlags = {}));
+let InternalSymbolName;
+(function(InternalSymbolName) {
+InternalSymbolName['Call'] = '__call';
+InternalSymbolName['Constructor'] = '__constructor';
+InternalSymbolName['New'] = '__new';
+InternalSymbolName['Index'] = '__index';
+InternalSymbolName['ExportStar'] = '__export';
+InternalSymbolName['Global'] = '__global';
+InternalSymbolName['Missing'] = '__missing';
+InternalSymbolName['Type'] = '__type';
+InternalSymbolName['Object'] = '__object';
+InternalSymbolName['JSXAttributes'] = '__jsxAttributes';
+InternalSymbolName['Class'] = '__class';
+InternalSymbolName['Function'] = '__function';
+InternalSymbolName['Computed'] = '__computed';
+InternalSymbolName['Resolving'] = '__resolving__';
+InternalSymbolName['ExportEquals'] = 'export=';
+InternalSymbolName['Default'] = 'default';
+InternalSymbolName['This'] = 'this';
+})(InternalSymbolName = ts.InternalSymbolName || (ts.InternalSymbolName = {}));
+/* @internal */
+let NodeCheckFlags;
+(function(NodeCheckFlags) {
+NodeCheckFlags[NodeCheckFlags['TypeChecked'] = 1] = 'TypeChecked';
+NodeCheckFlags[NodeCheckFlags['LexicalThis'] = 2] = 'LexicalThis';
+NodeCheckFlags[NodeCheckFlags['CaptureThis'] = 4] = 'CaptureThis';
+NodeCheckFlags[NodeCheckFlags['CaptureNewTarget'] = 8] = 'CaptureNewTarget';
+NodeCheckFlags[NodeCheckFlags['SuperInstance'] = 256] = 'SuperInstance';
+NodeCheckFlags[NodeCheckFlags['SuperStatic'] = 512] = 'SuperStatic';
+NodeCheckFlags[NodeCheckFlags['ContextChecked'] = 1024] = 'ContextChecked';
+NodeCheckFlags[NodeCheckFlags['MethodWithSuperPropertyAccessInAsync'] = 2048] = 'MethodWithSuperPropertyAccessInAsync';
+NodeCheckFlags[NodeCheckFlags['MethodWithSuperPropertyAssignmentInAsync'] = 4096] =
+    'MethodWithSuperPropertyAssignmentInAsync';
+NodeCheckFlags[NodeCheckFlags['CaptureArguments'] = 8192] = 'CaptureArguments';
+NodeCheckFlags[NodeCheckFlags['EnumValuesComputed'] = 16384] = 'EnumValuesComputed';
+NodeCheckFlags[NodeCheckFlags['LexicalModuleMergesWithClass'] = 32768] = 'LexicalModuleMergesWithClass';
+NodeCheckFlags[NodeCheckFlags['LoopWithCapturedBlockScopedBinding'] = 65536] = 'LoopWithCapturedBlockScopedBinding';
+NodeCheckFlags[NodeCheckFlags['ContainsCapturedBlockScopeBinding'] = 131072] = 'ContainsCapturedBlockScopeBinding';
+NodeCheckFlags[NodeCheckFlags['CapturedBlockScopedBinding'] = 262144] = 'CapturedBlockScopedBinding';
+NodeCheckFlags[NodeCheckFlags['BlockScopedBindingInLoop'] = 524288] = 'BlockScopedBindingInLoop';
+NodeCheckFlags[NodeCheckFlags['ClassWithBodyScopedClassBinding'] = 1048576] = 'ClassWithBodyScopedClassBinding';
+NodeCheckFlags[NodeCheckFlags['BodyScopedClassBinding'] = 2097152] = 'BodyScopedClassBinding';
+NodeCheckFlags[NodeCheckFlags['NeedsLoopOutParameter'] = 4194304] = 'NeedsLoopOutParameter';
+NodeCheckFlags[NodeCheckFlags['AssignmentsMarked'] = 8388608] = 'AssignmentsMarked';
+NodeCheckFlags[NodeCheckFlags['ClassWithConstructorReference'] = 16777216] = 'ClassWithConstructorReference';
+NodeCheckFlags[NodeCheckFlags['ConstructorReferenceInClass'] = 33554432] = 'ConstructorReferenceInClass';
+NodeCheckFlags[NodeCheckFlags['ContainsClassWithPrivateIdentifiers'] = 67108864] =
+    'ContainsClassWithPrivateIdentifiers';
+NodeCheckFlags[NodeCheckFlags['ContainsSuperPropertyInStaticInitializer'] = 134217728] =
+    'ContainsSuperPropertyInStaticInitializer';
+NodeCheckFlags[NodeCheckFlags['InCheckIdentifier'] = 268435456] = 'InCheckIdentifier';
+})(NodeCheckFlags = ts.NodeCheckFlags || (ts.NodeCheckFlags = {}));
+let TypeFlags;
+(function(TypeFlags) {
+TypeFlags[TypeFlags['Any'] = 1] = 'Any';
+TypeFlags[TypeFlags['Unknown'] = 2] = 'Unknown';
+TypeFlags[TypeFlags['String'] = 4] = 'String';
+TypeFlags[TypeFlags['Number'] = 8] = 'Number';
+TypeFlags[TypeFlags['Boolean'] = 16] = 'Boolean';
+TypeFlags[TypeFlags['Enum'] = 32] = 'Enum';
+TypeFlags[TypeFlags['BigInt'] = 64] = 'BigInt';
+TypeFlags[TypeFlags['StringLiteral'] = 128] = 'StringLiteral';
+TypeFlags[TypeFlags['NumberLiteral'] = 256] = 'NumberLiteral';
+TypeFlags[TypeFlags['BooleanLiteral'] = 512] = 'BooleanLiteral';
+TypeFlags[TypeFlags['EnumLiteral'] = 1024] = 'EnumLiteral';
+TypeFlags[TypeFlags['BigIntLiteral'] = 2048] = 'BigIntLiteral';
+TypeFlags[TypeFlags['ESSymbol'] = 4096] = 'ESSymbol';
+TypeFlags[TypeFlags['UniqueESSymbol'] = 8192] = 'UniqueESSymbol';
+TypeFlags[TypeFlags['Void'] = 16384] = 'Void';
+TypeFlags[TypeFlags['Undefined'] = 32768] = 'Undefined';
+TypeFlags[TypeFlags['Null'] = 65536] = 'Null';
+TypeFlags[TypeFlags['Never'] = 131072] = 'Never';
+TypeFlags[TypeFlags['TypeParameter'] = 262144] = 'TypeParameter';
+TypeFlags[TypeFlags['Object'] = 524288] = 'Object';
+TypeFlags[TypeFlags['Union'] = 1048576] = 'Union';
+TypeFlags[TypeFlags['Intersection'] = 2097152] = 'Intersection';
+TypeFlags[TypeFlags['Index'] = 4194304] = 'Index';
+TypeFlags[TypeFlags['IndexedAccess'] = 8388608] = 'IndexedAccess';
+TypeFlags[TypeFlags['Conditional'] = 16777216] = 'Conditional';
+TypeFlags[TypeFlags['Substitution'] = 33554432] = 'Substitution';
+TypeFlags[TypeFlags['NonPrimitive'] = 67108864] = 'NonPrimitive';
+TypeFlags[TypeFlags['TemplateLiteral'] = 134217728] = 'TemplateLiteral';
+TypeFlags[TypeFlags['StringMapping'] = 268435456] = 'StringMapping';
+/* @internal */
+TypeFlags[TypeFlags['AnyOrUnknown'] = 3] = 'AnyOrUnknown';
+/* @internal */
+TypeFlags[TypeFlags['Nullable'] = 98304] = 'Nullable';
+TypeFlags[TypeFlags['Literal'] = 2944] = 'Literal';
+TypeFlags[TypeFlags['Unit'] = 109440] = 'Unit';
+TypeFlags[TypeFlags['StringOrNumberLiteral'] = 384] = 'StringOrNumberLiteral';
+/* @internal */
+TypeFlags[TypeFlags['StringOrNumberLiteralOrUnique'] = 8576] = 'StringOrNumberLiteralOrUnique';
+/* @internal */
+TypeFlags[TypeFlags['DefinitelyFalsy'] = 117632] = 'DefinitelyFalsy';
+TypeFlags[TypeFlags['PossiblyFalsy'] = 117724] = 'PossiblyFalsy';
+/* @internal */
+TypeFlags[TypeFlags['Intrinsic'] = 67359327] = 'Intrinsic';
+/* @internal */
+TypeFlags[TypeFlags['Primitive'] = 131068] = 'Primitive';
+TypeFlags[TypeFlags['StringLike'] = 402653316] = 'StringLike';
+TypeFlags[TypeFlags['NumberLike'] = 296] = 'NumberLike';
+TypeFlags[TypeFlags['BigIntLike'] = 2112] = 'BigIntLike';
+TypeFlags[TypeFlags['BooleanLike'] = 528] = 'BooleanLike';
+TypeFlags[TypeFlags['EnumLike'] = 1056] = 'EnumLike';
+TypeFlags[TypeFlags['ESSymbolLike'] = 12288] = 'ESSymbolLike';
+TypeFlags[TypeFlags['VoidLike'] = 49152] = 'VoidLike';
+/* @internal */
+TypeFlags[TypeFlags['DefinitelyNonNullable'] = 470302716] = 'DefinitelyNonNullable';
+/* @internal */
+TypeFlags[TypeFlags['DisjointDomains'] = 469892092] = 'DisjointDomains';
+TypeFlags[TypeFlags['UnionOrIntersection'] = 3145728] = 'UnionOrIntersection';
+TypeFlags[TypeFlags['StructuredType'] = 3670016] = 'StructuredType';
+TypeFlags[TypeFlags['TypeVariable'] = 8650752] = 'TypeVariable';
+TypeFlags[TypeFlags['InstantiableNonPrimitive'] = 58982400] = 'InstantiableNonPrimitive';
+TypeFlags[TypeFlags['InstantiablePrimitive'] = 406847488] = 'InstantiablePrimitive';
+TypeFlags[TypeFlags['Instantiable'] = 465829888] = 'Instantiable';
+TypeFlags[TypeFlags['StructuredOrInstantiable'] = 469499904] = 'StructuredOrInstantiable';
+/* @internal */
+TypeFlags[TypeFlags['ObjectFlagsType'] = 3899393] = 'ObjectFlagsType';
+/* @internal */
+TypeFlags[TypeFlags['Simplifiable'] = 25165824] = 'Simplifiable';
+/* @internal */
+TypeFlags[TypeFlags['Singleton'] = 67358815] = 'Singleton';
+// 'Narrowable' types are types where narrowing actually narrows.
+// This *should* be every type other than null, undefined, void, and never
+TypeFlags[TypeFlags['Narrowable'] = 536624127] = 'Narrowable';
+// The following flags are aggregated during union and intersection type construction
+/* @internal */
+TypeFlags[TypeFlags['IncludesMask'] = 205258751] = 'IncludesMask';
+// The following flags are used for different purposes during union and intersection type construction
+/* @internal */
+TypeFlags[TypeFlags['IncludesMissingType'] = 262144] = 'IncludesMissingType';
+/* @internal */
+TypeFlags[TypeFlags['IncludesNonWideningType'] = 4194304] = 'IncludesNonWideningType';
+/* @internal */
+TypeFlags[TypeFlags['IncludesWildcard'] = 8388608] = 'IncludesWildcard';
+/* @internal */
+TypeFlags[TypeFlags['IncludesEmptyObject'] = 16777216] = 'IncludesEmptyObject';
+/* @internal */
+TypeFlags[TypeFlags['IncludesInstantiable'] = 33554432] = 'IncludesInstantiable';
+/* @internal */
+TypeFlags[TypeFlags['NotPrimitiveUnion'] = 36323363] = 'NotPrimitiveUnion';
+})(TypeFlags = ts.TypeFlags || (ts.TypeFlags = {}));
+// Types included in TypeFlags.ObjectFlagsType have an objectFlags property. Some ObjectFlags
+// are specific to certain types and reuse the same bit position. Those ObjectFlags require a check
+// for a certain TypeFlags value to determine their meaning.
+let ObjectFlags;
+(function(ObjectFlags) {
+ObjectFlags[ObjectFlags['Class'] = 1] = 'Class';
+ObjectFlags[ObjectFlags['Interface'] = 2] = 'Interface';
+ObjectFlags[ObjectFlags['Reference'] = 4] = 'Reference';
+ObjectFlags[ObjectFlags['Tuple'] = 8] = 'Tuple';
+ObjectFlags[ObjectFlags['Anonymous'] = 16] = 'Anonymous';
+ObjectFlags[ObjectFlags['Mapped'] = 32] = 'Mapped';
+ObjectFlags[ObjectFlags['Instantiated'] = 64] = 'Instantiated';
+ObjectFlags[ObjectFlags['ObjectLiteral'] = 128] = 'ObjectLiteral';
+ObjectFlags[ObjectFlags['EvolvingArray'] = 256] = 'EvolvingArray';
+ObjectFlags[ObjectFlags['ObjectLiteralPatternWithComputedProperties'] = 512] =
+    'ObjectLiteralPatternWithComputedProperties';
+ObjectFlags[ObjectFlags['ReverseMapped'] = 1024] = 'ReverseMapped';
+ObjectFlags[ObjectFlags['JsxAttributes'] = 2048] = 'JsxAttributes';
+ObjectFlags[ObjectFlags['JSLiteral'] = 4096] = 'JSLiteral';
+ObjectFlags[ObjectFlags['FreshLiteral'] = 8192] = 'FreshLiteral';
+ObjectFlags[ObjectFlags['ArrayLiteral'] = 16384] = 'ArrayLiteral';
+/* @internal */
+ObjectFlags[ObjectFlags['PrimitiveUnion'] = 32768] = 'PrimitiveUnion';
+/* @internal */
+ObjectFlags[ObjectFlags['ContainsWideningType'] = 65536] = 'ContainsWideningType';
+/* @internal */
+ObjectFlags[ObjectFlags['ContainsObjectOrArrayLiteral'] = 131072] = 'ContainsObjectOrArrayLiteral';
+/* @internal */
+ObjectFlags[ObjectFlags['NonInferrableType'] = 262144] = 'NonInferrableType';
+/* @internal */
+ObjectFlags[ObjectFlags['CouldContainTypeVariablesComputed'] = 524288] = 'CouldContainTypeVariablesComputed';
+/* @internal */
+ObjectFlags[ObjectFlags['CouldContainTypeVariables'] = 1048576] = 'CouldContainTypeVariables';
+ObjectFlags[ObjectFlags['ClassOrInterface'] = 3] = 'ClassOrInterface';
+/* @internal */
+ObjectFlags[ObjectFlags['RequiresWidening'] = 196608] = 'RequiresWidening';
+/* @internal */
+ObjectFlags[ObjectFlags['PropagatingFlags'] = 458752] = 'PropagatingFlags';
+// Object flags that uniquely identify the kind of ObjectType
+/* @internal */
+ObjectFlags[ObjectFlags['ObjectTypeKindMask'] = 1343] = 'ObjectTypeKindMask';
+// Flags that require TypeFlags.Object
+ObjectFlags[ObjectFlags['ContainsSpread'] = 2097152] = 'ContainsSpread';
+ObjectFlags[ObjectFlags['ObjectRestType'] = 4194304] = 'ObjectRestType';
+ObjectFlags[ObjectFlags['InstantiationExpressionType'] = 8388608] = 'InstantiationExpressionType';
+/* @internal */
+ObjectFlags[ObjectFlags['IsClassInstanceClone'] = 16777216] = 'IsClassInstanceClone';
+// Flags that require TypeFlags.Object and ObjectFlags.Reference
+/* @internal */
+ObjectFlags[ObjectFlags['IdenticalBaseTypeCalculated'] = 33554432] = 'IdenticalBaseTypeCalculated';
+/* @internal */
+ObjectFlags[ObjectFlags['IdenticalBaseTypeExists'] = 67108864] = 'IdenticalBaseTypeExists';
+// Flags that require TypeFlags.UnionOrIntersection or TypeFlags.Substitution
+/* @internal */
+ObjectFlags[ObjectFlags['IsGenericTypeComputed'] = 2097152] = 'IsGenericTypeComputed';
+/* @internal */
+ObjectFlags[ObjectFlags['IsGenericObjectType'] = 4194304] = 'IsGenericObjectType';
+/* @internal */
+ObjectFlags[ObjectFlags['IsGenericIndexType'] = 8388608] = 'IsGenericIndexType';
+/* @internal */
+ObjectFlags[ObjectFlags['IsGenericType'] = 12582912] = 'IsGenericType';
+// Flags that require TypeFlags.Union
+/* @internal */
+ObjectFlags[ObjectFlags['ContainsIntersections'] = 16777216] = 'ContainsIntersections';
+/* @internal */
+ObjectFlags[ObjectFlags['IsUnknownLikeUnionComputed'] = 33554432] = 'IsUnknownLikeUnionComputed';
+/* @internal */
+ObjectFlags[ObjectFlags['IsUnknownLikeUnion'] = 67108864] = 'IsUnknownLikeUnion';
+/* @internal */
+// Flags that require TypeFlags.Intersection
+/* @internal */
+ObjectFlags[ObjectFlags['IsNeverIntersectionComputed'] = 16777216] = 'IsNeverIntersectionComputed';
+/* @internal */
+ObjectFlags[ObjectFlags['IsNeverIntersection'] = 33554432] = 'IsNeverIntersection';
+})(ObjectFlags = ts.ObjectFlags || (ts.ObjectFlags = {}));
+/* @internal */
+let VarianceFlags;
+(function(VarianceFlags) {
+VarianceFlags[VarianceFlags['Invariant'] = 0] = 'Invariant';
+VarianceFlags[VarianceFlags['Covariant'] = 1] = 'Covariant';
+VarianceFlags[VarianceFlags['Contravariant'] = 2] = 'Contravariant';
+VarianceFlags[VarianceFlags['Bivariant'] = 3] = 'Bivariant';
+VarianceFlags[VarianceFlags['Independent'] = 4] = 'Independent';
+VarianceFlags[VarianceFlags['VarianceMask'] = 7] = 'VarianceMask';
+VarianceFlags[VarianceFlags['Unmeasurable'] = 8] = 'Unmeasurable';
+VarianceFlags[VarianceFlags['Unreliable'] = 16] = 'Unreliable';
+VarianceFlags[VarianceFlags['AllowsStructuralFallback'] = 24] = 'AllowsStructuralFallback';
+})(VarianceFlags = ts.VarianceFlags || (ts.VarianceFlags = {}));
+let ElementFlags;
+(function(ElementFlags) {
+ElementFlags[ElementFlags['Required'] = 1] = 'Required';
+ElementFlags[ElementFlags['Optional'] = 2] = 'Optional';
+ElementFlags[ElementFlags['Rest'] = 4] = 'Rest';
+ElementFlags[ElementFlags['Variadic'] = 8] = 'Variadic';
+ElementFlags[ElementFlags['Fixed'] = 3] = 'Fixed';
+ElementFlags[ElementFlags['Variable'] = 12] = 'Variable';
+ElementFlags[ElementFlags['NonRequired'] = 14] = 'NonRequired';
+ElementFlags[ElementFlags['NonRest'] = 11] = 'NonRest';
+})(ElementFlags = ts.ElementFlags || (ts.ElementFlags = {}));
+/* @internal */
+let AccessFlags;
+(function(AccessFlags) {
+AccessFlags[AccessFlags['None'] = 0] = 'None';
+AccessFlags[AccessFlags['IncludeUndefined'] = 1] = 'IncludeUndefined';
+AccessFlags[AccessFlags['NoIndexSignatures'] = 2] = 'NoIndexSignatures';
+AccessFlags[AccessFlags['Writing'] = 4] = 'Writing';
+AccessFlags[AccessFlags['CacheSymbol'] = 8] = 'CacheSymbol';
+AccessFlags[AccessFlags['NoTupleBoundsCheck'] = 16] = 'NoTupleBoundsCheck';
+AccessFlags[AccessFlags['ExpressionPosition'] = 32] = 'ExpressionPosition';
+AccessFlags[AccessFlags['ReportDeprecated'] = 64] = 'ReportDeprecated';
+AccessFlags[AccessFlags['SuppressNoImplicitAnyError'] = 128] = 'SuppressNoImplicitAnyError';
+AccessFlags[AccessFlags['Contextual'] = 256] = 'Contextual';
+AccessFlags[AccessFlags['Persistent'] = 1] = 'Persistent';
+})(AccessFlags = ts.AccessFlags || (ts.AccessFlags = {}));
+/* @internal */
+let JsxReferenceKind;
+(function(JsxReferenceKind) {
+JsxReferenceKind[JsxReferenceKind['Component'] = 0] = 'Component';
+JsxReferenceKind[JsxReferenceKind['Function'] = 1] = 'Function';
+JsxReferenceKind[JsxReferenceKind['Mixed'] = 2] = 'Mixed';
+})(JsxReferenceKind = ts.JsxReferenceKind || (ts.JsxReferenceKind = {}));
+let SignatureKind;
+(function(SignatureKind) {
+SignatureKind[SignatureKind['Call'] = 0] = 'Call';
+SignatureKind[SignatureKind['Construct'] = 1] = 'Construct';
+})(SignatureKind = ts.SignatureKind || (ts.SignatureKind = {}));
+/* @internal */
+let SignatureFlags;
+(function(SignatureFlags) {
+SignatureFlags[SignatureFlags['None'] = 0] = 'None';
+// Propagating flags
+SignatureFlags[SignatureFlags['HasRestParameter'] = 1] = 'HasRestParameter';
+SignatureFlags[SignatureFlags['HasLiteralTypes'] = 2] = 'HasLiteralTypes';
+SignatureFlags[SignatureFlags['Abstract'] = 4] = 'Abstract';
+// Non-propagating flags
+SignatureFlags[SignatureFlags['IsInnerCallChain'] = 8] = 'IsInnerCallChain';
+SignatureFlags[SignatureFlags['IsOuterCallChain'] = 16] = 'IsOuterCallChain';
+SignatureFlags[SignatureFlags['IsUntypedSignatureInJSFile'] = 32] = 'IsUntypedSignatureInJSFile';
+// We do not propagate `IsInnerCallChain` or `IsOuterCallChain` to instantiated signatures, as that would result in us
+// attempting to add `| undefined` on each recursive call to `getReturnTypeOfSignature` when
+// instantiating the return type.
+SignatureFlags[SignatureFlags['PropagatingFlags'] = 39] = 'PropagatingFlags';
+SignatureFlags[SignatureFlags['CallChainFlags'] = 24] = 'CallChainFlags';
+})(SignatureFlags = ts.SignatureFlags || (ts.SignatureFlags = {}));
+let IndexKind;
+(function(IndexKind) {
+IndexKind[IndexKind['String'] = 0] = 'String';
+IndexKind[IndexKind['Number'] = 1] = 'Number';
+})(IndexKind = ts.IndexKind || (ts.IndexKind = {}));
+/* @internal */
+let TypeMapKind;
+(function(TypeMapKind) {
+TypeMapKind[TypeMapKind['Simple'] = 0] = 'Simple';
+TypeMapKind[TypeMapKind['Array'] = 1] = 'Array';
+TypeMapKind[TypeMapKind['Deferred'] = 2] = 'Deferred';
+TypeMapKind[TypeMapKind['Function'] = 3] = 'Function';
+TypeMapKind[TypeMapKind['Composite'] = 4] = 'Composite';
+TypeMapKind[TypeMapKind['Merged'] = 5] = 'Merged';
+})(TypeMapKind = ts.TypeMapKind || (ts.TypeMapKind = {}));
+let InferencePriority;
+(function(InferencePriority) {
+InferencePriority[InferencePriority['NakedTypeVariable'] = 1] = 'NakedTypeVariable';
+InferencePriority[InferencePriority['SpeculativeTuple'] = 2] = 'SpeculativeTuple';
+InferencePriority[InferencePriority['SubstituteSource'] = 4] = 'SubstituteSource';
+InferencePriority[InferencePriority['HomomorphicMappedType'] = 8] = 'HomomorphicMappedType';
+InferencePriority[InferencePriority['PartialHomomorphicMappedType'] = 16] = 'PartialHomomorphicMappedType';
+InferencePriority[InferencePriority['MappedTypeConstraint'] = 32] = 'MappedTypeConstraint';
+InferencePriority[InferencePriority['ContravariantConditional'] = 64] = 'ContravariantConditional';
+InferencePriority[InferencePriority['ReturnType'] = 128] = 'ReturnType';
+InferencePriority[InferencePriority['LiteralKeyof'] = 256] = 'LiteralKeyof';
+InferencePriority[InferencePriority['NoConstraints'] = 512] = 'NoConstraints';
+InferencePriority[InferencePriority['AlwaysStrict'] = 1024] = 'AlwaysStrict';
+InferencePriority[InferencePriority['MaxValue'] = 2048] = 'MaxValue';
+InferencePriority[InferencePriority['PriorityImpliesCombination'] = 416] = 'PriorityImpliesCombination';
+InferencePriority[InferencePriority['Circularity'] = -1] = 'Circularity';
+})(InferencePriority = ts.InferencePriority || (ts.InferencePriority = {}));
+/* @internal */
+let InferenceFlags;
+(function(InferenceFlags) {
+InferenceFlags[InferenceFlags['None'] = 0] = 'None';
+InferenceFlags[InferenceFlags['NoDefault'] = 1] = 'NoDefault';
+InferenceFlags[InferenceFlags['AnyDefault'] = 2] = 'AnyDefault';
+InferenceFlags[InferenceFlags['SkippedGenericFunction'] = 4] = 'SkippedGenericFunction';
+})(InferenceFlags = ts.InferenceFlags || (ts.InferenceFlags = {}));
+/**
+ * Ternary values are defined such that
+ * x & y picks the lesser in the order False < Unknown < Maybe < True, and
+ * x | y picks the greater in the order False < Unknown < Maybe < True.
+ * Generally, Ternary.Maybe is used as the result of a relation that depends on itself, and
+ * Ternary.Unknown is used as the result of a variance check that depends on itself. We make
+ * a distinction because we don't want to cache circular variance check results.
+ */
+/* @internal */
+let Ternary;
+(function(Ternary) {
+Ternary[Ternary['False'] = 0] = 'False';
+Ternary[Ternary['Unknown'] = 1] = 'Unknown';
+Ternary[Ternary['Maybe'] = 3] = 'Maybe';
+Ternary[Ternary['True'] = -1] = 'True';
+})(Ternary = ts.Ternary || (ts.Ternary = {}));
+/* @internal */
+let AssignmentDeclarationKind;
+(function(AssignmentDeclarationKind) {
+AssignmentDeclarationKind[AssignmentDeclarationKind['None'] = 0] = 'None';
+// / exports.name = expr
+// / module.exports.name = expr
+AssignmentDeclarationKind[AssignmentDeclarationKind['ExportsProperty'] = 1] = 'ExportsProperty';
+// / module.exports = expr
+AssignmentDeclarationKind[AssignmentDeclarationKind['ModuleExports'] = 2] = 'ModuleExports';
+// / className.prototype.name = expr
+AssignmentDeclarationKind[AssignmentDeclarationKind['PrototypeProperty'] = 3] = 'PrototypeProperty';
+// / this.name = expr
+AssignmentDeclarationKind[AssignmentDeclarationKind['ThisProperty'] = 4] = 'ThisProperty';
+// F.name = expr
+AssignmentDeclarationKind[AssignmentDeclarationKind['Property'] = 5] = 'Property';
+// F.prototype = { ... }
+AssignmentDeclarationKind[AssignmentDeclarationKind['Prototype'] = 6] = 'Prototype';
+// Object.defineProperty(x, 'name', { value: any, writable?: boolean (false by default) });
+// Object.defineProperty(x, 'name', { get: Function, set: Function });
+// Object.defineProperty(x, 'name', { get: Function });
+// Object.defineProperty(x, 'name', { set: Function });
+AssignmentDeclarationKind[AssignmentDeclarationKind['ObjectDefinePropertyValue'] = 7] = 'ObjectDefinePropertyValue';
+// Object.defineProperty(exports || module.exports, 'name', ...);
+AssignmentDeclarationKind[AssignmentDeclarationKind['ObjectDefinePropertyExports'] = 8] = 'ObjectDefinePropertyExports';
+// Object.defineProperty(Foo.prototype, 'name', ...);
+AssignmentDeclarationKind[AssignmentDeclarationKind['ObjectDefinePrototypeProperty'] = 9] =
+    'ObjectDefinePrototypeProperty';
+})(AssignmentDeclarationKind = ts.AssignmentDeclarationKind || (ts.AssignmentDeclarationKind = {}));
+let DiagnosticCategory;
+(function(DiagnosticCategory) {
+DiagnosticCategory[DiagnosticCategory['Warning'] = 0] = 'Warning';
+DiagnosticCategory[DiagnosticCategory['Error'] = 1] = 'Error';
+DiagnosticCategory[DiagnosticCategory['Suggestion'] = 2] = 'Suggestion';
+DiagnosticCategory[DiagnosticCategory['Message'] = 3] = 'Message';
+})(DiagnosticCategory = ts.DiagnosticCategory || (ts.DiagnosticCategory = {}));
+/* @internal */
+function diagnosticCategoryName(d, lowerCase) {
+  if (lowerCase === void 0) {
+    lowerCase = true;
+  }
+  const name = DiagnosticCategory[d.category];
+  return lowerCase ? name.toLowerCase() : name;
+}
+ts.diagnosticCategoryName = diagnosticCategoryName;
+let ModuleResolutionKind;
+(function(ModuleResolutionKind) {
+ModuleResolutionKind[ModuleResolutionKind['Classic'] = 1] = 'Classic';
+ModuleResolutionKind[ModuleResolutionKind['NodeJs'] = 2] = 'NodeJs';
+// Starting with node12, node's module resolver has significant departures from traditional cjs resolution
+// to better support ecmascript modules and their use within node - however more features are still being added.
+// TypeScript's Node ESM support was introduced after Node 12 went end-of-life, and Node 14 is the earliest stable
+// version that supports both pattern trailers - *but*, Node 16 is the first version that also supports ECMASCript 2022.
+// In turn, we offer both a `NodeNext` moving resolution target, and a `Node16` version-anchored resolution target
+ModuleResolutionKind[ModuleResolutionKind['Node16'] = 3] = 'Node16';
+ModuleResolutionKind[ModuleResolutionKind['NodeNext'] = 99] = 'NodeNext';
+})(ModuleResolutionKind = ts.ModuleResolutionKind || (ts.ModuleResolutionKind = {}));
+let ModuleDetectionKind;
+(function(ModuleDetectionKind) {
+/**
+ * Files with imports, exports and/or import.meta are considered modules
+ */
+ModuleDetectionKind[ModuleDetectionKind['Legacy'] = 1] = 'Legacy';
+/**
+ * Legacy, but also files with jsx under react-jsx or react-jsxdev and esm mode files under moduleResolution: node16+
+ */
+ModuleDetectionKind[ModuleDetectionKind['Auto'] = 2] = 'Auto';
+/**
+ * Consider all non-declaration files modules, regardless of present syntax
+ */
+ModuleDetectionKind[ModuleDetectionKind['Force'] = 3] = 'Force';
+})(ModuleDetectionKind = ts.ModuleDetectionKind || (ts.ModuleDetectionKind = {}));
+let WatchFileKind;
+(function(WatchFileKind) {
+WatchFileKind[WatchFileKind['FixedPollingInterval'] = 0] = 'FixedPollingInterval';
+WatchFileKind[WatchFileKind['PriorityPollingInterval'] = 1] = 'PriorityPollingInterval';
+WatchFileKind[WatchFileKind['DynamicPriorityPolling'] = 2] = 'DynamicPriorityPolling';
+WatchFileKind[WatchFileKind['FixedChunkSizePolling'] = 3] = 'FixedChunkSizePolling';
+WatchFileKind[WatchFileKind['UseFsEvents'] = 4] = 'UseFsEvents';
+WatchFileKind[WatchFileKind['UseFsEventsOnParentDirectory'] = 5] = 'UseFsEventsOnParentDirectory';
+})(WatchFileKind = ts.WatchFileKind || (ts.WatchFileKind = {}));
+let WatchDirectoryKind;
+(function(WatchDirectoryKind) {
+WatchDirectoryKind[WatchDirectoryKind['UseFsEvents'] = 0] = 'UseFsEvents';
+WatchDirectoryKind[WatchDirectoryKind['FixedPollingInterval'] = 1] = 'FixedPollingInterval';
+WatchDirectoryKind[WatchDirectoryKind['DynamicPriorityPolling'] = 2] = 'DynamicPriorityPolling';
+WatchDirectoryKind[WatchDirectoryKind['FixedChunkSizePolling'] = 3] = 'FixedChunkSizePolling';
+})(WatchDirectoryKind = ts.WatchDirectoryKind || (ts.WatchDirectoryKind = {}));
+let PollingWatchKind;
+(function(PollingWatchKind) {
+PollingWatchKind[PollingWatchKind['FixedInterval'] = 0] = 'FixedInterval';
+PollingWatchKind[PollingWatchKind['PriorityInterval'] = 1] = 'PriorityInterval';
+PollingWatchKind[PollingWatchKind['DynamicPriority'] = 2] = 'DynamicPriority';
+PollingWatchKind[PollingWatchKind['FixedChunkSize'] = 3] = 'FixedChunkSize';
+})(PollingWatchKind = ts.PollingWatchKind || (ts.PollingWatchKind = {}));
+let ModuleKind;
+(function(ModuleKind) {
+ModuleKind[ModuleKind['None'] = 0] = 'None';
+ModuleKind[ModuleKind['CommonJS'] = 1] = 'CommonJS';
+ModuleKind[ModuleKind['AMD'] = 2] = 'AMD';
+ModuleKind[ModuleKind['UMD'] = 3] = 'UMD';
+ModuleKind[ModuleKind['System'] = 4] = 'System';
+// NOTE: ES module kinds should be contiguous to more easily check whether a module kind is *any* ES module kind.
+//       Non-ES module kinds should not come between ES2015 (the earliest ES module kind) and ESNext (the last ES
+//       module kind).
+ModuleKind[ModuleKind['ES2015'] = 5] = 'ES2015';
+ModuleKind[ModuleKind['ES2020'] = 6] = 'ES2020';
+ModuleKind[ModuleKind['ES2022'] = 7] = 'ES2022';
+ModuleKind[ModuleKind['ESNext'] = 99] = 'ESNext';
+// Node16+ is an amalgam of commonjs (albeit updated) and es2022+, and represents a distinct module system from es2020/esnext
+ModuleKind[ModuleKind['Node16'] = 100] = 'Node16';
+ModuleKind[ModuleKind['NodeNext'] = 199] = 'NodeNext';
+})(ModuleKind = ts.ModuleKind || (ts.ModuleKind = {}));
+let JsxEmit;
+(function(JsxEmit) {
+JsxEmit[JsxEmit['None'] = 0] = 'None';
+JsxEmit[JsxEmit['Preserve'] = 1] = 'Preserve';
+JsxEmit[JsxEmit['React'] = 2] = 'React';
+JsxEmit[JsxEmit['ReactNative'] = 3] = 'ReactNative';
+JsxEmit[JsxEmit['ReactJSX'] = 4] = 'ReactJSX';
+JsxEmit[JsxEmit['ReactJSXDev'] = 5] = 'ReactJSXDev';
+})(JsxEmit = ts.JsxEmit || (ts.JsxEmit = {}));
+let ImportsNotUsedAsValues;
+(function(ImportsNotUsedAsValues) {
+ImportsNotUsedAsValues[ImportsNotUsedAsValues['Remove'] = 0] = 'Remove';
+ImportsNotUsedAsValues[ImportsNotUsedAsValues['Preserve'] = 1] = 'Preserve';
+ImportsNotUsedAsValues[ImportsNotUsedAsValues['Error'] = 2] = 'Error';
+})(ImportsNotUsedAsValues = ts.ImportsNotUsedAsValues || (ts.ImportsNotUsedAsValues = {}));
+let NewLineKind;
+(function(NewLineKind) {
+NewLineKind[NewLineKind['CarriageReturnLineFeed'] = 0] = 'CarriageReturnLineFeed';
+NewLineKind[NewLineKind['LineFeed'] = 1] = 'LineFeed';
+})(NewLineKind = ts.NewLineKind || (ts.NewLineKind = {}));
+let ScriptKind;
+(function(ScriptKind) {
+ScriptKind[ScriptKind['Unknown'] = 0] = 'Unknown';
+ScriptKind[ScriptKind['JS'] = 1] = 'JS';
+ScriptKind[ScriptKind['JSX'] = 2] = 'JSX';
+ScriptKind[ScriptKind['TS'] = 3] = 'TS';
+ScriptKind[ScriptKind['TSX'] = 4] = 'TSX';
+ScriptKind[ScriptKind['External'] = 5] = 'External';
+ScriptKind[ScriptKind['JSON'] = 6] = 'JSON';
+/**
+ * Used on extensions that doesn't define the ScriptKind but the content defines it.
+ * Deferred extensions are going to be included in all project contexts.
+ */
+ScriptKind[ScriptKind['Deferred'] = 7] = 'Deferred';
+})(ScriptKind = ts.ScriptKind || (ts.ScriptKind = {}));
+let ScriptTarget;
+(function(ScriptTarget) {
+ScriptTarget[ScriptTarget['ES3'] = 0] = 'ES3';
+ScriptTarget[ScriptTarget['ES5'] = 1] = 'ES5';
+ScriptTarget[ScriptTarget['ES2015'] = 2] = 'ES2015';
+ScriptTarget[ScriptTarget['ES2016'] = 3] = 'ES2016';
+ScriptTarget[ScriptTarget['ES2017'] = 4] = 'ES2017';
+ScriptTarget[ScriptTarget['ES2018'] = 5] = 'ES2018';
+ScriptTarget[ScriptTarget['ES2019'] = 6] = 'ES2019';
+ScriptTarget[ScriptTarget['ES2020'] = 7] = 'ES2020';
+ScriptTarget[ScriptTarget['ES2021'] = 8] = 'ES2021';
+ScriptTarget[ScriptTarget['ES2022'] = 9] = 'ES2022';
+ScriptTarget[ScriptTarget['ESNext'] = 99] = 'ESNext';
+ScriptTarget[ScriptTarget['JSON'] = 100] = 'JSON';
+ScriptTarget[ScriptTarget['Latest'] = 99] = 'Latest';
+})(ScriptTarget = ts.ScriptTarget || (ts.ScriptTarget = {}));
+let LanguageVariant;
+(function(LanguageVariant) {
+LanguageVariant[LanguageVariant['Standard'] = 0] = 'Standard';
+LanguageVariant[LanguageVariant['JSX'] = 1] = 'JSX';
+})(LanguageVariant = ts.LanguageVariant || (ts.LanguageVariant = {}));
+let WatchDirectoryFlags;
+(function(WatchDirectoryFlags) {
+WatchDirectoryFlags[WatchDirectoryFlags['None'] = 0] = 'None';
+WatchDirectoryFlags[WatchDirectoryFlags['Recursive'] = 1] = 'Recursive';
+})(WatchDirectoryFlags = ts.WatchDirectoryFlags || (ts.WatchDirectoryFlags = {}));
+/* @internal */
+let CharacterCodes;
+(function(CharacterCodes) {
+CharacterCodes[CharacterCodes['nullCharacter'] = 0] = 'nullCharacter';
+CharacterCodes[CharacterCodes['maxAsciiCharacter'] = 127] = 'maxAsciiCharacter';
+CharacterCodes[CharacterCodes['lineFeed'] = 10] = 'lineFeed';
+CharacterCodes[CharacterCodes['carriageReturn'] = 13] = 'carriageReturn';
+CharacterCodes[CharacterCodes['lineSeparator'] = 8232] = 'lineSeparator';
+CharacterCodes[CharacterCodes['paragraphSeparator'] = 8233] = 'paragraphSeparator';
+CharacterCodes[CharacterCodes['nextLine'] = 133] = 'nextLine';
+// Unicode 3.0 space characters
+CharacterCodes[CharacterCodes['space'] = 32] = 'space';
+CharacterCodes[CharacterCodes['nonBreakingSpace'] = 160] = 'nonBreakingSpace';
+CharacterCodes[CharacterCodes['enQuad'] = 8192] = 'enQuad';
+CharacterCodes[CharacterCodes['emQuad'] = 8193] = 'emQuad';
+CharacterCodes[CharacterCodes['enSpace'] = 8194] = 'enSpace';
+CharacterCodes[CharacterCodes['emSpace'] = 8195] = 'emSpace';
+CharacterCodes[CharacterCodes['threePerEmSpace'] = 8196] = 'threePerEmSpace';
+CharacterCodes[CharacterCodes['fourPerEmSpace'] = 8197] = 'fourPerEmSpace';
+CharacterCodes[CharacterCodes['sixPerEmSpace'] = 8198] = 'sixPerEmSpace';
+CharacterCodes[CharacterCodes['figureSpace'] = 8199] = 'figureSpace';
+CharacterCodes[CharacterCodes['punctuationSpace'] = 8200] = 'punctuationSpace';
+CharacterCodes[CharacterCodes['thinSpace'] = 8201] = 'thinSpace';
+CharacterCodes[CharacterCodes['hairSpace'] = 8202] = 'hairSpace';
+CharacterCodes[CharacterCodes['zeroWidthSpace'] = 8203] = 'zeroWidthSpace';
+CharacterCodes[CharacterCodes['narrowNoBreakSpace'] = 8239] = 'narrowNoBreakSpace';
+CharacterCodes[CharacterCodes['ideographicSpace'] = 12288] = 'ideographicSpace';
+CharacterCodes[CharacterCodes['mathematicalSpace'] = 8287] = 'mathematicalSpace';
+CharacterCodes[CharacterCodes['ogham'] = 5760] = 'ogham';
+CharacterCodes[CharacterCodes['_'] = 95] = '_';
+CharacterCodes[CharacterCodes['$'] = 36] = '$';
+CharacterCodes[CharacterCodes['_0'] = 48] = '_0';
+CharacterCodes[CharacterCodes['_1'] = 49] = '_1';
+CharacterCodes[CharacterCodes['_2'] = 50] = '_2';
+CharacterCodes[CharacterCodes['_3'] = 51] = '_3';
+CharacterCodes[CharacterCodes['_4'] = 52] = '_4';
+CharacterCodes[CharacterCodes['_5'] = 53] = '_5';
+CharacterCodes[CharacterCodes['_6'] = 54] = '_6';
+CharacterCodes[CharacterCodes['_7'] = 55] = '_7';
+CharacterCodes[CharacterCodes['_8'] = 56] = '_8';
+CharacterCodes[CharacterCodes['_9'] = 57] = '_9';
+CharacterCodes[CharacterCodes['a'] = 97] = 'a';
+CharacterCodes[CharacterCodes['b'] = 98] = 'b';
+CharacterCodes[CharacterCodes['c'] = 99] = 'c';
+CharacterCodes[CharacterCodes['d'] = 100] = 'd';
+CharacterCodes[CharacterCodes['e'] = 101] = 'e';
+CharacterCodes[CharacterCodes['f'] = 102] = 'f';
+CharacterCodes[CharacterCodes['g'] = 103] = 'g';
+CharacterCodes[CharacterCodes['h'] = 104] = 'h';
+CharacterCodes[CharacterCodes['i'] = 105] = 'i';
+CharacterCodes[CharacterCodes['j'] = 106] = 'j';
+CharacterCodes[CharacterCodes['k'] = 107] = 'k';
+CharacterCodes[CharacterCodes['l'] = 108] = 'l';
+CharacterCodes[CharacterCodes['m'] = 109] = 'm';
+CharacterCodes[CharacterCodes['n'] = 110] = 'n';
+CharacterCodes[CharacterCodes['o'] = 111] = 'o';
+CharacterCodes[CharacterCodes['p'] = 112] = 'p';
+CharacterCodes[CharacterCodes['q'] = 113] = 'q';
+CharacterCodes[CharacterCodes['r'] = 114] = 'r';
+CharacterCodes[CharacterCodes['s'] = 115] = 's';
+CharacterCodes[CharacterCodes['t'] = 116] = 't';
+CharacterCodes[CharacterCodes['u'] = 117] = 'u';
+CharacterCodes[CharacterCodes['v'] = 118] = 'v';
+CharacterCodes[CharacterCodes['w'] = 119] = 'w';
+CharacterCodes[CharacterCodes['x'] = 120] = 'x';
+CharacterCodes[CharacterCodes['y'] = 121] = 'y';
+CharacterCodes[CharacterCodes['z'] = 122] = 'z';
+CharacterCodes[CharacterCodes['A'] = 65] = 'A';
+CharacterCodes[CharacterCodes['B'] = 66] = 'B';
+CharacterCodes[CharacterCodes['C'] = 67] = 'C';
+CharacterCodes[CharacterCodes['D'] = 68] = 'D';
+CharacterCodes[CharacterCodes['E'] = 69] = 'E';
+CharacterCodes[CharacterCodes['F'] = 70] = 'F';
+CharacterCodes[CharacterCodes['G'] = 71] = 'G';
+CharacterCodes[CharacterCodes['H'] = 72] = 'H';
+CharacterCodes[CharacterCodes['I'] = 73] = 'I';
+CharacterCodes[CharacterCodes['J'] = 74] = 'J';
+CharacterCodes[CharacterCodes['K'] = 75] = 'K';
+CharacterCodes[CharacterCodes['L'] = 76] = 'L';
+CharacterCodes[CharacterCodes['M'] = 77] = 'M';
+CharacterCodes[CharacterCodes['N'] = 78] = 'N';
+CharacterCodes[CharacterCodes['O'] = 79] = 'O';
+CharacterCodes[CharacterCodes['P'] = 80] = 'P';
+CharacterCodes[CharacterCodes['Q'] = 81] = 'Q';
+CharacterCodes[CharacterCodes['R'] = 82] = 'R';
+CharacterCodes[CharacterCodes['S'] = 83] = 'S';
+CharacterCodes[CharacterCodes['T'] = 84] = 'T';
+CharacterCodes[CharacterCodes['U'] = 85] = 'U';
+CharacterCodes[CharacterCodes['V'] = 86] = 'V';
+CharacterCodes[CharacterCodes['W'] = 87] = 'W';
+CharacterCodes[CharacterCodes['X'] = 88] = 'X';
+CharacterCodes[CharacterCodes['Y'] = 89] = 'Y';
+CharacterCodes[CharacterCodes['Z'] = 90] = 'Z';
+CharacterCodes[CharacterCodes['ampersand'] = 38] = 'ampersand';
+CharacterCodes[CharacterCodes['asterisk'] = 42] = 'asterisk';
+CharacterCodes[CharacterCodes['at'] = 64] = 'at';
+CharacterCodes[CharacterCodes['backslash'] = 92] = 'backslash';
+CharacterCodes[CharacterCodes['backtick'] = 96] = 'backtick';
+CharacterCodes[CharacterCodes['bar'] = 124] = 'bar';
+CharacterCodes[CharacterCodes['caret'] = 94] = 'caret';
+CharacterCodes[CharacterCodes['closeBrace'] = 125] = 'closeBrace';
+CharacterCodes[CharacterCodes['closeBracket'] = 93] = 'closeBracket';
+CharacterCodes[CharacterCodes['closeParen'] = 41] = 'closeParen';
+CharacterCodes[CharacterCodes['colon'] = 58] = 'colon';
+CharacterCodes[CharacterCodes['comma'] = 44] = 'comma';
+CharacterCodes[CharacterCodes['dot'] = 46] = 'dot';
+CharacterCodes[CharacterCodes['doubleQuote'] = 34] = 'doubleQuote';
+CharacterCodes[CharacterCodes['equals'] = 61] = 'equals';
+CharacterCodes[CharacterCodes['exclamation'] = 33] = 'exclamation';
+CharacterCodes[CharacterCodes['greaterThan'] = 62] = 'greaterThan';
+CharacterCodes[CharacterCodes['hash'] = 35] = 'hash';
+CharacterCodes[CharacterCodes['lessThan'] = 60] = 'lessThan';
+CharacterCodes[CharacterCodes['minus'] = 45] = 'minus';
+CharacterCodes[CharacterCodes['openBrace'] = 123] = 'openBrace';
+CharacterCodes[CharacterCodes['openBracket'] = 91] = 'openBracket';
+CharacterCodes[CharacterCodes['openParen'] = 40] = 'openParen';
+CharacterCodes[CharacterCodes['percent'] = 37] = 'percent';
+CharacterCodes[CharacterCodes['plus'] = 43] = 'plus';
+CharacterCodes[CharacterCodes['question'] = 63] = 'question';
+CharacterCodes[CharacterCodes['semicolon'] = 59] = 'semicolon';
+CharacterCodes[CharacterCodes['singleQuote'] = 39] = 'singleQuote';
+CharacterCodes[CharacterCodes['slash'] = 47] = 'slash';
+CharacterCodes[CharacterCodes['tilde'] = 126] = 'tilde';
+CharacterCodes[CharacterCodes['backspace'] = 8] = 'backspace';
+CharacterCodes[CharacterCodes['formFeed'] = 12] = 'formFeed';
+CharacterCodes[CharacterCodes['byteOrderMark'] = 65279] = 'byteOrderMark';
+CharacterCodes[CharacterCodes['tab'] = 9] = 'tab';
+CharacterCodes[CharacterCodes['verticalTab'] = 11] = 'verticalTab';
+})(CharacterCodes = ts.CharacterCodes || (ts.CharacterCodes = {}));
+let Extension;
+(function(Extension) {
+Extension['Ts'] = '.ts';
+Extension['Tsx'] = '.tsx';
+Extension['Dts'] = '.d.ts';
+Extension['Js'] = '.js';
+Extension['Jsx'] = '.jsx';
+Extension['Json'] = '.json';
+Extension['TsBuildInfo'] = '.tsbuildinfo';
+Extension['Mjs'] = '.mjs';
+Extension['Mts'] = '.mts';
+Extension['Dmts'] = '.d.mts';
+Extension['Cjs'] = '.cjs';
+Extension['Cts'] = '.cts';
+Extension['Dcts'] = '.d.cts';
+})(Extension = ts.Extension || (ts.Extension = {}));
+/* @internal */
+let TransformFlags;
+(function(TransformFlags) {
+TransformFlags[TransformFlags['None'] = 0] = 'None';
+// Facts
+// - Flags used to indicate that a node or subtree contains syntax that requires transformation.
+TransformFlags[TransformFlags['ContainsTypeScript'] = 1] = 'ContainsTypeScript';
+TransformFlags[TransformFlags['ContainsJsx'] = 2] = 'ContainsJsx';
+TransformFlags[TransformFlags['ContainsESNext'] = 4] = 'ContainsESNext';
+TransformFlags[TransformFlags['ContainsES2022'] = 8] = 'ContainsES2022';
+TransformFlags[TransformFlags['ContainsES2021'] = 16] = 'ContainsES2021';
+TransformFlags[TransformFlags['ContainsES2020'] = 32] = 'ContainsES2020';
+TransformFlags[TransformFlags['ContainsES2019'] = 64] = 'ContainsES2019';
+TransformFlags[TransformFlags['ContainsES2018'] = 128] = 'ContainsES2018';
+TransformFlags[TransformFlags['ContainsES2017'] = 256] = 'ContainsES2017';
+TransformFlags[TransformFlags['ContainsES2016'] = 512] = 'ContainsES2016';
+TransformFlags[TransformFlags['ContainsES2015'] = 1024] = 'ContainsES2015';
+TransformFlags[TransformFlags['ContainsGenerator'] = 2048] = 'ContainsGenerator';
+TransformFlags[TransformFlags['ContainsDestructuringAssignment'] = 4096] = 'ContainsDestructuringAssignment';
+// Markers
+// - Flags used to indicate that a subtree contains a specific transformation.
+TransformFlags[TransformFlags['ContainsTypeScriptClassSyntax'] = 8192] = 'ContainsTypeScriptClassSyntax';
+TransformFlags[TransformFlags['ContainsLexicalThis'] = 16384] = 'ContainsLexicalThis';
+TransformFlags[TransformFlags['ContainsRestOrSpread'] = 32768] = 'ContainsRestOrSpread';
+TransformFlags[TransformFlags['ContainsObjectRestOrSpread'] = 65536] = 'ContainsObjectRestOrSpread';
+TransformFlags[TransformFlags['ContainsComputedPropertyName'] = 131072] = 'ContainsComputedPropertyName';
+TransformFlags[TransformFlags['ContainsBlockScopedBinding'] = 262144] = 'ContainsBlockScopedBinding';
+TransformFlags[TransformFlags['ContainsBindingPattern'] = 524288] = 'ContainsBindingPattern';
+TransformFlags[TransformFlags['ContainsYield'] = 1048576] = 'ContainsYield';
+TransformFlags[TransformFlags['ContainsAwait'] = 2097152] = 'ContainsAwait';
+TransformFlags[TransformFlags['ContainsHoistedDeclarationOrCompletion'] = 4194304] =
+    'ContainsHoistedDeclarationOrCompletion';
+TransformFlags[TransformFlags['ContainsDynamicImport'] = 8388608] = 'ContainsDynamicImport';
+TransformFlags[TransformFlags['ContainsClassFields'] = 16777216] = 'ContainsClassFields';
+TransformFlags[TransformFlags['ContainsDecorators'] = 33554432] = 'ContainsDecorators';
+TransformFlags[TransformFlags['ContainsPossibleTopLevelAwait'] = 67108864] = 'ContainsPossibleTopLevelAwait';
+TransformFlags[TransformFlags['ContainsLexicalSuper'] = 134217728] = 'ContainsLexicalSuper';
+TransformFlags[TransformFlags['ContainsUpdateExpressionForIdentifier'] = 268435456] =
+    'ContainsUpdateExpressionForIdentifier';
+TransformFlags[TransformFlags['ContainsPrivateIdentifierInExpression'] = 536870912] =
+    'ContainsPrivateIdentifierInExpression';
+TransformFlags[TransformFlags['HasComputedFlags'] = -2147483648] = 'HasComputedFlags';
+// Assertions
+// - Bitmasks that are used to assert facts about the syntax of a node and its subtree.
+TransformFlags[TransformFlags['AssertTypeScript'] = 1] = 'AssertTypeScript';
+TransformFlags[TransformFlags['AssertJsx'] = 2] = 'AssertJsx';
+TransformFlags[TransformFlags['AssertESNext'] = 4] = 'AssertESNext';
+TransformFlags[TransformFlags['AssertES2022'] = 8] = 'AssertES2022';
+TransformFlags[TransformFlags['AssertES2021'] = 16] = 'AssertES2021';
+TransformFlags[TransformFlags['AssertES2020'] = 32] = 'AssertES2020';
+TransformFlags[TransformFlags['AssertES2019'] = 64] = 'AssertES2019';
+TransformFlags[TransformFlags['AssertES2018'] = 128] = 'AssertES2018';
+TransformFlags[TransformFlags['AssertES2017'] = 256] = 'AssertES2017';
+TransformFlags[TransformFlags['AssertES2016'] = 512] = 'AssertES2016';
+TransformFlags[TransformFlags['AssertES2015'] = 1024] = 'AssertES2015';
+TransformFlags[TransformFlags['AssertGenerator'] = 2048] = 'AssertGenerator';
+TransformFlags[TransformFlags['AssertDestructuringAssignment'] = 4096] = 'AssertDestructuringAssignment';
+// Scope Exclusions
+// - Bitmasks that exclude flags from propagating out of a specific context
+//   into the subtree flags of their container.
+TransformFlags[TransformFlags['OuterExpressionExcludes'] = -2147483648] = 'OuterExpressionExcludes';
+TransformFlags[TransformFlags['PropertyAccessExcludes'] = -2147483648] = 'PropertyAccessExcludes';
+TransformFlags[TransformFlags['NodeExcludes'] = -2147483648] = 'NodeExcludes';
+TransformFlags[TransformFlags['ArrowFunctionExcludes'] = -2072174592] = 'ArrowFunctionExcludes';
+TransformFlags[TransformFlags['FunctionExcludes'] = -1937940480] = 'FunctionExcludes';
+TransformFlags[TransformFlags['ConstructorExcludes'] = -1937948672] = 'ConstructorExcludes';
+TransformFlags[TransformFlags['MethodOrAccessorExcludes'] = -2005057536] = 'MethodOrAccessorExcludes';
+TransformFlags[TransformFlags['PropertyExcludes'] = -2013249536] = 'PropertyExcludes';
+TransformFlags[TransformFlags['ClassExcludes'] = -2147344384] = 'ClassExcludes';
+TransformFlags[TransformFlags['ModuleExcludes'] = -1941676032] = 'ModuleExcludes';
+TransformFlags[TransformFlags['TypeExcludes'] = -2] = 'TypeExcludes';
+TransformFlags[TransformFlags['ObjectLiteralExcludes'] = -2147278848] = 'ObjectLiteralExcludes';
+TransformFlags[TransformFlags['ArrayLiteralOrCallOrNewExcludes'] = -2147450880] = 'ArrayLiteralOrCallOrNewExcludes';
+TransformFlags[TransformFlags['VariableDeclarationListExcludes'] = -2146893824] = 'VariableDeclarationListExcludes';
+TransformFlags[TransformFlags['ParameterExcludes'] = -2147483648] = 'ParameterExcludes';
+TransformFlags[TransformFlags['CatchClauseExcludes'] = -2147418112] = 'CatchClauseExcludes';
+TransformFlags[TransformFlags['BindingPatternExcludes'] = -2147450880] = 'BindingPatternExcludes';
+TransformFlags[TransformFlags['ContainsLexicalThisOrSuper'] = 134234112] = 'ContainsLexicalThisOrSuper';
+// Propagating flags
+// - Bitmasks for flags that should propagate from a child
+TransformFlags[TransformFlags['PropertyNamePropagatingFlags'] = 134234112] = 'PropertyNamePropagatingFlags';
+// Masks
+// - Additional bitmasks
+})(TransformFlags = ts.TransformFlags || (ts.TransformFlags = {}));
+// Reference: https://code.visualstudio.com/docs/editor/userdefinedsnippets#_snippet-syntax
+/* @internal */
+let SnippetKind;
+(function(SnippetKind) {
+SnippetKind[SnippetKind['TabStop'] = 0] = 'TabStop';
+SnippetKind[SnippetKind['Placeholder'] = 1] = 'Placeholder';
+SnippetKind[SnippetKind['Choice'] = 2] = 'Choice';
+SnippetKind[SnippetKind['Variable'] = 3] = 'Variable';
+})(SnippetKind = ts.SnippetKind || (ts.SnippetKind = {}));
+let EmitFlags;
+(function(EmitFlags) {
+EmitFlags[EmitFlags['None'] = 0] = 'None';
+EmitFlags[EmitFlags['SingleLine'] = 1] = 'SingleLine';
+EmitFlags[EmitFlags['AdviseOnEmitNode'] = 2] = 'AdviseOnEmitNode';
+EmitFlags[EmitFlags['NoSubstitution'] = 4] = 'NoSubstitution';
+EmitFlags[EmitFlags['CapturesThis'] = 8] = 'CapturesThis';
+EmitFlags[EmitFlags['NoLeadingSourceMap'] = 16] = 'NoLeadingSourceMap';
+EmitFlags[EmitFlags['NoTrailingSourceMap'] = 32] = 'NoTrailingSourceMap';
+EmitFlags[EmitFlags['NoSourceMap'] = 48] = 'NoSourceMap';
+EmitFlags[EmitFlags['NoNestedSourceMaps'] = 64] = 'NoNestedSourceMaps';
+EmitFlags[EmitFlags['NoTokenLeadingSourceMaps'] = 128] = 'NoTokenLeadingSourceMaps';
+EmitFlags[EmitFlags['NoTokenTrailingSourceMaps'] = 256] = 'NoTokenTrailingSourceMaps';
+EmitFlags[EmitFlags['NoTokenSourceMaps'] = 384] = 'NoTokenSourceMaps';
+EmitFlags[EmitFlags['NoLeadingComments'] = 512] = 'NoLeadingComments';
+EmitFlags[EmitFlags['NoTrailingComments'] = 1024] = 'NoTrailingComments';
+EmitFlags[EmitFlags['NoComments'] = 1536] = 'NoComments';
+EmitFlags[EmitFlags['NoNestedComments'] = 2048] = 'NoNestedComments';
+EmitFlags[EmitFlags['HelperName'] = 4096] = 'HelperName';
+EmitFlags[EmitFlags['ExportName'] = 8192] = 'ExportName';
+EmitFlags[EmitFlags['LocalName'] = 16384] = 'LocalName';
+EmitFlags[EmitFlags['InternalName'] = 32768] = 'InternalName';
+EmitFlags[EmitFlags['Indented'] = 65536] = 'Indented';
+EmitFlags[EmitFlags['NoIndentation'] = 131072] = 'NoIndentation';
+EmitFlags[EmitFlags['AsyncFunctionBody'] = 262144] = 'AsyncFunctionBody';
+EmitFlags[EmitFlags['ReuseTempVariableScope'] = 524288] = 'ReuseTempVariableScope';
+EmitFlags[EmitFlags['CustomPrologue'] = 1048576] = 'CustomPrologue';
+EmitFlags[EmitFlags['NoHoisting'] = 2097152] = 'NoHoisting';
+EmitFlags[EmitFlags['HasEndOfDeclarationMarker'] = 4194304] = 'HasEndOfDeclarationMarker';
+EmitFlags[EmitFlags['Iterator'] = 8388608] = 'Iterator';
+EmitFlags[EmitFlags['NoAsciiEscaping'] = 16777216] = 'NoAsciiEscaping';
+/* @internal*/ EmitFlags[EmitFlags['TypeScriptClassWrapper'] = 33554432] = 'TypeScriptClassWrapper';
+/* @internal*/ EmitFlags[EmitFlags['NeverApplyImportHelper'] = 67108864] = 'NeverApplyImportHelper';
+/* @internal*/ EmitFlags[EmitFlags['IgnoreSourceNewlines'] = 134217728] = 'IgnoreSourceNewlines';
+/* @internal*/ EmitFlags[EmitFlags['Immutable'] = 268435456] = 'Immutable';
+/* @internal*/ EmitFlags[EmitFlags['IndirectCall'] = 536870912] = 'IndirectCall';
+})(EmitFlags = ts.EmitFlags || (ts.EmitFlags = {}));
+/**
+ * Used by the checker, this enum keeps track of external emit helpers that should be type
+ * checked.
+ */
+/* @internal */
+let ExternalEmitHelpers;
+(function(ExternalEmitHelpers) {
+ExternalEmitHelpers[ExternalEmitHelpers['Extends'] = 1] = 'Extends';
+ExternalEmitHelpers[ExternalEmitHelpers['Assign'] = 2] = 'Assign';
+ExternalEmitHelpers[ExternalEmitHelpers['Rest'] = 4] = 'Rest';
+ExternalEmitHelpers[ExternalEmitHelpers['Decorate'] = 8] = 'Decorate';
+ExternalEmitHelpers[ExternalEmitHelpers['Metadata'] = 16] = 'Metadata';
+ExternalEmitHelpers[ExternalEmitHelpers['Param'] = 32] = 'Param';
+ExternalEmitHelpers[ExternalEmitHelpers['Awaiter'] = 64] = 'Awaiter';
+ExternalEmitHelpers[ExternalEmitHelpers['Generator'] = 128] = 'Generator';
+ExternalEmitHelpers[ExternalEmitHelpers['Values'] = 256] = 'Values';
+ExternalEmitHelpers[ExternalEmitHelpers['Read'] = 512] = 'Read';
+ExternalEmitHelpers[ExternalEmitHelpers['SpreadArray'] = 1024] = 'SpreadArray';
+ExternalEmitHelpers[ExternalEmitHelpers['Await'] = 2048] = 'Await';
+ExternalEmitHelpers[ExternalEmitHelpers['AsyncGenerator'] = 4096] = 'AsyncGenerator';
+ExternalEmitHelpers[ExternalEmitHelpers['AsyncDelegator'] = 8192] = 'AsyncDelegator';
+ExternalEmitHelpers[ExternalEmitHelpers['AsyncValues'] = 16384] = 'AsyncValues';
+ExternalEmitHelpers[ExternalEmitHelpers['ExportStar'] = 32768] = 'ExportStar';
+ExternalEmitHelpers[ExternalEmitHelpers['ImportStar'] = 65536] = 'ImportStar';
+ExternalEmitHelpers[ExternalEmitHelpers['ImportDefault'] = 131072] = 'ImportDefault';
+ExternalEmitHelpers[ExternalEmitHelpers['MakeTemplateObject'] = 262144] = 'MakeTemplateObject';
+ExternalEmitHelpers[ExternalEmitHelpers['ClassPrivateFieldGet'] = 524288] = 'ClassPrivateFieldGet';
+ExternalEmitHelpers[ExternalEmitHelpers['ClassPrivateFieldSet'] = 1048576] = 'ClassPrivateFieldSet';
+ExternalEmitHelpers[ExternalEmitHelpers['ClassPrivateFieldIn'] = 2097152] = 'ClassPrivateFieldIn';
+ExternalEmitHelpers[ExternalEmitHelpers['CreateBinding'] = 4194304] = 'CreateBinding';
+ExternalEmitHelpers[ExternalEmitHelpers['FirstEmitHelper'] = 1] = 'FirstEmitHelper';
+ExternalEmitHelpers[ExternalEmitHelpers['LastEmitHelper'] = 4194304] = 'LastEmitHelper';
+// Helpers included by ES2015 for..of
+ExternalEmitHelpers[ExternalEmitHelpers['ForOfIncludes'] = 256] = 'ForOfIncludes';
+// Helpers included by ES2017 for..await..of
+ExternalEmitHelpers[ExternalEmitHelpers['ForAwaitOfIncludes'] = 16384] = 'ForAwaitOfIncludes';
+// Helpers included by ES2017 async generators
+ExternalEmitHelpers[ExternalEmitHelpers['AsyncGeneratorIncludes'] = 6144] = 'AsyncGeneratorIncludes';
+// Helpers included by yield* in ES2017 async generators
+ExternalEmitHelpers[ExternalEmitHelpers['AsyncDelegatorIncludes'] =                     
+                                                                                                    
+                                                                                                    
+<?xpacket end="w"?>
+endstream
+endobj
+79 0 obj
+3724
+endobj
+80 0 obj
+<<
+/Creator(28BW-8)/Producer(Develop ineo 287)/CreationDate(D:20240607093139+08'00')/ModDate(D:20240607093139+08'00')>>
+endobj
+81 0 obj
+<</Type /Catalog
+/Pages 2 0 R
+/Metadata 78 0 R
+/OpenAction [ 1 0 R /Fit ]
+>>
+endobj
+xref
+0 82
+0000000000 65535 f
+0000000016 00000 n
+0000168416 00000 n
+0000067628 00000 n
+0000067225 00000 n
+0000000206 00000 n
+0000013992 00000 n
+0000014013 00000 n
+0000014385 00000 n
+0000014404 00000 n
+0000020823 00000 n
+0000020844 00000 n
+0000061918 00000 n
+0000061940 00000 n
+0000062188 00000 n
+0000062207 00000 n
+0000062481 00000 n
+0000062500 00000 n
+0000065960 00000 n
+0000065981 00000 n
+0000066370 00000 n
+0000066390 00000 n
+0000066640 00000 n
+0000066659 00000 n
+0000066910 00000 n
+0000066929 00000 n
+0000067206 00000 n
+0000067608 00000 n
+0000067823 00000 n
+0000118207 00000 n
+0000117893 00000 n
+0000068016 00000 n
+0000072624 00000 n
+0000072645 00000 n
+0000115973 00000 n
+0000115995 00000 n
+0000116257 00000 n
+0000116276 00000 n
+0000116520 00000 n
+0000116539 00000 n
+0000116791 00000 n
+0000116810 00000 n
+0000117059 00000 n
+0000117078 00000 n
+0000117331 00000 n
+0000117350 00000 n
+0000117606 00000 n
+0000117625 00000 n
+0000117874 00000 n
+0000118187 00000 n
+0000118373 00000 n
+0000168200 00000 n
+0000167784 00000 n
+0000118566 00000 n
+0000126848 00000 n
+0000126869 00000 n
+0000127142 00000 n
+0000127161 00000 n
+0000128058 00000 n
+0000128078 00000 n
+0000158187 00000 n
+0000158209 00000 n
+0000165679 00000 n
+0000165700 00000 n
+0000166065 00000 n
+0000166085 00000 n
+0000166383 00000 n
+0000166402 00000 n
+0000166671 00000 n
+0000166690 00000 n
+0000166940 00000 n
+0000166959 00000 n
+0000167209 00000 n
+0000167228 00000 n
+0000167481 00000 n
+0000167500 00000 n
+0000167765 00000 n
+0000168180 00000 n
+0000168489 00000 n
+0000172294 00000 n
+0000172315 00000 n
+0000172452 00000 n
+trailer
+<</Size 82
+/Info 80 0 R
+/Root 81 0 R
+>>
+startxref
+172546
+%%EOF

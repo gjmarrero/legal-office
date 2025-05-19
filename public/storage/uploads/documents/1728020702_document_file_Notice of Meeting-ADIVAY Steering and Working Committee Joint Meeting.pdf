@@ -1,0 +1,2626 @@
+     };
+        }
+        FindAllReferences.createImportTracker = createImportTracker;
+        var ExportKind;
+        (function (ExportKind) {
+            ExportKind[ExportKind["Named"] = 0] = "Named";
+            ExportKind[ExportKind["Default"] = 1] = "Default";
+            ExportKind[ExportKind["ExportEquals"] = 2] = "ExportEquals";
+        })(ExportKind = FindAllReferences.ExportKind || (FindAllReferences.ExportKind = {}));
+        var ImportExport;
+        (function (ImportExport) {
+            ImportExport[ImportExport["Import"] = 0] = "Import";
+            ImportExport[ImportExport["Export"] = 1] = "Export";
+        })(ImportExport = FindAllReferences.ImportExport || (FindAllReferences.ImportExport = {}));
+        /** Returns import statements that directly reference the exporting module, and a list of files that may access the module through a namespace. */
+        function getImportersForExport(sourceFiles, sourceFilesSet, allDirectImports, _a, checker, cancellationToken) {
+            var exportingModuleSymbol = _a.exportingModuleSymbol, exportKind = _a.exportKind;
+            var markSeenDirectImport = ts.nodeSeenTracker();
+            var markSeenIndirectUser = ts.nodeSeenTracker();
+            var directImports = [];
+            var isAvailableThroughGlobal = !!exportingModuleSymbol.globalExports;
+            var indirectUserDeclarations = isAvailableThroughGlobal ? undefined : [];
+            handleDirectImports(exportingModuleSymbol);
+            return { directImports: directImports, indirectUsers: getIndirectUsers() };
+            function getIndirectUsers() {
+                if (isAvailableThroughGlobal) {
+                    // It has `export as namespace`, so anything could potentially use it.
+                    return sourceFiles;
+                }
+                // Module augmentations may use this module's exports without importing it.
+                if (exportingModuleSymbol.declarations) {
+                    for (var _i = 0, _a = exportingModuleSymbol.declarations; _i < _a.length; _i++) {
+                        var decl = _a[_i];
+                        if (ts.isExternalModuleAugmentation(decl) && sourceFilesSet.has(decl.getSourceFile().fileName)) {
+                            addIndirectUser(decl);
+                        }
+                    }
+                }
+                // This may return duplicates (if there are multiple module declarations in a single source file, all importing the same thing as a namespace), but `State.markSearchedSymbol` will handle that.
+                return indirectUserDeclarations.map(ts.getSourceFileOfNode);
+            }
+            function handleDirectImports(exportingModuleSymbol) {
+                var theseDirectImports = getDirectImports(exportingModuleSymbol);
+                if (theseDirectImports) {
+                    for (var _i = 0, theseDirectImports_1 = theseDirectImports; _i < theseDirectImports_1.length; _i++) {
+                        var direct = theseDirectImports_1[_i];
+                        if (!markSeenDirectImport(direct)) {
+                            continue;
+                        }
+                        if (cancellationToken)
+                            cancellationToken.throwIfCancellationRequested();
+                        switch (direct.kind) {
+                            case 210 /* SyntaxKind.CallExpression */:
+                                if (ts.isImportCall(direct)) {
+                                    handleImportCall(direct);
+                                    break;
+                                }
+                                if (!isAvailableThroughGlobal) {
+                                    var parent = direct.parent;
+                                    if (exportKind === 2 /* ExportKind.ExportEquals */ && parent.kind === 257 /* SyntaxKind.VariableDeclaration */) {
+                                        var name = parent.name;
+                                        if (name.kind === 79 /* SyntaxKind.Identifier */) {
+                                            directImports.push(name);
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            case 79 /* SyntaxKind.Identifier */: // for 'const x = require("y");
+                                break; // TODO: GH#23879
+                            case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                                handleNamespaceImport(direct, direct.name, ts.hasSyntacticModifier(direct, 1 /* ModifierFlags.Export */), /*alreadyAddedDirect*/ false);
+                                break;
+                            case 269 /* SyntaxKind.ImportDeclaration */:
+                                directImports.push(direct);
+                                var namedBindings = direct.importClause && direct.importClause.namedBindings;
+                                if (namedBindings && namedBindings.kind === 271 /* SyntaxKind.NamespaceImport */) {
+                                    handleNamespaceImport(direct, namedBindings.name, /*isReExport*/ false, /*alreadyAddedDirect*/ true);
+                                }
+                                else if (!isAvailableThroughGlobal && ts.isDefaultImport(direct)) {
+                                    addIndirectUser(getSourceFileLikeForImportDeclaration(direct)); // Add a check for indirect uses to handle synthetic default imports
+                                }
+                                break;
+                            case 275 /* SyntaxKind.ExportDeclaration */:
+                                if (!direct.exportClause) {
+                                    // This is `export * from "foo"`, so imports of this module may import the export too.
+                                    handleDirectImports(getContainingModuleSymbol(direct, checker));
+                                }
+                                else if (direct.exportClause.kind === 277 /* SyntaxKind.NamespaceExport */) {
+                                    // `export * as foo from "foo"` add to indirect uses
+                                    addIndirectUser(getSourceFileLikeForImportDeclaration(direct), /** addTransitiveDependencies */ true);
+                                }
+                                else {
+                                    // This is `export { foo } from "foo"` and creates an alias symbol, so recursive search will get handle re-exports.
+                                    directImports.push(direct);
+                                }
+                                break;
+                            case 202 /* SyntaxKind.ImportType */:
+                                // Only check for typeof import('xyz')
+                                if (!isAvailableThroughGlobal && direct.isTypeOf && !direct.qualifier && isExported(direct)) {
+                                    addIndirectUser(direct.getSourceFile(), /** addTransitiveDependencies */ true);
+                                }
+                                directImports.push(direct);
+                                break;
+                            default:
+                                ts.Debug.failBadSyntaxKind(direct, "Unexpected import kind.");
+                        }
+                    }
+                }
+            }
+            function handleImportCall(importCall) {
+                var top = ts.findAncestor(importCall, isAmbientModuleDeclaration) || importCall.getSourceFile();
+                addIndirectUser(top, /** addTransitiveDependencies */ !!isExported(importCall, /** stopAtAmbientModule */ true));
+            }
+            function isExported(node, stopAtAmbientModule) {
+                if (stopAtAmbientModule === void 0) { stopAtAmbientModule = false; }
+                return ts.findAncestor(node, function (node) {
+                    if (stopAtAmbientModule && isAmbientModuleDeclaration(node))
+                        return "quit";
+                    return ts.canHaveModifiers(node) && ts.some(node.modifiers, ts.isExportModifier);
+                });
+            }
+            function handleNamespaceImport(importDeclaration, name, isReExport, alreadyAddedDirect) {
+                if (exportKind === 2 /* ExportKind.ExportEquals */) {
+                    // This is a direct import, not import-as-namespace.
+                    if (!alreadyAddedDirect)
+                        directImports.push(importDeclaration);
+                }
+                else if (!isAvailableThroughGlobal) {
+                    var sourceFileLike = getSourceFileLikeForImportDeclaration(importDeclaration);
+                    ts.Debug.assert(sourceFileLike.kind === 308 /* SyntaxKind.SourceFile */ || sourceFileLike.kind === 264 /* SyntaxKind.ModuleDeclaration */);
+                    if (isReExport || findNamespaceReExports(sourceFileLike, name, checker)) {
+                        addIndirectUser(sourceFileLike, /** addTransitiveDependencies */ true);
+                    }
+                    else {
+                        addIndirectUser(sourceFileLike);
+                    }
+                }
+            }
+            /** Adds a module and all of its transitive dependencies as possible indirect users. */
+            function addIndirectUser(sourceFileLike, addTransitiveDependencies) {
+                if (addTransitiveDependencies === void 0) { addTransitiveDependencies = false; }
+                ts.Debug.assert(!isAvailableThroughGlobal);
+                var isNew = markSeenIndirectUser(sourceFileLike);
+                if (!isNew)
+                    return;
+                indirectUserDeclarations.push(sourceFileLike); // TODO: GH#18217
+                if (!addTransitiveDependencies)
+                    return;
+                var moduleSymbol = checker.getMergedSymbol(sourceFileLike.symbol);
+                if (!moduleSymbol)
+                    return;
+                ts.Debug.assert(!!(moduleSymbol.flags & 1536 /* SymbolFlags.Module */));
+                var directImports = getDirectImports(moduleSymbol);
+                if (directImports) {
+                    for (var _i = 0, directImports_1 = directImports; _i < directImports_1.length; _i++) {
+                        var directImport = directImports_1[_i];
+                        if (!ts.isImportTypeNode(directImport)) {
+                            addIndirectUser(getSourceFileLikeForImportDeclaration(directImport), /** addTransitiveDependencies */ true);
+                        }
+                    }
+                }
+            }
+            function getDirectImports(moduleSymbol) {
+                return allDirectImports.get(ts.getSymbolId(moduleSymbol).toString());
+            }
+        }
+        /**
+         * Given the set of direct imports of a module, we need to find which ones import the particular exported symbol.
+         * The returned `importSearches` will result in the entire source file being searched.
+         * But re-exports will be placed in 'singleReferences' since they cannot be locally referenced.
+         */
+        function getSearchesFromDirectImports(directImports, exportSymbol, exportKind, checker, isForRename) {
+            var importSearches = [];
+            var singleReferences = [];
+            function addSearch(location, symbol) {
+                importSearches.push([location, symbol]);
+            }
+            if (directImports) {
+                for (var _i = 0, directImports_2 = directImports; _i < directImports_2.length; _i++) {
+                    var decl = directImports_2[_i];
+                    handleImport(decl);
+                }
+            }
+            return { importSearches: importSearches, singleReferences: singleReferences };
+            function handleImport(decl) {
+                if (decl.kind === 268 /* SyntaxKind.ImportEqualsDeclaration */) {
+                    if (isExternalModuleImportEquals(decl)) {
+                        handleNamespaceImportLike(decl.name);
+                    }
+                    return;
+                }
+                if (decl.kind === 79 /* SyntaxKind.Identifier */) {
+                    handleNamespaceImportLike(decl);
+                    return;
+                }
+                if (decl.kind === 202 /* SyntaxKind.ImportType */) {
+                    if (decl.qualifier) {
+                        var firstIdentifier = ts.getFirstIdentifier(decl.qualifier);
+                        if (firstIdentifier.escapedText === ts.symbolName(exportSymbol)) {
+                            singleReferences.push(firstIdentifier);
+                        }
+                    }
+                    else if (exportKind === 2 /* ExportKind.ExportEquals */) {
+                        singleReferences.push(decl.argument.literal);
+                    }
+                    return;
+                }
+                // Ignore if there's a grammar error
+                if (decl.moduleSpecifier.kind !== 10 /* SyntaxKind.StringLiteral */) {
+                    return;
+                }
+                if (decl.kind === 275 /* SyntaxKind.ExportDeclaration */) {
+                    if (decl.exportClause && ts.isNamedExports(decl.exportClause)) {
+                        searchForNamedImport(decl.exportClause);
+                    }
+                    return;
+                }
+                var _a = decl.importClause || { name: undefined, namedBindings: undefined }, name = _a.name, namedBindings = _a.namedBindings;
+                if (namedBindings) {
+                    switch (namedBindings.kind) {
+                        case 271 /* SyntaxKind.NamespaceImport */:
+                            handleNamespaceImportLike(namedBindings.name);
+                            break;
+                        case 272 /* SyntaxKind.NamedImports */:
+                            // 'default' might be accessed as a named import `{ default as foo }`.
+                            if (exportKind === 0 /* ExportKind.Named */ || exportKind === 1 /* ExportKind.Default */) {
+                                searchForNamedImport(namedBindings);
+                            }
+                            break;
+                        default:
+                            ts.Debug.assertNever(namedBindings);
+                    }
+                }
+                // `export =` might be imported by a default import if `--allowSyntheticDefaultImports` is on, so this handles both ExportKind.Default and ExportKind.ExportEquals.
+                // If a default import has the same name as the default export, allow to rename it.
+                // Given `import f` and `export default function f`, we will rename both, but for `import g` we will rename just that.
+                if (name && (exportKind === 1 /* ExportKind.Default */ || exportKind === 2 /* ExportKind.ExportEquals */) && (!isForRename || name.escapedText === ts.symbolEscapedNameNoDefault(exportSymbol))) {
+                    var defaultImportAlias = checker.getSymbolAtLocation(name);
+                    addSearch(name, defaultImportAlias);
+                }
+            }
+            /**
+             * `import x = require("./x")` or `import * as x from "./x"`.
+             * An `export =` may be imported by this syntax, so it may be a direct import.
+             * If it's not a direct import, it will be in `indirectUsers`, so we don't have to do anything here.
+             */
+            function handleNamespaceImportLike(importName) {
+                // Don't rename an import that already has a different name than the export.
+                if (exportKind === 2 /* ExportKind.ExportEquals */ && (!isForRename || isNameMatch(importName.escapedText))) {
+                    addSearch(importName, checker.getSymbolAtLocation(importName));
+                }
+            }
+            function searchForNamedImport(namedBindings) {
+                if (!namedBindings) {
+                    return;
+                }
+                for (var _i = 0, _a = namedBindings.elements; _i < _a.length; _i++) {
+                    var element = _a[_i];
+                    var name = element.name, propertyName = element.propertyName;
+                    if (!isNameMatch((propertyName || name).escapedText)) {
+                        continue;
+                    }
+                    if (propertyName) {
+                        // This is `import { foo as bar } from "./a"` or `export { foo as bar } from "./a"`. `foo` isn't a local in the file, so just add it as a single reference.
+                        singleReferences.push(propertyName);
+                        // If renaming `{ foo as bar }`, don't touch `bar`, just `foo`.
+                        // But do rename `foo` in ` { default as foo }` if that's the original export name.
+                        if (!isForRename || name.escapedText === exportSymbol.escapedName) {
+                            // Search locally for `bar`.
+                            addSearch(name, checker.getSymbolAtLocation(name));
+                        }
+                    }
+                    else {
+                        var localSymbol = element.kind === 278 /* SyntaxKind.ExportSpecifier */ && element.propertyName
+                            ? checker.getExportSpecifierLocalTargetSymbol(element) // For re-exporting under a different name, we want to get the re-exported symbol.
+                            : checker.getSymbolAtLocation(name);
+                        addSearch(name, localSymbol);
+                    }
+                }
+            }
+            function isNameMatch(name) {
+                // Use name of "default" even in `export =` case because we may have allowSyntheticDefaultImports
+                return name === exportSymbol.escapedName || exportKind !== 0 /* ExportKind.Named */ && name === "default" /* InternalSymbolName.Default */;
+            }
+        }
+        /** Returns 'true' is the namespace 'name' is re-exported from this module, and 'false' if it is only used locally. */
+        function findNamespaceReExports(sourceFileLike, name, checker) {
+            var namespaceImportSymbol = checker.getSymbolAtLocation(name);
+            return !!forEachPossibleImportOrExportStatement(sourceFileLike, function (statement) {
+                if (!ts.isExportDeclaration(statement))
+                    return;
+                var exportClause = statement.exportClause, moduleSpecifier = statement.moduleSpecifier;
+                return !moduleSpecifier && exportClause && ts.isNamedExports(exportClause) &&
+                    exportClause.elements.some(function (element) { return checker.getExportSpecifierLocalTargetSymbol(element) === namespaceImportSymbol; });
+            });
+        }
+        function findModuleReferences(program, sourceFiles, searchModuleSymbol) {
+            var refs = [];
+            var checker = program.getTypeChecker();
+            for (var _i = 0, sourceFiles_1 = sourceFiles; _i < sourceFiles_1.length; _i++) {
+                var referencingFile = sourceFiles_1[_i];
+                var searchSourceFile = searchModuleSymbol.valueDeclaration;
+                if ((searchSourceFile === null || searchSourceFile === void 0 ? void 0 : searchSourceFile.kind) === 308 /* SyntaxKind.SourceFile */) {
+                    for (var _a = 0, _b = referencingFile.referencedFiles; _a < _b.length; _a++) {
+                        var ref = _b[_a];
+                        if (program.getSourceFileFromReference(referencingFile, ref) === searchSourceFile) {
+                            refs.push({ kind: "reference", referencingFile: referencingFile, ref: ref });
+                        }
+                    }
+                    for (var _c = 0, _d = referencingFile.typeReferenceDirectives; _c < _d.length; _c++) {
+                        var ref = _d[_c];
+                        var referenced = program.getResolvedTypeReferenceDirectives().get(ref.fileName, ref.resolutionMode || referencingFile.impliedNodeFormat);
+                        if (referenced !== undefined && referenced.resolvedFileName === searchSourceFile.fileName) {
+                            refs.push({ kind: "reference", referencingFile: referencingFile, ref: ref });
+                        }
+                    }
+                }
+                forEachImport(referencingFile, function (_importDecl, moduleSpecifier) {
+                    var moduleSymbol = checker.getSymbolAtLocation(moduleSpecifier);
+                    if (moduleSymbol === searchModuleSymbol) {
+                        refs.push({ kind: "import", literal: moduleSpecifier });
+                    }
+                });
+            }
+            return refs;
+        }
+        FindAllReferences.findModuleReferences = findModuleReferences;
+        /** Returns a map from a module symbol Id to all import statements that directly reference the module. */
+        function getDirectImportsMap(sourceFiles, checker, cancellationToken) {
+            var map = new ts.Map();
+            for (var _i = 0, sourceFiles_2 = sourceFiles; _i < sourceFiles_2.length; _i++) {
+                var sourceFile = sourceFiles_2[_i];
+                if (cancellationToken)
+                    cancellationToken.throwIfCancellationRequested();
+                forEachImport(sourceFile, function (importDecl, moduleSpecifier) {
+                    var moduleSymbol = checker.getSymbolAtLocation(moduleSpecifier);
+                    if (moduleSymbol) {
+                        var id = ts.getSymbolId(moduleSymbol).toString();
+                        var imports = map.get(id);
+                        if (!imports) {
+                            map.set(id, imports = []);
+                        }
+                        imports.push(importDecl);
+                    }
+                });
+            }
+            return map;
+        }
+        /** Iterates over all statements at the top level or in module declarations. Returns the first truthy result. */
+        function forEachPossibleImportOrExportStatement(sourceFileLike, action) {
+            return ts.forEach(sourceFileLike.kind === 308 /* SyntaxKind.SourceFile */ ? sourceFileLike.statements : sourceFileLike.body.statements, function (statement) {
+                return action(statement) || (isAmbientModuleDeclaration(statement) && ts.forEach(statement.body && statement.body.statements, action));
+            });
+        }
+        /** Calls `action` for each import, re-export, or require() in a file. */
+        function forEachImport(sourceFile, action) {
+            if (sourceFile.externalModuleIndicator || sourceFile.imports !== undefined) {
+                for (var _i = 0, _a = sourceFile.imports; _i < _a.length; _i++) {
+                    var i = _a[_i];
+                    action(ts.importFromModuleSpecifier(i), i);
+                }
+            }
+            else {
+                forEachPossibleImportOrExportStatement(sourceFile, function (statement) {
+                    switch (statement.kind) {
+                        case 275 /* SyntaxKind.ExportDeclaration */:
+                        case 269 /* SyntaxKind.ImportDeclaration */: {
+                            var decl = statement;
+                            if (decl.moduleSpecifier && ts.isStringLiteral(decl.moduleSpecifier)) {
+                                action(decl, decl.moduleSpecifier);
+                            }
+                            break;
+                        }
+                        case 268 /* SyntaxKind.ImportEqualsDeclaration */: {
+                            var decl = statement;
+                            if (isExternalModuleImportEquals(decl)) {
+                                action(decl, decl.moduleReference.expression);
+                            }
+                            break;
+                        }
+                    }
+                });
+            }
+        }
+        /**
+         * Given a local reference, we might notice that it's an import/export and recursively search for references of that.
+         * If at an import, look locally for the symbol it imports.
+         * If at an export, look for all imports of it.
+         * This doesn't handle export specifiers; that is done in `getReferencesAtExportSpecifier`.
+         * @param comingFromExport If we are doing a search for all exports, don't bother looking backwards for the imported symbol, since that's the reason we're here.
+         */
+        function getImportOrExportSymbol(node, symbol, checker, comingFromExport) {
+            return comingFromExport ? getExport() : getExport() || getImport();
+            function getExport() {
+                var _a;
+                var parent = node.parent;
+                var grandparent = parent.parent;
+                if (symbol.exportSymbol) {
+                    if (parent.kind === 208 /* SyntaxKind.PropertyAccessExpression */) {
+                        // When accessing an export of a JS module, there's no alias. The symbol will still be flagged as an export even though we're at the use.
+                        // So check that we are at the declaration.
+                        return ((_a = symbol.declarations) === null || _a === void 0 ? void 0 : _a.some(function (d) { return d === parent; })) && ts.isBinaryExpression(grandparent)
+                            ? getSpecialPropertyExport(grandparent, /*useLhsSymbol*/ false)
+                            : undefined;
+                    }
+                    else {
+                        return exportInfo(symbol.exportSymbol, getExportKindForDeclaration(parent));
+                    }
+                }
+                else {
+                    var exportNode = getExportNode(parent, node);
+                    if (exportNode && ts.hasSyntacticModifier(exportNode, 1 /* ModifierFlags.Export */)) {
+                        if (ts.isImportEqualsDeclaration(exportNode) && exportNode.moduleReference === node) {
+                            // We're at `Y` in `export import X = Y`. This is not the exported symbol, the left-hand-side is. So treat this as an import statement.
+                            if (comingFromExport) {
+                                return undefined;
+                            }
+                            var lhsSymbol = checker.getSymbolAtLocation(exportNode.name);
+                            return { kind: 0 /* ImportExport.Import */, symbol: lhsSymbol };
+                        }
+                        else {
+                            return exportInfo(symbol, getExportKindForDeclaration(exportNode));
+                        }
+                    }
+                    else if (ts.isNamespaceExport(parent)) {
+                        return exportInfo(symbol, 0 /* ExportKind.Named */);
+                    }
+                    // If we are in `export = a;` or `export default a;`, `parent` is the export assignment.
+                    else if (ts.isExportAssignment(parent)) {
+                        return getExportAssignmentExport(parent);
+                    }
+                    // If we are in `export = class A {};` (or `export = class A {};`) at `A`, `parent.parent` is the export assignment.
+                    else if (ts.isExportAssignment(grandparent)) {
+                        return getExportAssignmentExport(grandparent);
+                    }
+                    // Similar for `module.exports =` and `exports.A =`.
+                    else if (ts.isBinaryExpression(parent)) {
+                        return getSpecialPropertyExport(parent, /*useLhsSymbol*/ true);
+                    }
+                    else if (ts.isBinaryExpression(grandparent)) {
+                        return getSpecialPropertyExport(grandparent, /*useLhsSymbol*/ true);
+                    }
+                    else if (ts.isJSDocTypedefTag(parent)) {
+                        return exportInfo(symbol, 0 /* ExportKind.Named */);
+                    }
+                }
+                function getExportAssignmentExport(ex) {
+                    // Get the symbol for the `export =` node; its parent is the module it's the export of.
+                    if (!ex.symbol.parent)
+                        return undefined;
+                    var exportKind = ex.isExportEquals ? 2 /* ExportKind.ExportEquals */ : 1 /* ExportKind.Default */;
+                    return { kind: 1 /* ImportExport.Export */, symbol: symbol, exportInfo: { exportingModuleSymbol: ex.symbol.parent, exportKind: exportKind } };
+                }
+                function getSpecialPropertyExport(node, useLhsSymbol) {
+                    var kind;
+                    switch (ts.getAssignmentDeclarationKind(node)) {
+                        case 1 /* AssignmentDeclarationKind.ExportsProperty */:
+                            kind = 0 /* ExportKind.Named */;
+                            break;
+                        case 2 /* AssignmentDeclarationKind.ModuleExports */:
+                            kind = 2 /* ExportKind.ExportEquals */;
+                            break;
+                        default:
+                            return undefined;
+                    }
+                    var sym = useLhsSymbol ? checker.getSymbolAtLocation(ts.getNameOfAccessExpression(ts.cast(node.left, ts.isAccessExpression))) : symbol;
+                    return sym && exportInfo(sym, kind);
+                }
+            }
+            function getImport() {
+                var isImport = isNodeImport(node);
+                if (!isImport)
+                    return undefined;
+                // A symbol being imported is always an alias. So get what that aliases to find the local symbol.
+                var importedSymbol = checker.getImmediateAliasedSymbol(symbol);
+                if (!importedSymbol)
+                    return undefined;
+                // Search on the local symbol in the exporting module, not the exported symbol.
+                importedSymbol = skipExportSpecifierSymbol(importedSymbol, checker);
+                // Similarly, skip past the symbol for 'export ='
+                if (importedSymbol.escapedName === "export=") {
+                    importedSymbol = getExportEqualsLocalSymbol(importedSymbol, checker);
+                    if (importedSymbol === undefined)
+                        return undefined;
+                }
+                // If the import has a different name than the export, do not continue searching.
+                // If `importedName` is undefined, do continue searching as the export is anonymous.
+                // (All imports returned from this function will be ignored anyway if we are in rename and this is a not a named export.)
+                var importedName = ts.symbolEscapedNameNoDefault(importedSymbol);
+                if (importedName === undefined || importedName === "default" /* InternalSymbolName.Default */ || importedName === symbol.escapedName) {
+                    return { kind: 0 /* ImportExport.Import */, symbol: importedSymbol };
+                }
+            }
+            function exportInfo(symbol, kind) {
+                var exportInfo = getExportInfo(symbol, kind, checker);
+                return exportInfo && { kind: 1 /* ImportExport.Export */, symbol: symbol, exportInfo: exportInfo };
+            }
+            // Not meant for use with export specifiers or export assignment.
+            function getExportKindForDeclaration(node) {
+                return ts.hasSyntacticModifier(node, 1024 /* ModifierFlags.Default */) ? 1 /* ExportKind.Default */ : 0 /* ExportKind.Named */;
+            }
+        }
+        FindAllReferences.getImportOrExportSymbol = getImportOrExportSymbol;
+        function getExportEqualsLocalSymbol(importedSymbol, checker) {
+            if (importedSymbol.flags & 2097152 /* SymbolFlags.Alias */) {
+                return checker.getImmediateAliasedSymbol(importedSymbol);
+            }
+            var decl = ts.Debug.checkDefined(importedSymbol.valueDeclaration);
+            if (ts.isExportAssignment(decl)) { // `export = class {}`
+                return decl.expression.symbol;
+            }
+            else if (ts.isBinaryExpression(decl)) { // `module.exports = class {}`
+                return decl.right.symbol;
+            }
+            else if (ts.isSourceFile(decl)) { // json module
+                return decl.symbol;
+            }
+            return undefined;
+        }
+        // If a reference is a class expression, the exported node would be its parent.
+        // If a reference is a variable declaration, the exported node would be the variable statement.
+        function getExportNode(parent, node) {
+            var declaration = ts.isVariableDeclaration(parent) ? parent : ts.isBindingElement(parent) ? ts.walkUpBindingElementsAndPatterns(parent) : undefined;
+            if (declaration) {
+                return parent.name !== node ? undefined :
+                    ts.isCatchClause(declaration.parent) ? undefined : ts.isVariableStatement(declaration.parent.parent) ? declaration.parent.parent : undefined;
+            }
+            else {
+                return parent;
+            }
+        }
+        function isNodeImport(node) {
+            var parent = node.parent;
+            switch (parent.kind) {
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                    return parent.name === node && isExternalModuleImportEquals(parent);
+                case 273 /* SyntaxKind.ImportSpecifier */:
+                    // For a rename import `{ foo as bar }`, don't search for the imported symbol. Just find local uses of `bar`.
+                    return !parent.propertyName;
+                case 270 /* SyntaxKind.ImportClause */:
+                case 271 /* SyntaxKind.NamespaceImport */:
+                    ts.Debug.assert(parent.name === node);
+                    return true;
+                case 205 /* SyntaxKind.BindingElement */:
+                    return ts.isInJSFile(node) && ts.isVariableDeclarationInitializedToBareOrAccessedRequire(parent.parent.parent);
+                default:
+                    return false;
+            }
+        }
+        function getExportInfo(exportSymbol, exportKind, checker) {
+            var moduleSymbol = exportSymbol.parent;
+            if (!moduleSymbol)
+                return undefined; // This can happen if an `export` is not at the top-level (which is a compile error).
+            var exportingModuleSymbol = checker.getMergedSymbol(moduleSymbol); // Need to get merged symbol in case there's an augmentation.
+            // `export` may appear in a namespace. In that case, just rely on global search.
+            return ts.isExternalModuleSymbol(exportingModuleSymbol) ? { exportingModuleSymbol: exportingModuleSymbol, exportKind: exportKind } : undefined;
+        }
+        FindAllReferences.getExportInfo = getExportInfo;
+        /** If at an export specifier, go to the symbol it refers to. */
+        function skipExportSpecifierSymbol(symbol, checker) {
+            // For `export { foo } from './bar", there's nothing to skip, because it does not create a new alias. But `export { foo } does.
+            if (symbol.declarations) {
+                for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
+                    var declaration = _a[_i];
+                    if (ts.isExportSpecifier(declaration) && !declaration.propertyName && !declaration.parent.parent.moduleSpecifier) {
+                        return checker.getExportSpecifierLocalTargetSymbol(declaration);
+                    }
+                    else if (ts.isPropertyAccessExpression(declaration) && ts.isModuleExportsAccessExpression(declaration.expression) && !ts.isPrivateIdentifier(declaration.name)) {
+                        // Export of form 'module.exports.propName = expr';
+                        return checker.getSymbolAtLocation(declaration);
+                    }
+                    else if (ts.isShorthandPropertyAssignment(declaration)
+                        && ts.isBinaryExpression(declaration.parent.parent)
+                        && ts.getAssignmentDeclarationKind(declaration.parent.parent) === 2 /* AssignmentDeclarationKind.ModuleExports */) {
+                        return checker.getExportSpecifierLocalTargetSymbol(declaration.name);
+                    }
+                }
+            }
+            return symbol;
+        }
+        function getContainingModuleSymbol(importer, checker) {
+            return checker.getMergedSymbol(getSourceFileLikeForImportDeclaration(importer).symbol);
+        }
+        function getSourceFileLikeForImportDeclaration(node) {
+            if (node.kind === 210 /* SyntaxKind.CallExpression */) {
+                return node.getSourceFile();
+            }
+            var parent = node.parent;
+            if (parent.kind === 308 /* SyntaxKind.SourceFile */) {
+                return parent;
+            }
+            ts.Debug.assert(parent.kind === 265 /* SyntaxKind.ModuleBlock */);
+            return ts.cast(parent.parent, isAmbientModuleDeclaration);
+        }
+        function isAmbientModuleDeclaration(node) {
+            return node.kind === 264 /* SyntaxKind.ModuleDeclaration */ && node.name.kind === 10 /* SyntaxKind.StringLiteral */;
+        }
+        function isExternalModuleImportEquals(eq) {
+            return eq.moduleReference.kind === 280 /* SyntaxKind.ExternalModuleReference */ && eq.moduleReference.expression.kind === 10 /* SyntaxKind.StringLiteral */;
+        }
+    })(FindAllReferences = ts.FindAllReferences || (ts.FindAllReferences = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var FindAllReferences;
+    (function (FindAllReferences) {
+        var DefinitionKind;
+        (function (DefinitionKind) {
+            DefinitionKind[DefinitionKind["Symbol"] = 0] = "Symbol";
+            DefinitionKind[DefinitionKind["Label"] = 1] = "Label";
+            DefinitionKind[DefinitionKind["Keyword"] = 2] = "Keyword";
+            DefinitionKind[DefinitionKind["This"] = 3] = "This";
+            DefinitionKind[DefinitionKind["String"] = 4] = "String";
+            DefinitionKind[DefinitionKind["TripleSlashReference"] = 5] = "TripleSlashReference";
+        })(DefinitionKind = FindAllReferences.DefinitionKind || (FindAllReferences.DefinitionKind = {}));
+        var EntryKind;
+        (function (EntryKind) {
+            EntryKind[EntryKind["Span"] = 0] = "Span";
+            EntryKind[EntryKind["Node"] = 1] = "Node";
+            EntryKind[EntryKind["StringLiteral"] = 2] = "StringLiteral";
+            EntryKind[EntryKind["SearchedLocalFoundProperty"] = 3] = "SearchedLocalFoundProperty";
+            EntryKind[EntryKind["SearchedPropertyFoundLocal"] = 4] = "SearchedPropertyFoundLocal";
+        })(EntryKind = FindAllReferences.EntryKind || (FindAllReferences.EntryKind = {}));
+        function nodeEntry(node, kind) {
+            if (kind === void 0) { kind = 1 /* EntryKind.Node */; }
+            return {
+                kind: kind,
+                node: node.name || node,
+                context: getContextNodeForNodeEntry(node)
+            };
+        }
+        FindAllReferences.nodeEntry = nodeEntry;
+        function isContextWithStartAndEndNode(node) {
+            return node && node.kind === undefined;
+        }
+        FindAllReferences.isContextWithStartAndEndNode = isContextWithStartAndEndNode;
+        function getContextNodeForNodeEntry(node) {
+            if (ts.isDeclaration(node)) {
+                return getContextNode(node);
+            }
+            if (!node.parent)
+                return undefined;
+            if (!ts.isDeclaration(node.parent) && !ts.isExportAssignment(node.parent)) {
+                // Special property assignment in javascript
+                if (ts.isInJSFile(node)) {
+                    var binaryExpression = ts.isBinaryExpression(node.parent) ?
+                        node.parent :
+                        ts.isAccessExpression(node.parent) &&
+                            ts.isBinaryExpression(node.parent.parent) &&
+                            node.parent.parent.left === node.parent ?
+                            node.parent.parent :
+                            undefined;
+                    if (binaryExpression && ts.getAssignmentDeclarationKind(binaryExpression) !== 0 /* AssignmentDeclarationKind.None */) {
+                        return getContextNode(binaryExpression);
+                    }
+                }
+                // Jsx Tags
+                if (ts.isJsxOpeningElement(node.parent) || ts.isJsxClosingElement(node.parent)) {
+                    return node.parent.parent;
+                }
+                else if (ts.isJsxSelfClosingElement(node.parent) ||
+                    ts.isLabeledStatement(node.parent) ||
+                    ts.isBreakOrContinueStatement(node.parent)) {
+                    return node.parent;
+                }
+                else if (ts.isStringLiteralLike(node)) {
+                    var validImport = ts.tryGetImportFromModuleSpecifier(node);
+                    if (validImport) {
+                        var declOrStatement = ts.findAncestor(validImport, function (node) {
+                            return ts.isDeclaration(node) ||
+                                ts.isStatement(node) ||
+                                ts.isJSDocTag(node);
+                        });
+                        return ts.isDeclaration(declOrStatement) ?
+                            getContextNode(declOrStatement) :
+                            declOrStatement;
+                    }
+                }
+                // Handle computed property name
+                var propertyName = ts.findAncestor(node, ts.isComputedPropertyName);
+                return propertyName ?
+                    getContextNode(propertyName.parent) :
+                    undefined;
+            }
+            if (node.parent.name === node || // node is name of declaration, use parent
+                ts.isConstructorDeclaration(node.parent) ||
+                ts.isExportAssignment(node.parent) ||
+                // Property name of the import export specifier or binding pattern, use parent
+                ((ts.isImportOrExportSpecifier(node.parent) || ts.isBindingElement(node.parent))
+                    && node.parent.propertyName === node) ||
+                // Is default export
+                (node.kind === 88 /* SyntaxKind.DefaultKeyword */ && ts.hasSyntacticModifier(node.parent, 1025 /* ModifierFlags.ExportDefault */))) {
+                return getContextNode(node.parent);
+            }
+            return undefined;
+        }
+        function getContextNode(node) {
+            if (!node)
+                return undefined;
+            switch (node.kind) {
+                case 257 /* SyntaxKind.VariableDeclaration */:
+                    return !ts.isVariableDeclarationList(node.parent) || node.parent.declarations.length !== 1 ?
+                        node :
+                        ts.isVariableStatement(node.parent.parent) ?
+                            node.parent.parent :
+                            ts.isForInOrOfStatement(node.parent.parent) ?
+                                getContextNode(node.parent.parent) :
+                                node.parent;
+                case 205 /* SyntaxKind.BindingElement */:
+                    return getContextNode(node.parent.parent);
+                case 273 /* SyntaxKind.ImportSpecifier */:
+                    return node.parent.parent.parent;
+                case 278 /* SyntaxKind.ExportSpecifier */:
+                case 271 /* SyntaxKind.NamespaceImport */:
+                    return node.parent.parent;
+                case 270 /* SyntaxKind.ImportClause */:
+                case 277 /* SyntaxKind.NamespaceExport */:
+                    return node.parent;
+                case 223 /* SyntaxKind.BinaryExpression */:
+                    return ts.isExpressionStatement(node.parent) ?
+                        node.parent :
+                        node;
+                case 247 /* SyntaxKind.ForOfStatement */:
+                case 246 /* SyntaxKind.ForInStatement */:
+                    return {
+                        start: node.initializer,
+                        end: node.expression
+                    };
+                case 299 /* SyntaxKind.PropertyAssignment */:
+                case 300 /* SyntaxKind.ShorthandPropertyAssignment */:
+                    return ts.isArrayLiteralOrObjectLiteralDestructuringPattern(node.parent) ?
+                        getContextNode(ts.findAncestor(node.parent, function (node) {
+                            return ts.isBinaryExpression(node) || ts.isForInOrOfStatement(node);
+                        })) :
+                        node;
+                default:
+                    return node;
+            }
+        }
+        FindAllReferences.getContextNode = getContextNode;
+        function toContextSpan(textSpan, sourceFile, context) {
+            if (!context)
+                return undefined;
+            var contextSpan = isContextWithStartAndEndNode(context) ?
+                getTextSpan(context.start, sourceFile, context.end) :
+                getTextSpan(context, sourceFile);
+            return contextSpan.start !== textSpan.start || contextSpan.length !== textSpan.length ?
+                { contextSpan: contextSpan } :
+                undefined;
+        }
+        FindAllReferences.toContextSpan = toContextSpan;
+        var FindReferencesUse;
+        (function (FindReferencesUse) {
+            /**
+             * When searching for references to a symbol, the location will not be adjusted (this is the default behavior when not specified).
+             */
+            FindReferencesUse[FindReferencesUse["Other"] = 0] = "Other";
+            /**
+             * When searching for references to a symbol, the location will be adjusted if the cursor was on a keyword.
+             */
+            FindReferencesUse[FindReferencesUse["References"] = 1] = "References";
+            /**
+             * When searching for references to a symbol, the location will be adjusted if the cursor was on a keyword.
+             * Unlike `References`, the location will only be adjusted keyword belonged to a declaration with a valid name.
+             * If set, we will find fewer references -- if it is referenced by several different names, we still only find references for the original name.
+             */
+            FindReferencesUse[FindReferencesUse["Rename"] = 2] = "Rename";
+        })(FindReferencesUse = FindAllReferences.FindReferencesUse || (FindAllReferences.FindReferencesUse = {}));
+        function findReferencedSymbols(program, cancellationToken, sourceFiles, sourceFile, position) {
+            var node = ts.getTouchingPropertyName(sourceFile, position);
+            var options = { use: 1 /* FindReferencesUse.References */ };
+            var referencedSymbols = Core.getReferencedSymbolsForNode(position, node, program, sourceFiles, cancellationToken, options);
+            var checker = program.getTypeChecker();
+            // Unless the starting node is a declaration (vs e.g. JSDoc), don't attempt to compute isDefinition
+            var adjustedNode = Core.getAdjustedNode(node, options);
+            var symbol = isDefinitionForReference(adjustedNode) ? checker.getSymbolAtLocation(adjustedNode) : undefined;
+            return !referencedSymbols || !referencedSymbols.length ? undefined : ts.mapDefined(referencedSymbols, function (_a) {
+                var definition = _a.definition, references = _a.references;
+                // Only include referenced symbols that have a valid definition.
+                return definition && {
+                    definition: checker.runWithCancellationToken(cancellationToken, function (checker) { return definitionToReferencedSymbolDefinitionInfo(definition, checker, node); }),
+                    references: references.map(function (r) { return toReferencedSymbolEntry(r, symbol); })
+                };
+            });
+        }
+        FindAllReferences.findReferencedSymbols = findReferencedSymbols;
+        function isDefinitionForReference(node) {
+            return node.kind === 88 /* SyntaxKind.DefaultKeyword */
+                || !!ts.getDeclarationFromName(node)
+                || ts.isLiteralComputedPropertyDeclarationName(node)
+                || (node.kind === 135 /* SyntaxKind.ConstructorKeyword */ && ts.isConstructorDeclaration(node.parent));
+        }
+        function getImplementationsAtPosition(program, cancellationToken, sourceFiles, sourceFile, position) {
+            var node = ts.getTouchingPropertyName(sourceFile, position);
+            var referenceEntries;
+            var entries = getImplementationReferenceEntries(program, cancellationToken, sourceFiles, node, position);
+            if (node.parent.kind === 208 /* SyntaxKind.PropertyAccessExpression */
+                || node.parent.kind === 205 /* SyntaxKind.BindingElement */
+                || node.parent.kind === 209 /* SyntaxKind.ElementAccessExpression */
+                || node.kind === 106 /* SyntaxKind.SuperKeyword */) {
+                referenceEntries = entries && __spreadArray([], entries, true);
+            }
+            else if (entries) {
+                var queue = ts.createQueue(entries);
+                var seenNodes = new ts.Map();
+                while (!queue.isEmpty()) {
+                    var entry = queue.dequeue();
+                    if (!ts.addToSeen(seenNodes, ts.getNodeId(entry.node))) {
+                        continue;
+                    }
+                    referenceEntries = ts.append(referenceEntries, entry);
+                    var entries_1 = getImplementationReferenceEntries(program, cancellationToken, sourceFiles, entry.node, entry.node.pos);
+                    if (entries_1) {
+                        queue.enqueue.apply(queue, entries_1);
+                    }
+                }
+            }
+            var checker = program.getTypeChecker();
+            return ts.map(referenceEntries, function (entry) { return toImplementationLocation(entry, checker); });
+        }
+        FindAllReferences.getImplementationsAtPosition = getImplementationsAtPosition;
+        function getImplementationReferenceEntries(program, cancellationToken, sourceFiles, node, position) {
+            if (node.kind === 308 /* SyntaxKind.SourceFile */) {
+                return undefined;
+            }
+            var checker = program.getTypeChecker();
+            // If invoked directly on a shorthand property assignment, then return
+            // the declaration of the symbol being assigned (not the symbol being assigned to).
+            if (node.parent.kind === 300 /* SyntaxKind.ShorthandPropertyAssignment */) {
+                var result_2 = [];
+                Core.getReferenceEntriesForShorthandPropertyAssignment(node, checker, function (node) { return result_2.push(nodeEntry(node)); });
+                return result_2;
+            }
+            else if (node.kind === 106 /* SyntaxKind.SuperKeyword */ || ts.isSuperProperty(node.parent)) {
+                // References to and accesses on the super keyword only have one possible implementation, so no
+                // need to "Find all References"
+                var symbol = checker.getSymbolAtLocation(node);
+                return symbol.valueDeclaration && [nodeEntry(symbol.valueDeclaration)];
+            }
+            else {
+                // Perform "Find all References" and retrieve only those that are implementations
+                return getReferenceEntriesForNode(position, node, program, sourceFiles, cancellationToken, { implementations: true, use: 1 /* FindReferencesUse.References */ });
+            }
+        }
+        function findReferenceOrRenameEntries(program, cancellationToken, sourceFiles, node, position, options, convertEntry) {
+            return ts.map(flattenEntries(Core.getReferencedSymbolsForNode(position, node, program, sourceFiles, cancellationToken, options)), function (entry) { return convertEntry(entry, node, program.getTypeChecker()); });
+        }
+        FindAllReferences.findReferenceOrRenameEntries = findReferenceOrRenameEntries;
+        function getReferenceEntriesForNode(position, node, program, sourceFiles, cancellationToken, options, sourceFilesSet) {
+            if (options === void 0) { options = {}; }
+            if (sourceFilesSet === void 0) { sourceFilesSet = new ts.Set(sourceFiles.map(function (f) { return f.fileName; })); }
+            return flattenEntries(Core.getReferencedSymbolsForNode(position, node, program, sourceFiles, cancellationToken, options, sourceFilesSet));
+        }
+        FindAllReferences.getReferenceEntriesForNode = getReferenceEntriesForNode;
+        function flattenEntries(referenceSymbols) {
+            return referenceSymbols && ts.flatMap(referenceSymbols, function (r) { return r.references; });
+        }
+        function definitionToReferencedSymbolDefinitionInfo(def, checker, originalNode) {
+            var info = (function () {
+                switch (def.type) {
+                    case 0 /* DefinitionKind.Symbol */: {
+                        var symbol = def.symbol;
+                        var _a = getDefinitionKindAndDisplayParts(symbol, checker, originalNode), displayParts_1 = _a.displayParts, kind_1 = _a.kind;
+                        var name_1 = displayParts_1.map(function (p) { return p.text; }).join("");
+                        var declaration = symbol.declarations && ts.firstOrUndefined(symbol.declarations);
+                        var node = declaration ? (ts.getNameOfDeclaration(declaration) || declaration) : originalNode;
+                        return __assign(__assign({}, getFileAndTextSpanFromNode(node)), { name: name_1, kind: kind_1, displayParts: displayParts_1, context: getContextNode(declaration) });
+                    }
+                    case 1 /* DefinitionKind.Label */: {
+                        var node = def.node;
+                        return __assign(__assign({}, getFileAndTextSpanFromNode(node)), { name: node.text, kind: "label" /* ScriptElementKind.label */, displayParts: [ts.displayPart(node.text, ts.SymbolDisplayPartKind.text)] });
+                    }
+                    case 2 /* DefinitionKind.Keyword */: {
+                        var node = def.node;
+                        var name_2 = ts.tokenToString(node.kind);
+                        return __assign(__assign({}, getFileAndTextSpanFromNode(node)), { name: name_2, kind: "keyword" /* ScriptElementKind.keyword */, displayParts: [{ text: name_2, kind: "keyword" /* ScriptElementKind.keyword */ }] });
+                    }
+                    case 3 /* DefinitionKind.This */: {
+                        var node = def.node;
+                        var symbol = checker.getSymbolAtLocation(node);
+                        var displayParts_2 = symbol && ts.SymbolDisplay.getSymbolDisplayPartsDocumentationAndSymbolKind(checker, symbol, node.getSourceFile(), ts.getContainerNode(node), node).displayParts || [ts.textPart("this")];
+                        return __assign(__assign({}, getFileAndTextSpanFromNode(node)), { name: "this", kind: "var" /* ScriptElementKind.variableElement */, displayParts: displayParts_2 });
+                    }
+                    case 4 /* DefinitionKind.String */: {
+                        var node = def.node;
+                        return __assign(__assign({}, getFileAndTextSpanFromNode(node)), { name: node.text, kind: "var" /* ScriptElementKind.variableElement */, displayParts: [ts.displayPart(ts.getTextOfNode(node), ts.SymbolDisplayPartKind.stringLiteral)] });
+                    }
+                    case 5 /* DefinitionKind.TripleSlashReference */: {
+                        return {
+                            textSpan: ts.createTextSpanFromRange(def.reference),
+                            sourceFile: def.file,
+                            name: def.reference.fileName,
+                            kind: "string" /* ScriptElementKind.string */,
+                            displayParts: [ts.displayPart("\"".concat(def.reference.fileName, "\""), ts.SymbolDisplayPartKind.stringLiteral)]
+                        };
+                    }
+                    default:
+                        return ts.Debug.assertNever(def);
+                }
+            })();
+            var sourceFile = info.sourceFile, textSpan = info.textSpan, name = info.name, kind = info.kind, displayParts = info.displayParts, context = info.context;
+            return __assign({ containerKind: "" /* ScriptElementKind.unknown */, containerName: "", fileName: sourceFile.fileName, kind: kind, name: name, textSpan: textSpan, displayParts: displayParts }, toContextSpan(textSpan, sourceFile, context));
+        }
+        function getFileAndTextSpanFromNode(node) {
+            var sourceFile = node.getSourceFile();
+            return {
+                sourceFile: sourceFile,
+                textSpan: getTextSpan(ts.isComputedPropertyName(node) ? node.expression : node, sourceFile)
+            };
+        }
+        function getDefinitionKindAndDisplayParts(symbol, checker, node) {
+            var meaning = Core.getIntersectingMeaningFromDeclarations(node, symbol);
+            var enclosingDeclaration = symbol.declarations && ts.firstOrUndefined(symbol.declarations) || node;
+            var _a = ts.SymbolDisplay.getSymbolDisplayPartsDocumentationAndSymbolKind(checker, symbol, enclosingDeclaration.getSourceFile(), enclosingDeclaration, enclosingDeclaration, meaning), displayParts = _a.displayParts, symbolKind = _a.symbolKind;
+            return { displayParts: displayParts, kind: symbolKind };
+        }
+        function toRenameLocation(entry, originalNode, checker, providePrefixAndSuffixText) {
+            return __assign(__assign({}, entryToDocumentSpan(entry)), (providePrefixAndSuffixText && getPrefixAndSuffixText(entry, originalNode, checker)));
+        }
+        FindAllReferences.toRenameLocation = toRenameLocation;
+        function toReferencedSymbolEntry(entry, symbol) {
+            var referenceEntry = toReferenceEntry(entry);
+            if (!symbol)
+                return referenceEntry;
+            return __assign(__assign({}, referenceEntry), { isDefinition: entry.kind !== 0 /* EntryKind.Span */ && isDeclarationOfSymbol(entry.node, symbol) });
+        }
+        function toReferenceEntry(entry) {
+            var documentSpan = entryToDocumentSpan(entry);
+            if (entry.kind === 0 /* EntryKind.Span */) {
+                return __assign(__assign({}, documentSpan), { isWriteAccess: false });
+            }
+            var kind = entry.kind, node = entry.node;
+            return __assign(__assign({}, documentSpan), { isWriteAccess: isWriteAccessForReference(node), isInString: kind === 2 /* EntryKind.StringLiteral */ ? true : undefined });
+        }
+        FindAllReferences.toReferenceEntry = toReferenceEntry;
+        function entryToDocumentSpan(entry) {
+            if (entry.kind === 0 /* EntryKind.Span */) {
+                return { textSpan: entry.textSpan, fileName: entry.fileName };
+            }
+            else {
+                var sourceFile = entry.node.getSourceFile();
+                var textSpan = getTextSpan(entry.node, sourceFile);
+                return __assign({ textSpan: textSpan, fileName: sourceFile.fileName }, toContextSpan(textSpan, sourceFile, entry.context));
+            }
+        }
+        function getPrefixAndSuffixText(entry, originalNode, checker) {
+            if (entry.kind !== 0 /* EntryKind.Span */ && ts.isIdentifier(originalNode)) {
+                var node = entry.node, kind = entry.kind;
+                var parent = node.parent;
+                var name = originalNode.text;
+                var isShorthandAssignment = ts.isShorthandPropertyAssignment(parent);
+                if (isShorthandAssignment || (ts.isObjectBindingElementWithoutPropertyName(parent) && parent.name === node && parent.dotDotDotToken === undefined)) {
+                    var prefixColon = { prefixText: name + ": " };
+                    var suffixColon = { suffixText: ": " + name };
+                    if (kind === 3 /* EntryKind.SearchedLocalFoundProperty */) {
+                        return prefixColon;
+                    }
+                    if (kind === 4 /* EntryKind.SearchedPropertyFoundLocal */) {
+                        return suffixColon;
+                    }
+                    // In `const o = { x }; o.x`, symbolAtLocation at `x` in `{ x }` is the property symbol.
+                    // For a binding element `const { x } = o;`, symbolAtLocation at `x` is the property symbol.
+                    if (isShorthandAssignment) {
+                        var grandParent = parent.parent;
+                        if (ts.isObjectLiteralExpression(grandParent) &&
+                            ts.isBinaryExpression(grandParent.parent) &&
+                            ts.isModuleExportsAccessExpression(grandParent.parent.left)) {
+                            return prefixColon;
+                        }
+                        return suffixColon;
+                    }
+                    else {
+                        return prefixColon;
+                    }
+                }
+                else if (ts.isImportSpecifier(parent) && !parent.propertyName) {
+                    // If the original symbol was using this alias, just rename the alias.
+                    var originalSymbol = ts.isExportSpecifier(originalNode.parent) ? checker.getExportSpecifierLocalTargetSymbol(originalNode.parent) : checker.getSymbolAtLocation(originalNode);
+                    return ts.contains(originalSymbol.declarations, parent) ? { prefixText: name + " as " } : ts.emptyOptions;
+                }
+                else if (ts.isExportSpecifier(parent) && !parent.propertyName) {
+                    // If the symbol for the node is same as declared node symbol use prefix text
+                    return originalNode === entry.node || checker.getSymbolAtLocation(originalNode) === checker.getSymbolAtLocation(entry.node) ?
+                        { prefixText: name + " as " } :
+                        { suffixText: " as " + name };
+                }
+            }
+            return ts.emptyOptions;
+        }
+        function toImplementationLocation(entry, checker) {
+            var documentSpan = entryToDocumentSpan(entry);
+            if (entry.kind !== 0 /* EntryKind.Span */) {
+                var node = entry.node;
+                return __assign(__assign({}, documentSpan), implementationKindDisplayParts(node, checker));
+            }
+            else {
+                return __assign(__assign({}, documentSpan), { kind: "" /* ScriptElementKind.unknown */, displayParts: [] });
+            }
+        }
+        function implementationKindDisplayParts(node, checker) {
+            var symbol = checker.getSymbolAtLocation(ts.isDeclaration(node) && node.name ? node.name : node);
+            if (symbol) {
+                return getDefinitionKindAndDisplayParts(symbol, checker, node);
+            }
+            else if (node.kind === 207 /* SyntaxKind.ObjectLiteralExpression */) {
+                return {
+                    kind: "interface" /* ScriptElementKind.interfaceElement */,
+                    displayParts: [ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */), ts.textPart("object literal"), ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */)]
+                };
+            }
+            else if (node.kind === 228 /* SyntaxKind.ClassExpression */) {
+                return {
+                    kind: "local class" /* ScriptElementKind.localClassElement */,
+                    displayParts: [ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */), ts.textPart("anonymous local class"), ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */)]
+                };
+            }
+            else {
+                return { kind: ts.getNodeKind(node), displayParts: [] };
+            }
+        }
+        function toHighlightSpan(entry) {
+            var documentSpan = entryToDocumentSpan(entry);
+            if (entry.kind === 0 /* EntryKind.Span */) {
+                return {
+                    fileName: documentSpan.fileName,
+                    span: {
+                        textSpan: documentSpan.textSpan,
+                        kind: "reference" /* HighlightSpanKind.reference */
+                    }
+                };
+            }
+            var writeAccess = isWriteAccessForReference(entry.node);
+            var span = __assign({ textSpan: documentSpan.textSpan, kind: writeAccess ? "writtenReference" /* HighlightSpanKind.writtenReference */ : "reference" /* HighlightSpanKind.reference */, isInString: entry.kind === 2 /* EntryKind.StringLiteral */ ? true : undefined }, documentSpan.contextSpan && { contextSpan: documentSpan.contextSpan });
+            return { fileName: documentSpan.fileName, span: span };
+        }
+        FindAllReferences.toHighlightSpan = toHighlightSpan;
+        function getTextSpan(node, sourceFile, endNode) {
+            var start = node.getStart(sourceFile);
+            var end = (endNode || node).getEnd();
+            if (ts.isStringLiteralLike(node) && (end - start) > 2) {
+                ts.Debug.assert(endNode === undefined);
+                start += 1;
+                end -= 1;
+            }
+            return ts.createTextSpanFromBounds(start, end);
+        }
+        function getTextSpanOfEntry(entry) {
+            return entry.kind === 0 /* EntryKind.Span */ ? entry.textSpan :
+                getTextSpan(entry.node, entry.node.getSourceFile());
+        }
+        FindAllReferences.getTextSpanOfEntry = getTextSpanOfEntry;
+        /** A node is considered a writeAccess iff it is a name of a declaration or a target of an assignment */
+        function isWriteAccessForReference(node) {
+            var decl = ts.getDeclarationFromName(node);
+            return !!decl && declarationIsWriteAccess(decl) || node.kind === 88 /* SyntaxKind.DefaultKeyword */ || ts.isWriteAccess(node);
+        }
+        /** Whether a reference, `node`, is a definition of the `target` symbol */
+        function isDeclarationOfSymbol(node, target) {
+            var _a;
+            if (!target)
+                return false;
+            var source = ts.getDeclarationFromName(node) ||
+                (node.kind === 88 /* SyntaxKind.DefaultKeyword */ ? node.parent
+                    : ts.isLiteralComputedPropertyDeclarationName(node) ? node.parent.parent
+                        : node.kind === 135 /* SyntaxKind.ConstructorKeyword */ && ts.isConstructorDeclaration(node.parent) ? node.parent.parent
+                            : undefined);
+            var commonjsSource = source && ts.isBinaryExpression(source) ? source.left : undefined;
+            return !!(source && ((_a = target.declarations) === null || _a === void 0 ? void 0 : _a.some(function (d) { return d === source || d === commonjsSource; })));
+        }
+        FindAllReferences.isDeclarationOfSymbol = isDeclarationOfSymbol;
+        /**
+         * True if 'decl' provides a value, as in `function f() {}`;
+         * false if 'decl' is just a location for a future write, as in 'let x;'
+         */
+        function declarationIsWriteAccess(decl) {
+            // Consider anything in an ambient declaration to be a write access since it may be coming from JS.
+            if (!!(decl.flags & 16777216 /* NodeFlags.Ambient */))
+                return true;
+            switch (decl.kind) {
+                case 223 /* SyntaxKind.BinaryExpression */:
+                case 205 /* SyntaxKind.BindingElement */:
+                case 260 /* SyntaxKind.ClassDeclaration */:
+                case 228 /* SyntaxKind.ClassExpression */:
+                case 88 /* SyntaxKind.DefaultKeyword */:
+                case 263 /* SyntaxKind.EnumDeclaration */:
+                case 302 /* SyntaxKind.EnumMember */:
+                case 278 /* SyntaxKind.ExportSpecifier */:
+                case 270 /* SyntaxKind.ImportClause */: // default import
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                case 273 /* SyntaxKind.ImportSpecifier */:
+                case 261 /* SyntaxKind.InterfaceDeclaration */:
+                case 341 /* SyntaxKind.JSDocCallbackTag */:
+                case 348 /* SyntaxKind.JSDocTypedefTag */:
+                case 288 /* SyntaxKind.JsxAttribute */:
+                case 264 /* SyntaxKind.ModuleDeclaration */:
+                case 267 /* SyntaxKind.NamespaceExportDeclaration */:
+                case 271 /* SyntaxKind.NamespaceImport */:
+                case 277 /* SyntaxKind.NamespaceExport */:
+                case 166 /* SyntaxKind.Parameter */:
+                case 300 /* SyntaxKind.ShorthandPropertyAssignment */:
+                case 262 /* SyntaxKind.TypeAliasDeclaration */:
+                case 165 /* SyntaxKind.TypeParameter */:
+                    return true;
+                case 299 /* SyntaxKind.PropertyAssignment */:
+                    // In `({ x: y } = 0);`, `x` is not a write access. (Won't call this function for `y`.)
+                    return !ts.isArrayLiteralOrObjectLiteralDestructuringPattern(decl.parent);
+                case 259 /* SyntaxKind.FunctionDeclaration */:
+                case 215 /* SyntaxKind.FunctionExpression */:
+                case 173 /* SyntaxKind.Constructor */:
+                case 171 /* SyntaxKind.MethodDeclaration */:
+                case 174 /* SyntaxKind.GetAccessor */:
+                case 175 /* SyntaxKind.SetAccessor */:
+                    return !!decl.body;
+                case 257 /* SyntaxKind.VariableDeclaration */:
+                case 169 /* SyntaxKind.PropertyDeclaration */:
+                    return !!decl.initializer || ts.isCatchClause(decl.parent);
+                case 170 /* SyntaxKind.MethodSignature */:
+                case 168 /* SyntaxKind.PropertySignature */:
+                case 350 /* SyntaxKind.JSDocPropertyTag */:
+                case 343 /* SyntaxKind.JSDocParameterTag */:
+                    return false;
+                default:
+                    return ts.Debug.failBadSyntaxKind(decl);
+            }
+        }
+        /** Encapsulates the core find-all-references algorithm. */
+        var Core;
+        (function (Core) {
+            /** Core find-all-references algorithm. Handles special cases before delegating to `getReferencedSymbolsForSymbol`. */
+            function getReferencedSymbolsForNode(position, node, program, sourceFiles, cancellationToken, options, sourceFilesSet) {
+                var _a, _b;
+                if (options === void 0) { options = {}; }
+                if (sourceFilesSet === void 0) { sourceFilesSet = new ts.Set(sourceFiles.map(function (f) { return f.fileName; })); }
+                node = getAdjustedNode(node, options);
+                if (ts.isSourceFile(node)) {
+                    var resolvedRef = ts.GoToDefinition.getReferenceAtPosition(node, position, program);
+                    if (!(resolvedRef === null || resolvedRef === void 0 ? void 0 : resolvedRef.file)) {
+                        return undefined;
+                    }
+                    var moduleSymbol = program.getTypeChecker().getMergedSymbol(resolvedRef.file.symbol);
+                    if (moduleSymbol) {
+                        return getReferencedSymbolsForModule(program, moduleSymbol, /*excludeImportTypeOfExportEquals*/ false, sourceFiles, sourceFilesSet);
+                    }
+                    var fileIncludeReasons = program.getFileIncludeReasons();
+                    if (!fileIncludeReasons) {
+                        return undefined;
+                    }
+                    return [{
+                            definition: { type: 5 /* DefinitionKind.TripleSlashReference */, reference: resolvedRef.reference, file: node },
+                            references: getReferencesForNonModule(resolvedRef.file, fileIncludeReasons, program) || ts.emptyArray
+                        }];
+                }
+                if (!options.implementations) {
+                    var special = getReferencedSymbolsSpecial(node, sourceFiles, cancellationToken);
+                    if (special) {
+                        return special;
+                    }
+                }
+                var checker = program.getTypeChecker();
+                // constructors should use the class symbol, detected by name, if present
+                var symbol = checker.getSymbolAtLocation(ts.isConstructorDeclaration(node) && node.parent.name || node);
+                // Could not find a symbol e.g. unknown identifier
+                if (!symbol) {
+                    // String literal might be a property (and thus have a symbol), so do this here rather than in getReferencedSymbolsSpecial.
+                    if (!options.implementations && ts.isStringLiteralLike(node)) {
+                        if (ts.isModuleSpecifierLike(node)) {
+                            var fileIncludeReasons = program.getFileIncludeReasons();
+                            var referencedFileName = (_b = (_a = node.getSourceFile().resolvedModules) === null || _a === void 0 ? void 0 : _a.get(node.text, ts.getModeForUsageLocation(node.getSourceFile(), node))) === null || _b === void 0 ? void 0 : _b.resolvedFileName;
+                            var referencedFile = referencedFileName ? program.getSourceFile(referencedFileName) : undefined;
+                            if (referencedFile) {
+                                return [{ definition: { type: 4 /* DefinitionKind.String */, node: node }, references: getReferencesForNonModule(referencedFile, fileIncludeReasons, program) || ts.emptyArray }];
+                            }
+                            // Fall through to string literal references. This is not very likely to return
+                            // anything useful, but I guess it's better than nothing, and there's an existing
+                            // test that expects this to happen (fourslash/cases/untypedModuleImport.ts).
+                        }
+                        return getReferencesForStringLiteral(node, sourceFiles, checker, cancellationToken);
+                    }
+                    return undefined;
+                }
+                if (symbol.escapedName === "export=" /* InternalSymbolName.ExportEquals */) {
+                    return getReferencedSymbolsForModule(program, symbol.parent, /*excludeImportTypeOfExportEquals*/ false, sourceFiles, sourceFilesSet);
+                }
+                var moduleReferences = getReferencedSymbolsForModuleIfDeclaredBySourceFile(symbol, program, sourceFiles, cancellationToken, options, sourceFilesSet);
+                if (moduleReferences && !(symbol.flags & 33554432 /* SymbolFlags.Transient */)) {
+                    return moduleReferences;
+                }
+                var aliasedSymbol = getMergedAliasedSymbolOfNamespaceExportDeclaration(node, symbol, checker);
+                var moduleReferencesOfExportTarget = aliasedSymbol &&
+                    getReferencedSymbolsForModuleIfDeclaredBySourceFile(aliasedSymbol, program, sourceFiles, cancellationToken, options, sourceFilesSet);
+                var references = getReferencedSymbolsForSymbol(symbol, node, sourceFiles, sourceFilesSet, checker, cancellationToken, options);
+                return mergeReferences(program, moduleReferences, references, moduleReferencesOfExportTarget);
+            }
+            Core.getReferencedSymbolsForNode = getReferencedSymbolsForNode;
+            function getAdjustedNode(node, options) {
+                if (options.use === 1 /* FindReferencesUse.References */) {
+                    node = ts.getAdjustedReferenceLocation(node);
+                }
+                else if (options.use === 2 /* FindReferencesUse.Rename */) {
+                    node = ts.getAdjustedRenameLocation(node);
+                }
+                return node;
+            }
+            Core.getAdjustedNode = getAdjustedNode;
+            function getReferencesForFileName(fileName, program, sourceFiles, sourceFilesSet) {
+                var _a, _b;
+                if (sourceFilesSet === void 0) { sourceFilesSet = new ts.Set(sourceFiles.map(function (f) { return f.fileName; })); }
+                var moduleSymbol = (_a = program.getSourceFile(fileName)) === null || _a === void 0 ? void 0 : _a.symbol;
+                if (moduleSymbol) {
+                    return ((_b = getReferencedSymbolsForModule(program, moduleSymbol, /*excludeImportTypeOfExportEquals*/ false, sourceFiles, sourceFilesSet)[0]) === null || _b === void 0 ? void 0 : _b.references) || ts.emptyArray;
+                }
+                var fileIncludeReasons = program.getFileIncludeReasons();
+                var referencedFile = program.getSourceFile(fileName);
+                return referencedFile && fileIncludeReasons && getReferencesForNonModule(referencedFile, fileIncludeReasons, program) || ts.emptyArray;
+            }
+            Core.getReferencesForFileName = getReferencesForFileName;
+            function getReferencesForNonModule(referencedFile, refFileMap, program) {
+                var entries;
+                var references = refFileMap.get(referencedFile.path) || ts.emptyArray;
+                for (var _i = 0, references_1 = references; _i < references_1.length; _i++) {
+                    var ref = references_1[_i];
+                    if (ts.isReferencedFile(ref)) {
+                        var referencingFile = program.getSourceFileByPath(ref.file);
+                        var location = ts.getReferencedFileLocation(program.getSourceFileByPath, ref);
+                        if (ts.isReferenceFileLocation(location)) {
+                            entries = ts.append(entries, {
+                                kind: 0 /* EntryKind.Span */,
+                                fileName: referencingFile.fileName,
+                                textSpan: ts.createTextSpanFromRange(location)
+                            });
+                        }
+                    }
+                }
+                return entries;
+            }
+            function getMergedAliasedSymbolOfNamespaceExportDeclaration(node, symbol, checker) {
+                if (node.parent && ts.isNamespaceExportDeclaration(node.parent)) {
+                    var aliasedSymbol = checker.getAliasedSymbol(symbol);
+                    var targetSymbol = checker.getMergedSymbol(aliasedSymbol);
+                    if (aliasedSymbol !== targetSymbol) {
+                        return targetSymbol;
+                    }
+                }
+                return undefined;
+            }
+            function getReferencedSymbolsForModuleIfDeclaredBySourceFile(symbol, program, sourceFiles, cancellationToken, options, sourceFilesSet) {
+                var moduleSourceFile = (symbol.flags & 1536 /* SymbolFlags.Module */) && symbol.declarations && ts.find(symbol.declarations, ts.isSourceFile);
+                if (!moduleSourceFile)
+                    return undefined;
+                var exportEquals = symbol.exports.get("export=" /* InternalSymbolName.ExportEquals */);
+                // If !!exportEquals, we're about to add references to `import("mod")` anyway, so don't double-count them.
+                var moduleReferences = getReferencedSymbolsForModule(program, symbol, !!exportEquals, sourceFiles, sourceFilesSet);
+                if (!exportEquals || !sourceFilesSet.has(moduleSourceFile.fileName))
+                    return moduleReferences;
+                // Continue to get references to 'export ='.
+                var checker = program.getTypeChecker();
+                symbol = ts.skipAlias(exportEquals, checker);
+                return mergeReferences(program, moduleReferences, getReferencedSymbolsForSymbol(symbol, /*node*/ undefined, sourceFiles, sourceFilesSet, checker, cancellationToken, options));
+            }
+            /**
+             * Merges the references by sorting them (by file index in sourceFiles and their location in it) that point to same definition symbol
+             */
+            function mergeReferences(program) {
+                var referencesToMerge = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    referencesToMerge[_i - 1] = arguments[_i];
+                }
+                var result;
+                for (var _a = 0, referencesToMerge_1 = referencesToMerge; _a < referencesToMerge_1.length; _a++) {
+                    var references = referencesToMerge_1[_a];
+                    if (!references || !references.length)
+                        continue;
+                    if (!result) {
+                        result = references;
+                        continue;
+                    }
+                    var _loop_3 = function (entry) {
+                        if (!entry.definition || entry.definition.type !== 0 /* DefinitionKind.Symbol */) {
+                            result.push(entry);
+                            return "continue";
+                        }
+                        var symbol = entry.definition.symbol;
+                        var refIndex = ts.findIndex(result, function (ref) { return !!ref.definition &&
+                            ref.definition.type === 0 /* DefinitionKind.Symbol */ &&
+                            ref.definition.symbol === symbol; });
+                        if (refIndex === -1) {
+                            result.push(entry);
+                            return "continue";
+                        }
+                        var reference = result[refIndex];
+                        result[refIndex] = {
+                            definition: reference.definition,
+                            references: reference.references.concat(entry.references).sort(function (entry1, entry2) {
+                                var entry1File = getSourceFileIndexOfEntry(program, entry1);
+                                var entry2File = getSourceFileIndexOfEntry(program, entry2);
+                                if (entry1File !== entry2File) {
+                                    return ts.compareValues(entry1File, entry2File);
+                                }
+                                var entry1Span = getTextSpanOfEntry(entry1);
+                                var entry2Span = getTextSpanOfEntry(entry2);
+                                return entry1Span.start !== entry2Span.start ?
+                                    ts.compareValues(entry1Span.start, entry2Span.start) :
+                                    ts.compareValues(entry1Span.length, entry2Span.length);
+                            })
+                        };
+                    };
+                    for (var _b = 0, references_2 = references; _b < references_2.length; _b++) {
+                        var entry = references_2[_b];
+                        _loop_3(entry);
+                    }
+                }
+                return result;
+            }
+            function getSourceFileIndexOfEntry(program, entry) {
+                var sourceFile = entry.kind === 0 /* EntryKind.Span */ ?
+                    program.getSourceFile(entry.fileName) :
+                    entry.node.getSourceFile();
+                return program.getSourceFiles().indexOf(sourceFile);
+            }
+            function getReferencedSymbolsForModule(program, symbol, excludeImportTypeOfExportEquals, sourceFiles, sourceFilesSet) {
+                ts.Debug.assert(!!symbol.valueDeclaration);
+                var references = ts.mapDefined(FindAllReferences.findModuleReferences(program, sourceFiles, symbol), function (reference) {
+                    if (reference.kind === "import") {
+                        var parent = reference.literal.parent;
+                        if (ts.isLiteralTypeNode(parent)) {
+                            var importType = ts.cast(parent.parent, ts.isImportTypeNode);
+                            if (excludeImportTypeOfExportEquals && !importType.qualifier) {
+                                return undefined;
+                            }
+                        }
+                        // import("foo") with no qualifier will reference the `export =` of the module, which may be referenced anyway.
+                        return nodeEntry(reference.literal);
+                    }
+                    else {
+                        return {
+                            kind: 0 /* EntryKind.Span */,
+                            fileName: reference.referencingFile.fileName,
+                            textSpan: ts.createTextSpanFromRange(reference.ref),
+                        };
+                    }
+                });
+                if (symbol.declarations) {
+                    for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
+                        var decl = _a[_i];
+                        switch (decl.kind) {
+                            case 308 /* SyntaxKind.SourceFile */:
+                                // Don't include the source file itself. (This may not be ideal behavior, but awkward to include an entire file as a reference.)
+                                break;
+                            case 264 /* SyntaxKind.ModuleDeclaration */:
+                                if (sourceFilesSet.has(decl.getSourceFile().fileName)) {
+                                    references.push(nodeEntry(decl.name));
+                                }
+                                break;
+                            default:
+                                // This may be merged with something.
+                                ts.Debug.assert(!!(symbol.flags & 33554432 /* SymbolFlags.Transient */), "Expected a module symbol to be declared by a SourceFile or ModuleDeclaration.");
+                        }
+                    }
+                }
+                var exported = symbol.exports.get("export=" /* InternalSymbolName.ExportEquals */);
+                if (exported === null || exported === void 0 ? void 0 : exported.declarations) {
+                    for (var _b = 0, _c = exported.declarations; _b < _c.length; _b++) {
+                        var decl = _c[_b];
+                        var sourceFile = decl.getSourceFile();
+                        if (sourceFilesSet.has(sourceFile.fileName)) {
+                            // At `module.exports = ...`, reference node is `module`
+                            var node = ts.isBinaryExpression(decl) && ts.isPropertyAccessExpression(decl.left) ? decl.left.expression :
+                                ts.isExportAssignment(decl) ? ts.Debug.checkDefined(ts.findChildOfKind(decl, 93 /* SyntaxKind.ExportKeyword */, sourceFile)) :
+                                    ts.getNameOfDeclaration(decl) || decl;
+                            references.push(nodeEntry(node));
+                        }
+                    }
+                }
+                return references.length ? [{ definition: { type: 0 /* DefinitionKind.Symbol */, symbol: symbol }, references: references }] : ts.emptyArray;
+            }
+            /** As in a `readonly prop: any` or `constructor(readonly prop: any)`, not a `readonly any[]`. */
+            function isReadonlyTypeOperator(node) {
+                return node.kind === 146 /* SyntaxKind.ReadonlyKeyword */
+                    && ts.isTypeOperatorNode(node.parent)
+                    && node.parent.operator === 146 /* SyntaxKind.ReadonlyKeyword */;
+            }
+            /** getReferencedSymbols for special node kinds. */
+            function getReferencedSymbolsSpecial(node, sourceFiles, cancellationToken) {
+                if (ts.isTypeKeyword(node.kind)) {
+                    // A void expression (i.e., `void foo()`) is not special, but the `void` type is.
+                    if (node.kind === 114 /* SyntaxKind.VoidKeyword */ && ts.isVoidExpression(node.parent)) {
+                        return undefined;
+                    }
+                    // A modifier readonly (like on a property declaration) is not special;
+                    // a readonly type keyword (like `readonly string[]`) is.
+                    if (node.kind === 146 /* SyntaxKind.ReadonlyKeyword */ && !isReadonlyTypeOperator(node)) {
+                        return undefined;
+                    }
+                    // Likewise, when we *are* looking for a special keyword, make sure we
+                    // *don’t* include readonly member modifiers.
+                    return getAllReferencesForKeyword(sourceFiles, node.kind, cancellationToken, node.kind === 146 /* SyntaxKind.ReadonlyKeyword */ ? isReadonlyTypeOperator : undefined);
+                }
+                if (ts.isImportMeta(node.parent) && node.parent.name === node) {
+                    return getAllReferencesForImportMeta(sourceFiles, cancellationToken);
+                }
+                if (ts.isStaticModifier(node) && ts.isClassStaticBlockDeclaration(node.parent)) {
+                    return [{ definition: { type: 2 /* DefinitionKind.Keyword */, node: node }, references: [nodeEntry(node)] }];
+                }
+                // Labels
+                if (ts.isJumpStatementTarget(node)) {
+                    var labelDefinition = ts.getTargetLabel(node.parent, node.text);
+                    // if we have a label definition, look within its statement for references, if not, then
+                    // the label is undefined and we have no results..
+                    return labelDefinition && getLabelReferencesInNode(labelDefinition.parent, labelDefinition);
+                }
+                else if (ts.isLabelOfLabeledStatement(node)) {
+                    // it is a label definition and not a target, search within the parent labeledStatement
+                    return getLabelReferencesInNode(node.parent, node);
+                }
+                if (ts.isThis(node)) {
+                    return getReferencesForThisKeyword(node, sourceFiles, cancellationToken);
+                }
+                if (node.kind === 106 /* SyntaxKind.SuperKeyword */) {
+                    return getReferencesForSuperKeyword(node);
+                }
+                return undefined;
+            }
+            /** Core find-all-references algorithm for a normal symbol. */
+            function getReferencedSymbolsForSymbol(originalSymbol, node, sourceFiles, sourceFilesSet, checker, cancellationToken, options) {
+                var symbol = node && skipPastExportOrImportSpecifierOrUnion(originalSymbol, node, checker, /*useLocalSymbolForExportSpecifier*/ !isForRenameWithPrefixAndSuffixText(options)) || originalSymbol;
+                // Compute the meaning from the location and the symbol it references
+                var searchMeaning = node ? getIntersectingMeaningFromDeclarations(node, symbol) : 7 /* SemanticMeaning.All */;
+                var result = [];
+                var state = new State(sourceFiles, sourceFilesSet, node ? getSpecialSearchKind(node) : 0 /* SpecialSearchKind.None */, checker, cancellationToken, searchMeaning, options, result);
+                var exportSpecifier = !isForRenameWithPrefixAndSuffixText(options) || !symbol.declarations ? undefined : ts.find(symbol.declarations, ts.isExportSpecifier);
+                if (exportSpecifier) {
+                    // When renaming at an export specifier, rename the export and not the thing being exported.
+                    getReferencesAtExportSpecifier(exportSpecifier.name, symbol, exportSpecifier, state.createSearch(node, originalSymbol, /*comingFrom*/ undefined), state, /*addReferencesHere*/ true, /*alwaysGetReferences*/ true);
+                }
+                else if (node && node.kind === 88 /* SyntaxKind.DefaultKeyword */ && symbol.escapedName === "default" /* InternalSymbolName.Default */ && symbol.parent) {
+                    addReference(node, symbol, state);
+                    searchForImportsOfExport(node, symbol, { exportingModuleSymbol: symbol.parent, exportKind: 1 /* ExportKind.Default */ }, state);
+                }
+                else {
+                    var search = state.createSearch(node, symbol, /*comingFrom*/ undefined, { allSearchSymbols: node ? populateSearchSymbolSet(symbol, node, checker, options.use === 2 /* FindReferencesUse.Rename */, !!options.providePrefixAndSuffixTextForRename, !!options.implementations) : [symbol] });
+                    getReferencesInContainerOrFiles(symbol, state, search);
+                }
+                return result;
+            }
+            function getReferencesInContainerOrFiles(symbol, state, search) {
+                // Try to get the smallest valid scope that we can limit our search to;
+                // otherwise we'll need to search globally (i.e. include each file).
+                var scope = getSymbolScope(symbol);
+                if (scope) {
+                    getReferencesInContainer(scope, scope.getSourceFile(), search, state, /*addReferencesHere*/ !(ts.isSourceFile(scope) && !ts.contains(state.sourceFiles, scope)));
+                }
+                else {
+                    // Global search
+                    for (var _i = 0, _a = state.sourceFiles; _i < _a.length; _i++) {
+                        var sourceFile = _a[_i];
+                        state.cancellationToken.throwIfCancellationRequested();
+                        searchForName(sourceFile, search, state);
+                    }
+                }
+            }
+            function getSpecialSearchKind(node) {
+                switch (node.kind) {
+                    case 173 /* SyntaxKind.Constructor */:
+                    case 135 /* SyntaxKind.ConstructorKeyword */:
+                        return 1 /* SpecialSearchKind.Constructor */;
+                    case 79 /* SyntaxKind.Identifier */:
+                        if (ts.isClassLike(node.parent)) {
+                            ts.Debug.assert(node.parent.name === node);
+                            return 2 /* SpecialSearchKind.Class */;
+                        }
+                    // falls through
+                    default:
+                        return 0 /* SpecialSearchKind.None */;
+                }
+            }
+            /** Handle a few special cases relating to export/import specifiers. */
+            function skipPastExportOrImportSpecifierOrUnion(symbol, node, checker, useLocalSymbolForExportSpecifier) {
+                var parent = node.parent;
+                if (ts.isExportSpecifier(parent) && useLocalSymbolForExportSpecifier) {
+                    return getLocalSymbolForExportSpecifier(node, symbol, parent, checker);
+                }
+                // If the symbol is declared as part of a declaration like `{ type: "a" } | { type: "b" }`, use the property on the union type to get more references.
+                return ts.firstDefined(symbol.declarations, function (decl) {
+                    if (!decl.parent) {
+                        // Ignore UMD module and global merge
+                        if (symbol.flags & 33554432 /* SymbolFlags.Transient */)
+                            return undefined;
+                        // Assertions for GH#21814. We should be handling SourceFile symbols in `getReferencedSymbolsForModule` instead of getting here.
+                        ts.Debug.fail("Unexpected symbol at ".concat(ts.Debug.formatSyntaxKind(node.kind), ": ").concat(ts.Debug.formatSymbol(symbol)));
+                    }
+                    return ts.isTypeLiteralNode(decl.parent) && ts.isUnionTypeNode(decl.parent.parent)
+                        ? checker.getPropertyOfType(checker.getTypeFromTypeNode(decl.parent.parent), symbol.name)
+                        : undefined;
+                });
+            }
+            var SpecialSearchKind;
+            (function (SpecialSearchKind) {
+                SpecialSearchKind[SpecialSearchKind["None"] = 0] = "None";
+                SpecialSearchKind[SpecialSearchKind["Constructor"] = 1] = "Constructor";
+                SpecialSearchKind[SpecialSearchKind["Class"] = 2] = "Class";
+            })(SpecialSearchKind || (SpecialSearchKind = {}));
+            function getNonModuleSymbolOfMergedModuleSymbol(symbol) {
+                if (!(symbol.flags & (1536 /* SymbolFlags.Module */ | 33554432 /* SymbolFlags.Transient */)))
+                    return undefined;
+                var decl = symbol.declarations && ts.find(symbol.declarations, function (d) { return !ts.isSourceFile(d) && !ts.isModuleDeclaration(d); });
+                return decl && decl.symbol;
+            }
+            /**
+             * Holds all state needed for the finding references.
+             * Unlike `Search`, there is only one `State`.
+             */
+            var State = /** @class */ (function () {
+                function State(sourceFiles, sourceFilesSet, specialSearchKind, checker, cancellationToken, searchMeaning, options, result) {
+                    this.sourceFiles = sourceFiles;
+                    this.sourceFilesSet = sourceFilesSet;
+                    this.specialSearchKind = specialSearchKind;
+                    this.checker = checker;
+                    this.cancellationToken = cancellationToken;
+                    this.searchMeaning = searchMeaning;
+                    this.options = options;
+                    this.result = result;
+                    /** Cache for `explicitlyinheritsFrom`. */
+                    this.inheritsFromCache = new ts.Map();
+                    /**
+                     * Type nodes can contain multiple references to the same type. For example:
+                     *      let x: Foo & (Foo & Bar) = ...
+                     * Because we are returning the implementation locations and not the identifier locations,
+                     * duplicate entries would be returned here as each of the type references is part of
+                     * the same implementation. For that reason, check before we add a new entry.
+                     */
+                    this.markSeenContainingTypeReference = ts.nodeSeenTracker();
+                    /**
+                     * It's possible that we will encounter the right side of `export { foo as bar } from "x";` more than once.
+                     * For example:
+                     *     // b.ts
+                     *     export { foo as bar } from "./a";
+                     *     import { bar } from "./b";
+                     *
+                     * Normally at `foo as bar` we directly add `foo` and do not locally search for it (since it doesn't declare a local).
+                     * But another reference to it may appear in the same source file.
+                     * See `tests/cases/fourslash/transitiveExportImports3.ts`.
+                     */
+                    this.markSeenReExportRHS = ts.nodeSeenTracker();
+                    this.symbolIdToReferences = [];
+                    // Source file ID → symbol ID → Whether the symbol has been searched for in the source file.
+                    this.sourceFileToSeenSymbols = [];
+                }
+                State.prototype.includesSourceFile = function (sourceFile) {
+                    return this.sourceFilesSet.has(sourceFile.fileName);
+                };
+                /** Gets every place to look for references of an exported symbols. See `ImportsResult` in `importTracker.ts` for more documentation. */
+                State.prototype.getImportSearches = function (exportSymbol, exportInfo) {
+                    if (!this.importTracker)
+                        this.importTracker = FindAllReferences.createImportTracker(this.sourceFiles, this.sourceFilesSet, this.checker, this.cancellationToken);
+                    return this.importTracker(exportSymbol, exportInfo, this.options.use === 2 /* FindReferencesUse.Rename */);
+                };
+                /** @param allSearchSymbols set of additional symbols for use by `includes`. */
+                State.prototype.createSearch = function (location, symbol, comingFrom, searchOptions) {
+                    if (searchOptions === void 0) { searchOptions = {}; }
+                    // Note: if this is an external module symbol, the name doesn't include quotes.
+                    // Note: getLocalSymbolForExportDefault handles `export default class C {}`, but not `export default C` or `export { C as default }`.
+                    // The other two forms seem to be handled downstream (e.g. in `skipPastExportOrImportSpecifier`), so special-casing the first form
+                    // here appears to be intentional).
+                    var _a = searchOptions.text, text = _a === void 0 ? ts.stripQuotes(ts.symbolName(ts.getLocalSymbolForExportDefault(symbol) || getNonModuleSymbolOfMergedModuleSymbol(symbol) || symbol)) : _a, _b = searchOptions.allSearchSymbols, allSearchSymbols = _b === void 0 ? [symbol] : _b;
+                    var escapedText = ts.escapeLeadingUnderscores(text);
+                    var parents = this.options.implementations && location ? getParentSymbolsOfPropertyAccess(location, symbol, this.checker) : undefined;
+                    return { symbol: symbol, comingFrom: comingFrom, text: text, escapedText: escapedText, parents: parents, allSearchSymbols: allSearchSymbols, includes: function (sym) { return ts.contains(allSearchSymbols, sym); } };
+                };
+                /**
+                 * Callback to add references for a particular searched symbol.
+                 * This initializes a reference group, so only call this if you will add at least one reference.
+                 */
+                State.prototype.referenceAdder = function (searchSymbol) {
+                    var symbolId = ts.getSymbolId(searchSymbol);
+                    var references = this.symbolIdToReferences[symbolId];
+                    if (!references) {
+                        references = this.symbolIdToReferences[symbolId] = [];
+                        this.result.push({ definition: { type: 0 /* DefinitionKind.Symbol */, symbol: searchSymbol }, references: references });
+                    }
+                    return function (node, kind) { return references.push(nodeEntry(node, kind)); };
+                };
+                /** Add a reference with no associated definition. */
+                State.prototype.addStringOrCommentReference = function (fileName, textSpan) {
+                    this.result.push({
+                        definition: undefined,
+                        references: [{ kind: 0 /* EntryKind.Span */, fileName: fileName, textSpan: textSpan }]
+                    });
+                };
+                /** Returns `true` the first time we search for a symbol in a file and `false` afterwards. */
+                State.prototype.markSearchedSymbols = function (sourceFile, symbols) {
+                    var sourceId = ts.getNodeId(sourceFile);
+                    var seenSymbols = this.sourceFileToSeenSymbols[sourceId] || (this.sourceFileToSeenSymbols[sourceId] = new ts.Set());
+                    var anyNewSymbols = false;
+                    for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
+                        var sym = symbols_1[_i];
+                        anyNewSymbols = ts.tryAddToSet(seenSymbols, ts.getSymbolId(sym)) || anyNewSymbols;
+                    }
+                    return anyNewSymbols;
+                };
+                return State;
+            }());
+            /** Search for all imports of a given exported symbol using `State.getImportSearches`. */
+            function searchForImportsOfExport(exportLocation, exportSymbol, exportInfo, state) {
+                var _a = state.getImportSearches(exportSymbol, exportInfo), importSearches = _a.importSearches, singleReferences = _a.singleReferences, indirectUsers = _a.indirectUsers;
+                // For `import { foo as bar }` just add the reference to `foo`, and don't otherwise search in the file.
+                if (singleReferences.length) {
+                    var addRef = state.referenceAdder(exportSymbol);
+                    for (var _i = 0, singleReferences_1 = singleReferences; _i < singleReferences_1.length; _i++) {
+                        var singleRef = singleReferences_1[_i];
+                        if (shouldAddSingleReference(singleRef, state))
+                            addRef(singleRef);
+                    }
+                }
+                // For each import, find all references to that import in its source file.
+                for (var _b = 0, importSearches_1 = importSearches; _b < importSearches_1.length; _b++) {
+                    var _c = importSearches_1[_b], importLocation = _c[0], importSymbol = _c[1];
+                    getReferencesInSourceFile(importLocation.getSourceFile(), state.createSearch(importLocation, importSymbol, 1 /* ImportExport.Export */), state);
+                }
+                if (indirectUsers.length) {
+                    var indirectSearch = void 0;
+                    switch (exportInfo.exportKind) {
+                        case 0 /* ExportKind.Named */:
+                            indirectSearch = state.createSearch(exportLocation, exportSymbol, 1 /* ImportExport.Export */);
+                            break;
+                        case 1 /* ExportKind.Default */:
+                            // Search for a property access to '.default'. This can't be renamed.
+                            indirectSearch = state.options.use === 2 /* FindReferencesUse.Rename */ ? undefined : state.createSearch(exportLocation, exportSymbol, 1 /* ImportExport.Export */, { text: "default" });
+                            break;
+                        case 2 /* ExportKind.ExportEquals */:
+                            break;
+                    }
+                    if (indirectSearch) {
+                        for (var _d = 0, indirectUsers_1 = indirectUsers; _d < indirectUsers_1.length; _d++) {
+                            var indirectUser = indirectUsers_1[_d];
+                            searchForName(indirectUser, indirectSearch, state);
+                        }
+                    }
+                }
+            }
+            function eachExportReference(sourceFiles, checker, cancellationToken, exportSymbol, exportingModuleSymbol, exportName, isDefaultExport, cb) {
+                var importTracker = FindAllReferences.createImportTracker(sourceFiles, new ts.Set(sourceFiles.map(function (f) { return f.fileName; })), checker, cancellationToken);
+                var _a = importTracker(exportSymbol, { exportKind: isDefaultExport ? 1 /* ExportKind.Default */ : 0 /* ExportKind.Named */, exportingModuleSymbol: exportingModuleSymbol }, /*isForRename*/ false), importSearches = _a.importSearches, indirectUsers = _a.indirectUsers, singleReferences = _a.singleReferences;
+                for (var _i = 0, importSearches_2 = importSearches; _i < importSearches_2.length; _i++) {
+                    var importLocation = importSearches_2[_i][0];
+                    cb(importLocation);
+                }
+                for (var _b = 0, singleReferences_2 = singleReferences; _b < singleReferences_2.length; _b++) {
+                    var singleReference = singleReferences_2[_b];
+                    if (ts.isIdentifier(singleReference) && ts.isImportTypeNode(singleReference.parent)) {
+                        cb(singleReference);
+                    }
+                }
+                for (var _c = 0, indirectUsers_2 = indirectUsers; _c < indirectUsers_2.length; _c++) {
+                    var indirectUser = indirectUsers_2[_c];
+                    for (var _d = 0, _e = getPossibleSymbolReferenceNodes(indirectUser, isDefaultExport ? "default" : exportName); _d < _e.length; _d++) {
+                        var node = _e[_d];
+                        // Import specifiers should be handled by importSearches
+                        var symbol = checker.getSymbolAtLocation(node);
+                        var hasExportAssignmentDeclaration = ts.some(symbol === null || symbol === void 0 ? void 0 : symbol.declarations, function (d) { return ts.tryCast(d, ts.isExportAssignment) ? true : false; });
+                        if (ts.isIdentifier(node) && !ts.isImportOrExportSpecifier(node.parent) && (symbol === exportSymbol || hasExportAssignmentDeclaration)) {
+                            cb(node);
+                        }
+                    }
+                }
+            }
+            Core.eachExportReference = eachExportReference;
+            function shouldAddSingleReference(singleRef, state) {
+                if (!hasMatchingMeaning(singleRef, state))
+                    return false;
+                if (state.options.use !== 2 /* FindReferencesUse.Rename */)
+                    return true;
+                // Don't rename an import type `import("./module-name")` when renaming `name` in `export = name;`
+                if (!ts.isIdentifier(singleRef))
+                    return false;
+                // At `default` in `import { default as x }` or `export { default as x }`, do add a reference, but do not rename.
+                return !(ts.isImportOrExportSpecifier(singleRef.parent) && singleRef.escapedText === "default" /* InternalSymbolName.Default */);
+            }
+            // Go to the symbol we imported from and find references for it.
+            function searchForImportedSymbol(symbol, state) {
+                if (!symbol.declarations)
+                    return;
+                for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
+                    var declaration = _a[_i];
+                    var exportingFile = declaration.getSourceFile();
+                    // Need to search in the file even if it's not in the search-file set, because it might export the symbol.
+                    getReferencesInSourceFile(exportingFile, state.createSearch(declaration, symbol, 0 /* ImportExport.Import */), state, state.includesSourceFile(exportingFile));
+                }
+            }
+            /** Search for all occurrences of an identifier in a source file (and filter out the ones that match). */
+            function searchForName(sourceFile, search, state) {
+                if (ts.getNameTable(sourceFile).get(search.escapedText) !== undefined) {
+                    getReferencesInSourceFile(sourceFile, search, state);
+                }
+            }
+            function getPropertySymbolOfDestructuringAssignment(location, checker) {
+                return ts.isArrayLiteralOrObjectLiteralDestructuringPattern(location.parent.parent)
+                    ? checker.getPropertySymbolOfDestructuringAssignment(location)
+                    : undefined;
+            }
+            /**
+             * Determines the smallest scope in which a symbol may have named references.
+             * Note that not every construct has been accounted for. This function can
+             * probably be improved.
+             *
+             * @returns undefined if the scope cannot be determined, implying that
+             * a reference to a symbol can occur anywhere.
+             */
+            function getSymbolScope(symbol) {
+                // If this is the symbol of a named function expression or named class expression,
+                // then named references are limited to its own scope.
+                var declarations = symbol.declarations, flags = symbol.flags, parent = symbol.parent, valueDeclaration = symbol.valueDeclaration;
+                if (valueDeclaration && (valueDeclaration.kind === 215 /* SyntaxKind.FunctionExpression */ || valueDeclaration.kind === 228 /* SyntaxKind.ClassExpression */)) {
+                    return valueDeclaration;
+                }
+                if (!declarations) {
+                    return undefined;
+                }
+                // If this is private property or method, the scope is the containing class
+                if (flags & (4 /* SymbolFlags.Property */ | 8192 /* SymbolFlags.Method */)) {
+                    var privateDeclaration = ts.find(declarations, function (d) { return ts.hasEffectiveModifier(d, 8 /* ModifierFlags.Private */) || ts.isPrivateIdentifierClassElementDeclaration(d); });
+                    if (privateDeclaration) {
+                        return ts.getAncestor(privateDeclaration, 260 /* SyntaxKind.ClassDeclaration */);
+                    }
+                    // Else this is a public property and could be accessed from anywhere.
+                    return undefined;
+                }
+                // If symbol is of object binding pattern element without property name we would want to
+                // look for property too and that could be anywhere
+                if (declarations.some(ts.isObjectBindingElementWithoutPropertyName)) {
+                    return undefined;
+                }
+                /*
+                If the symbol has a parent, it's globally visible unless:
+                - It's a private property (handled above).
+                - It's a type parameter.
+                - The parent is an external module: then we should only search in the module (and recurse on the export later).
+                - But if the parent has `export as namespace`, the symbol is globally visible through that namespace.
+                */
+                var exposedByParent = parent && !(symbol.flags & 262144 /* SymbolFlags.TypeParameter */);
+                if (exposedByParent && !(ts.isExternalModuleSymbol(parent) && !parent.globalExports)) {
+                    return undefined;
+                }
+                var scope;
+                for (var _i = 0, declarations_1 = declarations; _i < declarations_1.length; _i++) {
+                    var declaration = declarations_1[_i];
+                    var container = ts.getContainerNode(declaration);
+                    if (scope && scope !== container) {
+                        // Different declarations have different containers, bail out
+                        return undefined;
+                    }
+                    if (!container || container.kind === 308 /* SyntaxKind.SourceFile */ && !ts.isExternalOrCommonJsModule(container)) {
+                        // This is a global variable and not an external module, any declaration defined
+                        // within this scope is visible outside the file
+                        return undefined;
+                    }
+                    scope = container;
+                    if (ts.isFunctionExpression(scope)) {
+                        var next = void 0;
+                        while (next = ts.getNextJSDocCommentLocation(scope)) {
+                            scope = next;
+                        }
+                    }
+                }
+                // If symbol.parent, this means we are in an export of an external module. (Otherwise we would have returned `undefined` above.)
+                // For an export of a module, we may be in a declaration file, and it may be accessed elsewhere. E.g.:
+                //     declare module "a" { export type T = number; }
+                //     declare module "b" { import { T } from "a"; export const x: T; }
+                // So we must search the whole source file. (Because we will mark the source file as seen, we we won't return to it when searching for imports.)
+                return exposedByParent ? scope.getSourceFile() : scope; // TODO: GH#18217
+            }
+            /** Used as a quick check for whether a symbol is used at all in a file (besides its definition). */
+            function isSymbolReferencedInFile(definition, checker, sourceFile, searchContainer) {
+                if (searchContainer === void 0) { searchContainer = sourceFile; }
+                return eachSymbolReferenceInFile(definition, checker, sourceFile, function () { return true; }, searchContainer) || false;
+            }
+            Core.isSymbolReferencedInFile = isSymbolReferencedInFile;
+            function eachSymbolReferenceInFile(definition, checker, sourceFile, cb, searchContainer) {
+                if (searchContainer === void 0) { searchContainer = sourceFile; }
+                var symbol = ts.isParameterPropertyDeclaration(definition.parent, definition.parent.parent)
+                    ? ts.first(checker.getSymbolsOfParameterPropertyDeclaration(definition.parent, definition.text))
+                    : checker.getSymbolAtLocation(definition);
+                if (!symbol)
+                    return undefined;
+                for (var _i = 0, _a = getPossibleSymbolReferenceNodes(sourceFile, symbol.name, searchContainer); _i < _a.length; _i++) {
+                    var token = _a[_i];
+                    if (!ts.isIdentifier(token) || token === definition || token.escapedText !== definition.escapedText)
+                        continue;
+                    var referenceSymbol = checker.getSymbolAtLocation(token);
+                    if (referenceSymbol === symbol
+                        || checker.getShorthandAssignmentValueSymbol(token.parent) === symbol
+                        || ts.isExportSpecifier(token.parent) && getLocalSymbolForExportSpecifier(token, referenceSymbol, token.parent, checker) === symbol) {
+                        var res = cb(token);
+                        if (res)
+                            return res;
+                    }
+                }
+            }
+            Core.eachSymbolReferenceInFile = eachSymbolReferenceInFile;
+            function getTopMostDeclarationNamesInFile(declarationName, sourceFile) {
+                var candidates = ts.filter(getPossibleSymbolReferenceNodes(sourceFile, declarationName), function (name) { return !!ts.getDeclarationFromName(name); });
+                return candidates.reduce(function (topMost, decl) {
+                    var depth = getDepth(decl);
+                    if (!ts.some(topMost.declarationNames) || depth === topMost.depth) {
+                        topMost.declarationNames.push(decl);
+                        topMost.depth = depth;
+                    }
+                    else if (depth < topMost.depth) {
+                        topMost.declarationNames = [decl];
+                        topMost.depth = depth;
+                    }
+                    return topMost;
+                }, { depth: Infinity, declarationNames: [] }).declarationNames;
+                function getDepth(declaration) {
+                    var depth = 0;
+                    while (declaration) {
+                        declaration = ts.getContainerNode(declaration);
+                        depth++;
+                    }
+                    return depth;
+                }
+            }
+            Core.getTopMostDeclarationNamesInFile = getTopMostDeclarationNamesInFile;
+            function someSignatureUsage(signature, sourceFiles, checker, cb) {
+                if (!signature.name || !ts.isIdentifier(signature.name))
+                    return false;
+                var symbol = ts.Debug.checkDefined(checker.getSymbolAtLocation(signature.name));
+                for (var _i = 0, sourceFiles_3 = sourceFiles; _i < sourceFiles_3.length; _i++) {
+                    var sourceFile = sourceFiles_3[_i];
+                    for (var _a = 0, _b = getPossibleSymbolReferenceNodes(sourceFile, symbol.name); _a < _b.length; _a++) {
+                        var name = _b[_a];
+                        if (!ts.isIdentifier(name) || name === signature.name || name.escapedText !== signature.name.escapedText)
+                            continue;
+                        var called = ts.climbPastPropertyAccess(name);
+                        var call = ts.isCallExpression(called.parent) && called.parent.expression === called ? called.parent : undefined;
+                        var referenceSymbol = checker.getSymbolAtLocation(name);
+                        if (referenceSymbol && checker.getRootSymbols(referenceSymbol).some(function (s) { return s === symbol; })) {
+                            if (cb(name, call)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            Core.someSignatureUsage = someSignatureUsage;
+            function getPossibleSymbolReferenceNodes(sourceFile, symbolName, container) {
+                if (container === void 0) { container = sourceFile; }
+                return getPossibleSymbolReferencePositions(sourceFile, symbolName, container).map(function (pos) { return ts.getTouchingPropertyName(sourceFile, pos); });
+            }
+            function getPossibleSymbolReferencePositions(sourceFile, symbolName, container) {
+                if (container === void 0) { container = sourceFile; }
+                var positions = [];
+                /// TODO: Cache symbol existence for files to save text search
+                // Also, need to make this work for unicode escapes.
+                // Be resilient in the face of a symbol with no name or zero length name
+                if (!symbolName || !symbolName.length) {
+                    return positions;
+                }
+                var text = sourceFile.text;
+                var sourceLength = text.length;
+                var symbolNameLength = symbolName.length;
+                var position = text.indexOf(symbolName, container.pos);
+                while (position >= 0) {
+                    // If we are past the end, stop looking
+                    if (position > container.end)
+                        break;
+                    // We found a match.  Make sure it's not part of a larger word (i.e. the char
+                    // before and after it have to be a non-identifier char).
+                    var endPosition = position + symbolNameLength;
+                    if ((position === 0 || !ts.isIdentifierPart(text.charCodeAt(position - 1), 99 /* ScriptTarget.Latest */)) &&
+                        (endPosition === sourceLength || !ts.isIdentifierPart(text.charCodeAt(endPosition), 99 /* ScriptTarget.Latest */))) {
+                        // Found a real match.  Keep searching.
+                        positions.push(position);
+                    }
+                    position = text.indexOf(symbolName, position + symbolNameLength + 1);
+                }
+                return positions;
+            }
+            function getLabelReferencesInNode(container, targetLabel) {
+                var sourceFile = container.getSourceFile();
+                var labelName = targetLabel.text;
+                var references = ts.mapDefined(getPossibleSymbolReferenceNodes(sourceFile, labelName, container), function (node) {
+                    // Only pick labels that are either the target label, or have a target that is the target label
+                    return node === targetLabel || (ts.isJumpStatementTarget(node) && ts.getTargetLabel(node, labelName) === targetLabel) ? nodeEntry(node) : undefined;
+                });
+                return [{ definition: { type: 1 /* DefinitionKind.Label */, node: targetLabel }, references: references }];
+            }
+            function isValidReferencePosition(node, searchSymbolName) {
+                // Compare the length so we filter out strict superstrings of the symbol we are looking for
+                switch (node.kind) {
+                    case 80 /* SyntaxKind.PrivateIdentifier */:
+                        if (ts.isJSDocMemberName(node.parent)) {
+                            return true;
+                        }
+                    // falls through I guess
+                    case 79 /* SyntaxKind.Identifier */:
+                        return node.text.length === searchSymbolName.length;
+                    case 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */:
+                    case 10 /* SyntaxKind.StringLiteral */: {
+                        var str = node;
+                        return (ts.isLiteralNameOfPropertyDeclarationOrIndexAccess(str) || ts.isNameOfModuleDeclaration(node) || ts.isExpressionOfExternalModuleImportEqualsDeclaration(node) || (ts.isCallExpression(node.parent) && ts.isBindableObjectDefinePropertyCall(node.parent) && node.parent.arguments[1] === node)) &&
+                            str.text.length === searchSymbolName.length;
+                    }
+                    case 8 /* SyntaxKind.NumericLiteral */:
+                        return ts.isLiteralNameOfPropertyDeclarationOrIndexAccess(node) && node.text.length === searchSymbolName.length;
+                    case 88 /* SyntaxKind.DefaultKeyword */:
+                        return "default".length === searchSymbolName.length;
+                    default:
+                        return false;
+                }
+            }
+            function getAllReferencesForImportMeta(sourceFiles, cancellationToken) {
+                var references = ts.flatMap(sourceFiles, function (sourceFile) {
+                    cancellationToken.throwIfCancellationRequested();
+                    return ts.mapDefined(getPossibleSymbolReferenceNodes(sourceFile, "meta", sourceFile), function (node) {
+                        var parent = node.parent;
+                        if (ts.isImportMeta(parent)) {
+                            return nodeEntry(parent);
+                        }
+                    });
+                });
+                return references.length ? [{ definition: { type: 2 /* DefinitionKind.Keyword */, node: references[0].node }, references: references }] : undefined;
+            }
+            function getAllReferencesForKeyword(sourceFiles, keywordKind, cancellationToken, filter) {
+                var references = ts.flatMap(sourceFiles, function (sourceFile) {
+                    cancellationToken.throwIfCancellationRequested();
+                    return ts.mapDefined(getPossibleSymbolReferenceNodes(sourceFile, ts.tokenToString(keywordKind), sourceFile), function (referenceLocation) {
+                        if (referenceLocation.kind === keywordKind && (!filter || filter(referenceLocation))) {
+                            return nodeEntry(referenceLocation);
+                        }
+                    });
+                });
+                return references.length ? [{ definition: { type: 2 /* DefinitionKind.Keyword */, node: references[0].node }, references: references }] : undefined;
+            }
+            function getReferencesInSourceFile(sourceFile, search, state, addReferencesHere) {
+                if (addReferencesHere === void 0) { addReferencesHere = true; }
+                state.cancellationToken.throwIfCancellationRequested();
+                return getReferencesInContainer(sourceFile, sourceFile, search, state, addReferencesHere);
+            }
+            /**
+             * Search within node "container" for references for a search value, where the search value is defined as a
+             * tuple of(searchSymbol, searchText, searchLocation, and searchMeaning).
+             * searchLocation: a node where the search value
+             */
+            function getReferencesInContainer(container, sourceFile, search, state, addReferencesHere) {
+                if (!state.markSearchedSymbols(sourceFile, search.allSearchSymbols)) {
+                    return;
+                }
+                for (var _i = 0, _a = getPossibleSymbolReferencePositions(sourceFile, search.text, container); _i < _a.length; _i++) {
+                    var position = _a[_i];
+                    getReferencesAtLocation(sourceFile, position, search, state, addReferencesHere);
+                }
+            }
+            function hasMatchingMeaning(referenceLocation, state) {
+                return !!(ts.getMeaningFromLocation(referenceLocation) & state.searchMeaning);
+            }
+            function getReferencesAtLocation(sourceFile, position, search, state, addReferencesHere) {
+                var referenceLocation = ts.getTouchingPropertyName(sourceFile, position);
+                if (!isValidReferencePosition(referenceLocation, search.text)) {
+                    // This wasn't the start of a token.  Check to see if it might be a
+                    // match in a comment or string if that's what the caller is asking
+                    // for.
+                    if (!state.options.implementations && (state.options.findInStrings && ts.isInString(sourceFile, position) || state.options.findInComments && ts.isInNonReferenceComment(sourceFile, position))) {
+                        // In the case where we're looking inside comments/strings, we don't have
+                        // an actual definition.  So just use 'undefined' here.  Features like
+                        // 'Rename' won't care (as they ignore the definitions), and features like
+                        // 'FindReferences' will just filter out these results.
+                        state.addStringOrCommentReference(sourceFile.fileName, ts.createTextSpan(position, search.text.length));
+                    }
+                    return;
+                }
+                if (!hasMatchingMeaning(referenceLocation, state))
+                    return;
+                var referenceSymbol = state.checker.getSymbolAtLocation(referenceLocation);
+                if (!referenceSymbol) {
+                    return;
+                }
+                var parent = referenceLocation.parent;
+                if (ts.isImportSpecifier(parent) && parent.propertyName === referenceLocation) {
+                    // This is added through `singleReferences` in ImportsResult. If we happen to see it again, don't add it again.
+                    return;
+                }
+                if (ts.isExportSpecifier(parent)) {
+                    ts.Debug.assert(referenceLocation.kind === 79 /* SyntaxKind.Identifier */);
+                    getReferencesAtExportSpecifier(referenceLocation, referenceSymbol, parent, search, state, addReferencesHere);
+                    return;
+                }
+                var relatedSymbol = getRelatedSymbol(search, referenceSymbol, referenceLocation, state);
+                if (!relatedSymbol) {
+                    getReferenceForShorthandProperty(referenceSymbol, search, state);
+                    return;
+                }
+                switch (state.specialSearchKind) {
+                    case 0 /* SpecialSearchKind.None */:
+                        if (addReferencesHere)
+                            addReference(referenceLocation, relatedSymbol, state);
+                        break;
+                    case 1 /* SpecialSearchKind.Constructor */:
+                        addConstructorReferences(referenceLocation, sourceFile, search, state);
+                        break;
+                    case 2 /* SpecialSearchKind.Class */:
+                        addClassStaticThisReferences(referenceLocation, search, state);
+                        break;
+                    default:
+                        ts.Debug.assertNever(state.specialSearchKind);
+                }
+                // Use the parent symbol if the location is commonjs require syntax on javascript files only.
+                if (ts.isInJSFile(referenceLocation)
+                    && referenceLocation.parent.kind === 205 /* SyntaxKind.BindingElement */
+                    && ts.isVariableDeclarationInitializedToBareOrAccessedRequire(referenceLocation.parent.parent.parent)) {
+                    referenceSymbol = referenceLocation.parent.symbol;
+                    // The parent will not have a symbol if it's an ObjectBindingPattern (when destructuring is used).  In
+                    // this case, just skip it, since the bound identifiers are not an alias of the import.
+                    if (!referenceSymbol)
+                        return;
+                }
+                getImportOrExportReferences(referenceLocation, referenceSymbol, search, state);
+            }
+            function getReferencesAtExportSpecifier(referenceLocation, referenceSymbol, exportSpecifier, search, state, addReferencesHere, alwaysGetReferences) {
+                ts.Debug.assert(!alwaysGetReferences || !!state.options.providePrefixAndSuffixTextForRename, "If alwaysGetReferences is true, then prefix/suffix text must be enabled");
+                var parent = exportSpecifier.parent, propertyName = exportSpecifier.propertyName, name = exportSpecifier.name;
+                var exportDeclaration = parent.parent;
+                var localSymbol = getLocalSymbolForExportSpecifier(referenceLocation, referenceSymbol, exportSpecifier, state.checker);
+                if (!alwaysGetReferences && !search.includes(localSymbol)) {
+                    return;
+                }
+                if (!propertyName) {
+                    // Don't rename at `export { default } from "m";`. (but do continue to search for imports of the re-export)
+                    if (!(state.options.use === 2 /* FindReferencesUse.Rename */ && (name.escapedText === "default" /* InternalSymbolName.Default */))) {
+                        addRef();
+                    }
+                }
+                else if (referenceLocation === propertyName) {
+                    // For `export { foo as bar } from "baz"`, "`foo`" will be added from the singleReferences for import searches of the original export.
+                    // For `export { foo as bar };`, where `foo` is a local, so add it now.
+                    if (!exportDeclaration.moduleSpecifier) {
+                        addRef();
+                    }
+                    if (addReferencesHere && state.options.use !== 2 /* FindReferencesUse.Rename */ && state.markSeenReExportRHS(name)) {
+                        addReference(name, ts.Debug.checkDefined(exportSpecifier.symbol), state);
+                    }
+                }
+                else {
+                    if (state.markSeenReExportRHS(referenceLocation)) {
+                        addRef();
+                    }
+                }
+                // For `export { foo as bar }`, rename `foo`, but not `bar`.
+                if (!isForRenameWithPrefixAndSuffixText(state.options) || alwaysGetReferences) {
+                    var isDefaultExport = referenceLocation.originalKeywordKind === 88 /* SyntaxKind.DefaultKeyword */
+                        || exportSpecifier.name.originalKeywordKind === 88 /* SyntaxKind.DefaultKeyword */;
+                    var exportKind = isDefaultExport ? 1 /* ExportKind.Default */ : 0 /* ExportKind.Named */;
+                    var exportSymbol = ts.Debug.checkDefined(exportSpecifier.symbol);
+                    var exportInfo = FindAllReferences.getExportInfo(exportSymbol, exportKind, state.checker);
+                    if (exportInfo) {
+                        searchForImportsOfExport(referenceLocation, exportSymbol, exportInfo, state);
+                    }
+                }
+                // At `export { x } from "foo"`, also search for the imported symbol `"foo".x`.
+                if (search.comingFrom !== 1 /* ImportExport.Export */ && exportDeclaration.moduleSpecifier && !propertyName && !isForRenameWithPrefixAndSuffixText(state.options)) {
+                    var imported = state.checker.getExportSpecifierLocalTargetSymbol(exportSpecifier);
+                    if (imported)
+                        searchForImportedSymbol(imported, state);
+                }
+                function addRef() {
+                    if (addReferencesHere)
+                        addReference(referenceLocation, localSymbol, state);
+                }
+            }
+            function getLocalSymbolForExportSpecifier(referenceLocation, referenceSymbol, exportSpecifier, checker) {
+                return isExportSpecifierAlias(referenceLocation, exportSpecifier) && checker.getExportSpecifierLocalTargetSymbol(exportSpecifier) || referenceSymbol;
+            }
+            function isExportSpecifierAlias(referenceLocation, exportSpecifier) {
+                var parent = exportSpecifier.parent, propertyName = exportSpecifier.propertyName, name = exportSpecifier.name;
+                ts.Debug.assert(propertyName === referenceLocation || name === referenceLocation);
+                if (propertyName) {
+                    // Given `export { foo as bar } [from "someModule"]`: It's an alias at `foo`, but at `bar` it's a new symbol.
+                    return propertyName === referenceLocation;
+                }
+                else {
+                    // `export { foo } from "foo"` is a re-export.
+                    // `export { foo };` is not a re-export, it creates an alias for the local variable `foo`.
+                    return !parent.parent.moduleSpecifier;
+                }
+            }
+            function getImportOrExportReferences(referenceLocation, referenceSymbol, search, state) {
+                var importOrExport = FindAllReferences.getImportOrExportSymbol(referenceLocation, referenceSymbol, state.checker, search.comingFrom === 1 /* ImportExport.Export */);
+                if (!importOrExport)
+                    return;
+                var symbol = importOrExport.symbol;
+                if (importOrExport.kind === 0 /* ImportExport.Import */) {
+                    if (!(isForRenameWithPrefixAndSuffixText(state.options))) {
+                        searchForImportedSymbol(symbol, state);
+                    }
+                }
+                else {
+                    searchForImportsOfExport(referenceLocation, symbol, importOrExport.exportInfo, state);
+                }
+            }
+            function getReferenceForShorthandProperty(_a, search, state) {
+                var flags = _a.flags, valueDeclaration = _a.valueDeclaration;
+                var shorthandValueSymbol = state.checker.getShorthandAssignmentValueSymbol(valueDeclaration);
+                var name = valueDeclaration && ts.getNameOfDeclaration(valueDeclaration);
+                /*
+                * Because in short-hand property assignment, an identifier which stored as name of the short-hand property assignment
+                * has two meanings: property name and property value. Therefore when we do findAllReference at the position where
+                * an identifier is declared, the language service should return the position of the variable declaration as well as
+                * the position in short-hand property assignment excluding property accessing. However, if we do findAllReference at the
+                * position of property accessing, the referenceEntry of such position will be handled in the first case.
+                */
+                if (!(flags & 33554432 /* SymbolFlags.Transient */) && name && search.includes(shorthandValueSymbol)) {
+                    addReference(name, shorthandValueSymbol, state);
+                }
+            }
+            function addReference(referenceLocation, relatedSymbol, state) {
+                var _a = "kind" in relatedSymbol ? relatedSymbol : { kind: undefined, symbol: relatedSymbol }, kind = _a.kind, symbol = _a.symbol; // eslint-disable-line local/no-in-operator
+                // if rename symbol from default export anonymous function, for example `export default function() {}`, we do not need to add reference
+                if (state.options.use === 2 /* FindReferencesUse.Rename */ && referenceLocation.kind === 88 /* SyntaxKind.DefaultKeyword */) {
+                    return;
+                }
+                var addRef = state.referenceAdder(symbol);
+                if (state.options.implementations) {
+                    addImplementationReferences(referenceLocation, addRef, state);
+                }
+                else {
+                    addRef(referenceLocation, kind);
+                }
+            }
+            /** Adds references when a constructor is used with `new this()` in its own class and `super()` calls in subclasses.  */
+            function addConstructorReferences(referenceLocation, sourceFile, search, state) {
+                if (ts.isNewExpressionTarget(referenceLocation)) {
+                    addReference(referenceLocation, search.symbol, state);
+                }
+                var pusher = function () { return state.referenceAdder(search.symbol); };
+                if (ts.isClassLike(referenceLocation.parent)) {
+                    ts.Debug.assert(referenceLocation.kind === 88 /* SyntaxKind.DefaultKeyword */ || referenceLocation.parent.name === referenceLocation);
+                    // This is the class declaration containing the constructor.
+                    findOwnConstructorReferences(search.symbol, sourceFile, pusher());
+                }
+                else {
+                    // If this class appears in `extends C`, then the extending class' "super" calls are references.
+                    var classExtending = tryGetClassByExtendingIdentifier(referenceLocation);
+                    if (classExtending) {
+                        findSuperConstructorAccesses(classExtending, pusher());
+                        findInheritedConstructorReferences(classExtending, state);
+                    }
+                }
+            }
+            function addClassStaticThisReferences(referenceLocation, search, state) {
+                addReference(referenceLocation, search.symbol, state);
+                var classLike = referenceLocation.parent;
+                if (state.options.use === 2 /* FindReferencesUse.Rename */ || !ts.isClassLike(classLike))
+                    return;
+                ts.Debug.assert(classLike.name === referenceLocation);
+                var addRef = state.referenceAdder(search.symbol);
+                for (var _i = 0, _a = classLike.members; _i < _a.length; _i++) {
+                    var member = _a[_i];
+                    if (!(ts.isMethodOrAccessor(member) && ts.isStatic(member))) {
+                        continue;
+                    }
+                    if (member.body) {
+                        member.body.forEachChild(function cb(node) {
+                            if (node.kind === 108 /* SyntaxKind.ThisKeyword */) {
+                                addRef(node);
+                            }
+                            else if (!ts.isFunctionLike(node) && !ts.isClassLike(node)) {
+                                node.forEachChild(cb);
+                            }
+                        });
+                    }
+                }
+            }
+            /**
+             * `classSymbol` is the class where the constructor was defined.
+             * Reference the constructor and all calls to `new this()`.
+             */
+            function findOwnConstructorReferences(classSymbol, sourceFile, addNode) {
+                var constructorSymbol = getClassConstructorSymbol(classSymbol);
+                if (constructorSymbol && constructorSymbol.declarations) {
+                    for (var _i = 0, _a = constructorSymbol.declarations; _i < _a.length; _i++) {
+                        var decl = _a[_i];
+                        var ctrKeyword = ts.findChildOfKind(decl, 135 /* SyntaxKind.ConstructorKeyword */, sourceFile);
+                        ts.Debug.assert(decl.kind === 173 /* SyntaxKind.Constructor */ && !!ctrKeyword);
+                        addNode(ctrKeyword);
+                    }
+                }
+                if (classSymbol.exports) {
+                    classSymbol.exports.forEach(function (member) {
+                        var decl = member.valueDeclaration;
+                        if (decl && decl.kind === 171 /* SyntaxKind.MethodDeclaration */) {
+                            var body = decl.body;
+                            if (body) {
+                                forEachDescendantOfKind(body, 108 /* SyntaxKind.ThisKeyword */, function (thisKeyword) {
+                                    if (ts.isNewExpressionTarget(thisKeyword)) {
+                                        addNode(thisKeyword);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+            function getClassConstructorSymbol(classSymbol) {
+                return classSymbol.members && classSymbol.members.get("__constructor" /* InternalSymbolName.Constructor */);
+            }
+            /** Find references to `super` in the constructor of an extending class.  */
+            function findSuperConstructorAccesses(classDeclaration, addNode) {
+                var constructor = getClassConstructorSymbol(classDeclaration.symbol);
+                if (!(constructor && constructor.declarations)) {
+                    return;
+                }
+                for (var _i = 0, _a = constructor.declarations; _i < _a.length; _i++) {
+                    var decl = _a[_i];
+                    ts.Debug.assert(decl.kind === 173 /* SyntaxKind.Constructor */);
+                    var body = decl.body;
+                    if (body) {
+                        forEachDescendantOfKind(body, 106 /* SyntaxKind.SuperKeyword */, function (node) {
+                            if (ts.isCallExpressionTarget(node)) {
+                                addNode(node);
+                            }
+                        });
+                    }
+                }
+            }
+            function hasOwnConstructor(classDeclaration) {
+                return !!getClassConstructorSymbol(classDeclaration.symbol);
+            }
+            function findInheritedConstructorReferences(classDeclaration, state) {
+                if (hasOwnConstructor(classDeclaration))
+                    return;
+                var classSymbol = classDeclaration.symbol;
+                var search = state.createSearch(/*location*/ undefined, classSymbol, /*comingFrom*/ undefined);
+                getReferencesInContainerOrFiles(classSymbol, state, search);
+            }
+            function addImplementationReferences(refNode, addReference, state) {
+                // Check if we found a function/propertyAssignment/method with an implementation or initializer
+                if (ts.isDeclarationName(refNode) && isImplementation(refNode.parent)) {
+                    addReference(refNode);
+                    return;
+                }
+                if (refNode.kind !== 79 /* SyntaxKind.Identifier */) {
+                    return;
+                }
+                if (refNode.parent.kind === 300 /* SyntaxKind.ShorthandPropertyAssignment */) {
+                    // Go ahead and dereference the shorthand assignment by going to its definition
+                    getReferenceEntriesForShorthandPropertyAssignment(refNode, state.checker, addReference);
+                }
+                // Check if the node is within an extends or implements clause
+                var containingClass = getContainingClassIfInHeritageClause(refNode);
+                if (containingClass) {
+                    addReference(containingClass);
+                    return;
+                }
+                // If we got a type reference, try and see if the reference applies to any expressions that can implement an interface
+                // Find the first node whose parent isn't a type node -- i.e., the highest type node.
+                var typeNode = ts.findAncestor(refNode, function (a) { return !ts.isQualifiedName(a.parent) && !ts.isTypeNode(a.parent) && !ts.isTypeElement(a.parent); });
+                var typeHavingNode = typeNode.parent;
+                if (ts.hasType(typeHavingNode) && typeHavingNode.type === typeNode && state.markSeenContainingTypeReference(typeHavingNode)) {
+                    if (ts.hasInitializer(typeHavingNode)) {
+                        addIfImplementation(typeHavingNode.initializer);
+                    }
+                    else if (ts.isFunctionLike(typeHavingNode) && typeHavingNode.body) {
+                        var body = typeHavingNode.body;
+                        if (body.kind === 238 /* SyntaxKind.Block */) {
+                            ts.forEachReturnStatement(body, function (returnStatement) {
+                                if (returnStatement.expression)
+                                    addIfImplementation(returnStatement.expression);
+                            });
+                        }
+                        else {
+                            addIfImplementation(body);
+                        }
+                    }
+                    else if (ts.isAssertionExpression(typeHavingNode)) {
+                        addIfImplementation(typeHavingNode.expression);
+                    }
+                }
+                function addIfImplementation(e) {
+                    if (isImplementationExpression(e))
+                        addReference(e);
+                }
+            }
+            function getContainingClassIfInHeritageClause(node) {
+                return ts.isIdentifier(node) || ts.isPropertyAccessExpression(node) ? getContainingClassIfInHeritageClause(node.parent)
+                    : ts.isExpressionWithTypeArguments(node) ? ts.tryCast(node.parent.parent, ts.isClassLike) : undefined;
+            }
+            /**
+             * Returns true if this is an expression that can be considered an implementation
+             */
+            function isImplementationExpression(node) {
+                switch (node.kind) {
+                    case 214 /* SyntaxKind.ParenthesizedExpression */:
+                        return isImplementationExpression(node.expression);
+                    case 216 /* SyntaxKind.ArrowFunction */:
+                    case 215 /* SyntaxKind.FunctionExpression */:
+                    case 207 /* SyntaxKind.ObjectLiteralExpression */:
+                    case 228 /* SyntaxKind.ClassExpression */:
+                    case 206 /* SyntaxKind.ArrayLiteralExpression */:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            /**
+             * Determines if the parent symbol occurs somewhere in the child's ancestry. If the parent symbol
+             * is an interface, determines if some ancestor of the child symbol extends or inherits from it.
+             * Also takes in a cache of previous results which makes this slightly more efficient and is
+             * necessary to avoid potential loops like so:
+             *     class A extends B { }
+             *     class B extends A { }
+             *
+             * We traverse the AST rather than using the type checker because users are typically only interested
+             * in explicit implementations of an interface/class when calling "Go to Implementation". Sibling
+             * implementations of types that share a common ancestor with the type whose implementation we are
+             * searching for need to be filtered out of the results. The type checker doesn't let us make the
+             * distinction between structurally compatible implementations and explicit implementations, so we
+             * must use the AST.
+             *
+             * @param symbol         A class or interface Symbol
+             * @param parent        Another class or interface Symbol
+             * @param cachedResults A map of symbol id pairs (i.e. "child,parent") to booleans indicating previous results
+             */
+            function explicitlyInheritsFrom(symbol, parent, cachedResults, checker) {
+                if (symbol === parent) {
+                    return true;
+                }
+                var key = ts.getSymbolId(symbol) + "," + ts.getSymbolId(parent);
+                var cached = cachedResults.get(key);
+                if (cached !== undefined) {
+                    return cached;
+                }
+                // Set the key so that we don't infinitely recurse
+                cachedResults.set(key, false);
+                var inherits = !!symbol.declarations && symbol.declarations.some(function (declaration) {
+                    return ts.getAllSuperTypeNodes(declaration).some(function (typeReference) {
+                        var type = checker.getTypeAtLocation(typeReference);
+                        return !!type && !!type.symbol && explicitlyInheritsFrom(type.symbol, parent, cachedResults, checker);
+                    });
+                });
+                cachedResults.set(key, inherits);
+                return inherits;
+            }
+            function getReferencesForSuperKeyword(superKeyword) {
+                var searchSpaceNode = ts.getSuperContainer(superKeyword, /*stopOnFunctions*/ false);
+                if (!searchSpaceNode) {
+                    return undefined;
+                }
+                // Whether 'super' occurs in a static context within a class.
+                var staticFlag = 32 /* ModifierFlags.Static */;
+                switch (searchSpaceNode.kind) {
+                    case 169 /* SyntaxKind.PropertyDeclaration */:
+                    case 168 /* SyntaxKind.PropertySignature */:
+                    case 171 /* SyntaxKind.MethodDeclaration */:
+                    case 170 /* SyntaxKind.MethodSignature */:
+                    case 173 /* SyntaxKind.Constructor */:
+                    case 174 /* SyntaxKind.GetAccessor */:
+                    case 175 /* SyntaxKind.SetAccessor */:
+                        staticFlag &= ts.getSyntacticModifierFlags(searchSpaceNode);
+                        searchSpaceNode = searchSpaceNode.parent; // re-assign to be the owning class
+                        break;
+                    default:
+                        return undefined;
+                }
+                var sourceFile = searchSpaceNode.getSourceFile();
+                var references = ts.mapDefined(getPossibleSymbolReferenceNodes(sourceFile, "super", searchSpaceNode), function (node) {
+                    if (node.kind !== 106 /* SyntaxKind.SuperKeyword */) {
+                        return;
+                    }
+                    var container = ts.getSuperContainer(node, /*stopOnFunctions*/ false);
+                    // If we have a 'super' container, we must have an enclosing class.
+                    // Now make sure the owning class is the same as the search-space
+                    // and has the same static qualifier as the original 'super's owner.
+                    return container && ts.isStatic(container) === !!staticFlag && container.parent.symbol === searchSpaceNode.symbol ? nodeEntry(node) : undefined;
+                });
+                return [{ definition: { type: 0 /* DefinitionKind.Symbol */, symbol: searchSpaceNode.symbol }, references: references }];
+            }
+            function isParameterName(node) {
+                return node.kind === 79 /* SyntaxKind.Identifier */ && node.parent.kind === 166 /* SyntaxKind.Parameter */ && node.parent.name === node;
+            }
+            function getReferencesForThisKeyword(thisOrSuperKeyword, sourceFiles, cancellationToken) {
+                var searchSpaceNode = ts.getThisContainer(thisOrSuperKeyword, /* includeArrowFunctions */ false);
+                // Whether 'this' occurs in a static context within a class.
+                var staticFlag = 32 /* ModifierFlags.Static */;
+                switch (searchSpaceNode.kind) {
+                    case 171 /* SyntaxKind.MethodDeclaration */:
+                    case 170 /* SyntaxKind.MethodSignature */:
+                        if (ts.isObjectLiteralMethod(searchSpaceNode)) {
+                            staticFlag &= ts.getSyntacticModifierFlags(searchSpaceNode);
+                            searchSpaceNode = searchSpaceNode.parent; // re-assign to be the owning object literals
+                            break;
+                        }
+                    // falls through
+                    case 169 /* SyntaxKind.PropertyDeclaration */:
+                    case 168 /* SyntaxKind.PropertySignature */:
+                    case 173 /* SyntaxKind.Constructor */:
+                    case 174 /* SyntaxKind.GetAccessor */:
+                    case 175 /* SyntaxKind.SetAccessor */:
+                        staticFlag &= ts.getSyntacticModifierFlags(searchSpaceNode);
+                        searchSpaceNode = searchSpaceNode.parent; // re-assign to be the owning class
+                        break;
+                    case 308 /* SyntaxKind.SourceFile */:
+                        if (ts.isExternalModule(searchSpaceNode) || isParameterName(thisOrSuperKeyword)) {
+                            return undefined;
+                        }
+                    // falls through
+                    case 259 /* SyntaxKind.FunctionDeclaration */:
+                    case 215 /* SyntaxKind.FunctionExpression */:
+                        break;
+                    // Computed properties in classes are not handled here because references to this are illegal,
+                    // so there is no point finding references to them.
+                    default:
+                        return undefined;
+                }
+                var references = ts.flatMap(searchSpaceNode.kind === 308 /* SyntaxKind.SourceFile */ ? sourceFiles : [searchSpaceNode.getSourceFile()], function (sourceFile) {
+                    cancellationToken.throwIfCancellationRequested();
+                    return getPossibleSymbolReferenceNodes(sourceFile, "this", ts.isSourceFile(searchSpaceNode) ? sourceFile : searchSpaceNode).filter(function (node) {
+                        if (!ts.isThis(node)) {
+                            return false;
+                        }
+                        var container = ts.getThisContainer(node, /* includeArrowFunctions */ false);
+                        switch (searchSpaceNode.kind) {
+                            case 215 /* SyntaxKind.FunctionExpression */:
+                            case 259 /* SyntaxKind.FunctionDeclaration */:
+                                return searchSpaceNode.symbol === container.symbol;
+                            case 171 /* SyntaxKind.MethodDeclaration */:
+                            case 170 /* SyntaxKind.MethodSignature */:
+                                return ts.isObjectLiteralMethod(searchSpaceNode) && searchSpaceNode.symbol === container.symbol;
+                            case 228 /* SyntaxKind.ClassExpression */:
+                            case 260 /* SyntaxKind.ClassDeclaration */:
+                            case 207 /* SyntaxKind.ObjectLiteralExpression */:
+                                // Make sure the container belongs to the same class/object literals
+                                // and has the appropriate static modifier from the original container.
+                                return container.parent && searchSpaceNode.symbol === container.parent.symbol && ts.isStatic(container) === !!staticFlag;
+                            case 308 /* SyntaxKind.SourceFile */:
+                                return container.kind === 308 /* SyntaxKind.SourceFile */ && !ts.isExternalModule(container) && !isParameterName(node);
+                        }
+                    });
+                }).map(function (n) { return nodeEntry(n); });
+                var thisParameter = ts.firstDefined(references, function (r) { return ts.isParameter(r.node.parent) ? r.node : undefined; });
+                return [{
+                        definition: { type: 3 /* DefinitionKind.This */, node: thisParameter || thisOrSuperKeyword },
+                        references: references
+                    }];
+            }
+            function getReferencesForStringLiteral(node, sourceFiles, checker, cancellationToken) {
+                var type = ts.getContextualTypeFromParentOrAncestorTypeNode(node, checker);
+                var references = ts.flatMap(sourceFiles, function (sourceFile) {
+                    cancellationToken.throwIfCancellationRequested();
+                    return ts.mapDefined(getPossibleSymbolReferenceNodes(sourceFile, node.text), function (ref) {
+                        if (ts.isStringLiteralLike(ref) && ref.text === node.text) {
+                            if (type) {
+                                var refType = ts.getContextualTypeFromParentOrAncestorTypeNode(ref, checker);
+                                if (type !== checker.getStringType() && type === refType) {
+                                    return nodeEntry(ref, 2 /* EntryKind.StringLiteral */);
+                                }
+                            }
+                            else {
+                                return ts.isNoSubstitutionTemplateLiteral(ref) && !ts.rangeIsOnSingleLine(ref, sourceFile) ? undefined :
+                                    nodeEntry(ref, 2 /* EntryKind.StringLiteral */);
+                            }
+                        }
+                    });
+                });
+                return [{
+                        definition: { type: 4 /* DefinitionKind.String */, node: node },
+                        references: references
+                    }];
+            }
+            // For certain symbol kinds, we need to include other symbols in the search set.
+            // This is not needed when searching for re-exports.
+            function populateSearchSymbolSet(symbol, location, checker, isForRename, providePrefixAndSuffixText, implementations) {
+                var result = [];
+                forEachRelatedSymbol(symbol, location, checker, isForRename, !(isForRename && providePrefixAndSuffixText), function (sym, root, base) {
+                    // static method/property and instance method/property might have the same name. Only include static or only include instance.
+                    if (base) {
+                        if (isStaticSymbol(symbol) !== isStaticSymbol(base)) {
+                            base = undefined;
+                        }
+                    }
+                    result.push(base || root || sym);
+                },
+                // when try to find implementation, implementations is true, and not allowed to find base class
+                /*allowBaseTypes*/ function () { return !implementations; });
+                return result;
+            }
+            /**
+             * @param allowBaseTypes return true means it would try to find in base class or interface.
+             */
+            function forEachRelatedSymbol(symbol, location, checker, isForRenamePopulateSearchSymbolSet, onlyIncludeBindingElementAtReferenceLocation,
+            /**
+             * @param baseSymbol This symbol means one property/mehtod from base class or interface when it is not null or undefined,
+             */
+            cbSymbol, allowBaseTypes) {
+                var containingObjectLiteralElement = ts.getContainingObjectLiteralElement(location);
+                if (containingObjectLiteralElement) {
+                    /* Because in short-hand property assignment, location has two meaning : property name and as value of the property
+                    * When we do findAllReference at the position of the short-hand property assignment, we would want to have references to position of
+                    * property name and variable declaration of the identifier.
+                    * Like in below example, when querying for all references for an identifier 'name', of the property assignment, the language service
+                    * should show both 'name' in 'obj' and 'name' in variable declaration
+                    *      const name = "Foo";
+                    *      const obj = { name };
+                    * In order to do that, we will populate the search set with the value symbol of the identifier as a value of the property assignment
+                    * so that when matching with potential reference symbol, both symbols from property declaration and variable declaration
+                    * will be included correctly.
+                    */
+                    var shorthandValueSymbol = checker.getShorthandAssignmentValueSymbol(location.parent); // gets the local symbol
+                    if (shorthandValueSymbol && isForRenamePopulateSearchSymbolSet) {
+                        // When renaming 'x' in `const o = { x }`, just rename the local variable, not the property.
+                        return cbSymbol(shorthandValueSymbol, /*rootSymbol*/ undefined, /*baseSymbol*/ undefined, 3 /* EntryKind.SearchedLocalFoundProperty */);
+                    }
+                    // If the location is in a context sensitive location (i.e. in an object literal) try
+                    // to get a contextual type for it, and add the property symbol from the contextual
+                    // type to the search set
+                    var contextualType = checker.getContextualType(containingObjectLiteralElement.parent);
+                    var res_1 = contextualType && ts.firstDefined(ts.getPropertySymbolsFromContextualType(containingObjectLiteralElement, checker, contextualType, /*unionSymbolOk*/ true), function (sym) { return fromRoot(sym, 4 /* EntryKind.SearchedPropertyFoundLocal */); });
+                    if (res_1)
+                        return res_1;
+                    // If the location is name of property symbol from object literal destructuring pattern
+                    // Search the property symbol
+                    //      for ( { property: p2 } of elems) { }
+                    var propertySymbol = getPropertySymbolOfDestructuringAssignment(location, checker);
+                    var res1 = propertySymbol && cbSymbol(propertySymbol, /*rootSymbol*/ undefined, /*baseSymbol*/ undefined, 4 /* EntryKind.SearchedPropertyFoundLocal */);
+                    if (res1)
+                        return res1;
+                    var res2 = shorthandValueSymbol && cbSymbol(shorthandValueSymbol, /*rootSymbol*/ undefined, /*baseSymbol*/ undefined, 3 /* EntryKind.SearchedLocalFoundProperty */);
+                    if (res2)
+                        return res2;
+                }
+                var aliasedSymbol = getMergedAliasedSymbolOfNamespaceExportDeclaration(location, symbol, checker);
+                if (aliasedSymbol) {
+                    // In case of UMD module and global merging, search for global as well
+                    var res_2 = cbSymbol(aliasedSymbol, /*rootSymbol*/ undefined, /*baseSymbol*/ undefined, 1 /* EntryKind.Node */);
+                    if (res_2)
+                        return res_2;
+                }
+                var res = fromRoot(symbol);
+                if (res)
+                    return res;
+                if (symbol.valueDeclaration && ts.isParameterPropertyDeclaration(symbol.valueDeclaration, symbol.valueDeclaration.parent)) {
+                    // For a parameter property, now try on the other symbol (property if this was a parameter, parameter if this was a property).
+                    var paramProps = checker.getSymbolsOfParameterPropertyDeclaration(ts.cast(symbol.valueDeclaration, ts.isParameter), symbol.name);
+                    ts.Debug.assert(paramProps.length === 2 && !!(paramProps[0].flags & 1 /* SymbolFlags.FunctionScopedVariable */) && !!(paramProps[1].flags & 4 /* SymbolFlags.Property */)); // is [parameter, property]
+                    return fromRoot(symbol.flags & 1 /* SymbolFlags.FunctionScopedVariable */ ? paramProps[1] : paramProps[0]);
+                }
+                var exportSpecifier = ts.getDeclarationOfKind(symbol, 278 /* SyntaxKind.ExportSpecifier */);
+                if (!isForRenamePopulateSearchSymbolSet || exportSpecifier && !exportSpecifier.propertyName) {
+                    var localSymbol = exportSpecifier && checker.getExportSpecifierLocalTargetSymbol(exportSpecifier);
+                    if (localSymbol) {
+                        var res_3 = cbSymbol(localSymbol, /*rootSymbol*/ undefined, /*baseSymbol*/ undefined, 1 /* EntryKind.Node */);
+                        if (res_3)
+                            return res_3;
+                    }
+                }
+                // symbolAtLocation for a binding element is the local symbol. See if the search symbol is the property.
+                // Don't do this when populating search set for a rename when prefix and suffix text will be provided -- just rename the local.
+                if (!isForRenamePopulateSearchSymbolSet) {
+                    var bindingElementPropertySymbol = void 0;
+                    if (onlyIncludeBindingElementAtReferenceLocation) {
+                        bindingElementPropertySymbol = ts.isObjectBindingElementWithoutPropertyName(location.parent) ? ts.getPropertySymbolFromBindingElement(checker, location.parent) : undefined;
+                    }
+                    else {
+                        bindingElementPropertySymbol = getPropertySymbolOfObjectBindingPatternWithoutPropertyName(symbol, checker);
+                    }
+                    return bindingElementPropertySymbol && fromRoot(bindingElementPropertySymbol, 4 /* EntryKind.SearchedPropertyFoundLocal */);
+                }
+                ts.Debug.assert(isForRenamePopulateSearchSymbolSet);
+                // due to the above assert and the arguments at the uses of this function,
+                // (onlyIncludeBindingElementAtReferenceLocation <=> !providePrefixAndSuffixTextForRename) holds
+                var includeOriginalSymbolOfBindingElement = onlyIncludeBindingElementAtReferenceLocation;
+                if (includeOriginalSymbolOfBindingElement) {
+                    var bindingElementPropertySymbol = getPropertySymbolOfObjectBindingPatternWithoutPropertyName(symbol, checker);
+                    return bindingElementPropertySymbol && fromRoot(bindingElementPropertySymbol, 4 /* EntryKind.SearchedPropertyFoundLocal */);
+                }
+                function fromRoot(sym, kind) {
+                    // If this is a union property:
+                    //   - In populateSearchSymbolsSet we will add all the symbols from all its source symbols in all unioned types.
+                    //   - In findRelatedSymbol, we will just use the union symbol if any source symbol is included in the search.
+                    // If the symbol is an instantiation from a another symbol (e.g. widened symbol):
+                    //   - In populateSearchSymbolsSet, add the root the list
+                    //   - In findRelatedSymbol, return the source symbol if that is in the search. (Do not return the instantiation symbol.)
+                    return ts.firstDefined(checker.getRootSymbols(sym), function (rootSymbol) {
+                        return cbSymbol(sym, rootSymbol, /*baseSymbol*/ undefined, kind)
+                            // Add symbol of properties/methods of the same name in base classes and implemented interfaces definitions
+                            || (rootSymbol.parent && rootSymbol.parent.flags & (32 /* SymbolFlags.Class */ | 64 /* SymbolFlags.Interface */) && allowBaseTypes(rootSymbol)
+                                ? getPropertySymbolsFromBaseTypes(rootSymbol.parent, rootSymbol.name, checker, function (base) { return cbSymbol(sym, rootSymbol, base, kind); })
+                                : undefined);
+                    });
+                }
+                function getPropertySymbolOfObjectBindingPatternWithoutPropertyName(symbol, checker) {
+                    var bindingElement = ts.getDeclarationOfKind(symbol, 205 /* SyntaxKind.BindingElement */);
+                    if (bindingElement && ts.isObjectBindingElementWithoutPropertyName(bindingElement)) {
+                        return ts.getPropertySymbolFromBindingElement(checker, bindingElement);
+                    }
+                }
+            }
+            /**
+             * Find symbol of the given property-name and add the symbol to the given result array
+             * @param symbol a symbol to start searching for the given propertyName
+             * @param propertyName a name of property to search for
+             * @param result an array of symbol of found property symbols
+             * @param previousIterationSymbolsCache a cache of symbol from previous iterations of calling this function to prevent infinite revisiting of the same symbol.
+             *                                The value of previousIterationSymbol is undefined when the function is first called.
+             */
+            function getPropertySymbolsFromBaseTypes(symbol, propertyName, checker, cb) {
+                var seen = new ts.Map();
+                return recur(symbol);
+                function recur(symbol) {
+                    // Use `addToSeen` to ensure we don't infinitely recurse in this situation:
+                    //      interface C extends C {
+                    //          /*findRef*/propName: string;
+                    //      }
+                    if (!(symbol.flags & (32 /* SymbolFlags.Class */ | 64 /* SymbolFlags.Interface */)) || !ts.addToSeen(seen, ts.getSymbolId(symbol)))
+                        return;
+                    return ts.firstDefined(symbol.declarations, function (declaration) { return ts.firstDefined(ts.getAllSuperTypeNodes(declaration), function (typeReference) {
+                        var type = checker.getTypeAtLocation(typeReference);
+                        var propertySymbol = type && type.symbol && checker.getPropertyOfType(type, propertyName);
+                        // Visit the typeReference as well to see if it directly or indirectly uses that property
+                        return type && propertySymbol && (ts.firstDefined(checker.getRootSymbols(propertySymbol), cb) || recur(type.symbol));
+                    }); });
+                }
+            }
+            function isStaticSymbol(symbol) {
+        

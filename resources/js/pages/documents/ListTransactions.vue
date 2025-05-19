@@ -1,15 +1,14 @@
 <script setup>
 import axios, { formToJSON } from 'axios';
-import { onMounted, ref, reactive, h } from 'vue';
+import { onMounted, ref, reactive, h, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useToastr } from '../../toastr';
 import { useAuthUserStore } from '../../stores/AuthUserStore';
-import VuePdfEmbed from 'vue-pdf-embed';
 import TransactionModal from './TransactionModal.vue';
 import DocumentButtons from './DocumentButtons.vue';
 import Swal from 'sweetalert2';
-
-
+import { createLoadingTask, VuePdf } from 'vue3-pdfjs';
+import { Form } from 'vee-validate';
 
 const authUserStore = useAuthUserStore();
 const router = useRouter();
@@ -32,7 +31,6 @@ const doc = reactive({
     last_assigned: '',
     last_transaction_type: '',
 });
-
 const document = ref({ 'data': [] });
 
 const previewSource = ref();
@@ -53,6 +51,7 @@ const getTransactions = () => {
 }
 
 const getDocument = () => {
+
     axios.get(`/api/documents/document/${route.params.id}`)
         .then((response) => {
             doc.id = response.data[0].id;
@@ -65,9 +64,18 @@ const getDocument = () => {
             doc.status = response.data[0].status;
             doc.last_assigned = response.data[0].last_assigned;
             doc.last_transaction_type = response.data[0].last_transaction_type;
-            previewFile(main_document_path.value, doc.document_file);
+
+            console.log('def pdf source - getDocument', main_document_path.value, doc.document_file)
+            getTransactions();
+            getAttachedFiles();
+            getAdditionalFiles();
+            // previewFile(main_document_path.value, doc.document_file);
         })
+
 }
+
+const numOfPages = ref(0)
+
 
 //download file
 // const getFile = () => {
@@ -109,28 +117,24 @@ const getTransaction_File = (transaction) => {
         });
 }
 
-const rotateLeft = ref(0);
-
-const rotatePdf = () => {
-    rotateLeft.value += 90;
-}
-
-// const previewFile = (document_path, document_file) => {
-//     // previewSource.value = document_path + document_file;
-
-//     console.log("File:" + previewSource.value);
-// }
-
-
 
 const getAttachedFiles = () => {
-    axios.get(`/api/documents/getAttachedFiles/${route.params.id}`)
+    return axios.get(`/api/documents/getAttachedFiles/${route.params.id}`)
         .then((response) => {
             attachedFiles.value = response.data;
             merged_files.value = response.data;
             previewSource.value = merged_path.value + merged_files.value;
         })
 }
+
+getAttachedFiles().then(() => {
+    console.log('pdf source', previewSource.value)
+
+    const loadingTask = createLoadingTask(previewSource.value)
+    loadingTask.promise.then((pdf) => {
+        numOfPages.value = pdf.numPages
+    })
+})
 
 const additionalFiles = ref();
 
@@ -140,9 +144,10 @@ const getAdditionalFiles = () => {
             additionalFiles.value = response.data;
         })
 }
-const previewFile = (document_path,document_file) => {
-    previewSource.value = document_path+document_file;
-    // console.log(document_path + document_file);
+const previewFile = (document_path, document_file) => {
+    previewSource.value = document_path + document_file;
+
+    console.log('new pdf_source', previewSource.value)
 }
 
 const modalVisible = ref(false);
@@ -348,11 +353,30 @@ const receiveDocument = (value) => {
     }
 }
 
+const rotation = ref(0)
+
+const rotationStyle = computed(() => ({
+    transform: `rotate(${rotation.value}deg)`,
+    transformOrigin: 'center',
+}))
+
+function rotatePdf() {
+    rotation.value = (rotation.value + 90) % 360
+}
+
+const scale = ref(2.0)
+
+function zoomIn(){
+    console.log(scale.value)
+    scale.value += 0.1
+}
+
+function zoomOut(){
+    console.log(scale.value)
+    if(scale.value > 0.2) scale.value -= 0.1
+}
 onMounted(() => {
     getDocument();
-    getTransactions();
-    getAttachedFiles();
-    getAdditionalFiles();
     getEmployees();
 })
 </script>
@@ -379,51 +403,64 @@ onMounted(() => {
             <div class="row">
                 <div class="col-lg-6">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="jumbotron" style="overflow: scroll; height:385px;">
-                                <p class="lead">Title: {{ doc.title }} {{ doc.last_assignment }}</p>
-                                <p class="lead">Date Received: {{ doc.date_received }}</p>
-                                <p class="lead">Client: {{ doc.client_name }}</p>
-                                <p class="lead">
-                                    <a href="#" @click.prevent="previewFile(main_document_path, doc.document_file)">
-                                        {{ doc.document_file }}
-                                    </a>
-                                </p>
-                                <p class="lead" v-for="additionalFile in additionalFiles">
-                                    <a href="#"
-                                        @click.prevent="previewFile(main_document_path, additionalFile.document_file)">
-                                        {{ additionalFile.document_file }}
-                                    </a>
-                                </p>
-                                <p class="lead" v-for="file in transaction_attachments.data">
-                                    <a href="#" @click.prevent="previewFile(transaction_path, file.attachment)">
-                                        {{ file.attachment }}
-                                    </a>
-                                </p>
-                                <!-- @click.prevent="getFile(doc)" -->
-                                <hr class="my-4">
-                                <p>Content: {{ doc.description }}</p>
+                        <div class="card-body document-div">
+                            <div style="float: right;">
+                                <DocumentButtons :key="doc.id" v-bind:document="doc" @attach-file="attachFile"
+                                    @receive-document="receiveDocument" @archive-document="archiveDocument"
+                                    @route-document="routeDocument" @reopen-document="reopenDocument"
+                                    @delete-document="deleteDocument" />
                             </div>
-                            <DocumentButtons :key="doc.id" v-bind:document="doc" @attach-file="attachFile"
-                                @receive-document="receiveDocument" @archive-document="archiveDocument"
-                                @route-document="routeDocument" @reopen-document="reopenDocument"
-                                @delete-document="deleteDocument" />
+
+                            <p>Title: {{ doc.title }} {{ doc.last_assignment }}</p>
+                            <p>Date Received: {{ doc.date_received }}</p>
+                            <p>Client: {{ doc.client_name }}</p>
+                            <p>Content: {{ doc.description }}</p>
+
+                            <!-- @click.prevent="getFile(doc)" -->
+                            <hr class="my-4">
+                            <p class="lead">Attachments:</p>
+                            <p>
+                                <a href="#" @click.prevent="previewFile(main_document_path, doc.document_file)">
+                                    {{ doc.document_file }}
+                                </a>
+                            </p>
+                            <p v-for="additionalFile in additionalFiles">
+                                <a href="#"
+                                    @click.prevent="previewFile(main_document_path, additionalFile.document_file)">
+                                    {{ additionalFile.document_file }}
+                                </a>
+                            </p>
+                            <p v-for="file in transaction_attachments.data">
+                                <a href="#" @click.prevent="previewFile(transaction_path, file.attachment)">
+                                    {{ file.attachment }}
+                                </a>
+                            </p>
+
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div v-if="previewSource" class="col-lg-6">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="jumbotron" style="overflow: scroll; height:407px;">
-                                <a @click.prevent="rotatePdf">
-                                    <font-awesome-icon icon="fa-solid fa-rotate-right" class="mr-2" />
-                                </a>
-                                <a class="download-link" :href="previewSource" download>
-                                    <font-awesome-icon icon="fa-solid fa-download" class="mr-2"/>
-                                </a>
-                                <!-- <VuePDF :pdf="pdf" height="50px"/> -->
-                                <vue-pdf-embed :source="previewSource" :rotation="rotateLeft" :downloadable="true" />
+                        <div class="card-body document-div" >
+
+                            <a @click.prevent="rotatePdf">
+                                <font-awesome-icon icon="fa-solid fa-rotate-right" class="mr-2" />
+                            </a>
+                            <!-- <a @click.prevent="zoomIn">
+                                <font-awesome-icon icon="fa-solid fa-search-plus" class="mr-2"/>
+                            </a>
+                            <a @click.prevent="zoomOut">
+                                <font-awesome-icon icon="fa-solid fa-search-minus" class="mr-2"/>
+                            </a> -->
+                            <a :href="previewSource" download>
+                                <font-awesome-icon icon="fa-solid fa-download" class="mr-2" />
+                            </a>
+                            <!-- <vue-pdf-embed :source="previewSource" :rotation="rotateLeft" :downloadable="true" /> -->
+                            <!-- <VuePdf :src="previewSource" :allPages="true" /> -->
+                            <div :style="rotationStyle">
+                                <VuePdf v-for="page in numOfPages" :key="previewSource" :src="previewSource" :page="page"/>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -561,7 +598,7 @@ onMounted(() => {
                 </div>
                 <div class="modal-body">
                     <div>
-                        <Form @submit.prevent="createAttachFile()">
+                        <Form @submit="createAttachFile()">
                             <div class="form-group">
                                 <input type="file" class="form-control-file" id="document_file" name="document_file"
                                     @change="getFileAttachment" />
@@ -574,6 +611,11 @@ onMounted(() => {
             </div>
         </div>
     </div>
-
-
 </template>
+
+<style lang="css" scoped>
+.document-div {
+    height: 410px;
+    overflow: scroll;
+}
+</style>

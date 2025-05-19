@@ -1,0 +1,3440 @@
+<Language language="German (Deutsch)">
+	<Default>
+		<Font From="Segoe UI" To="Arial" FailTo="Tahoma"/>
+	</Default>  
+	<Strings>
+		<!--æœ‰æ›´æ–°çš„é¡¹-->
+		<Item Name="CompressedSize">
+			<Text>
+				<![CDATA[Komprimierte GrÃ¶ÃŸe]]>
+			</Text>
+		</Item>
+		<Item Name="noNameDisplayText">
+			<Text>
+				<![CDATA[Dateiname fehlt]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDescs">
+			<Text>
+				<![CDATA[Wiederherstellung von 3 Dateien ist fehlgeschlagen, wie folgt.]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDesc">
+			<Text>
+				<![CDATA[Wiederherstellung einer Datei ist fehlgeschlagen, wie folgt.]]>
+			</Text>
+		</Item>			
+		<Item Name="SaveFailFileName">
+			<Text>
+				<![CDATA[Dateiname]]>
+			</Text>
+		</Item>
+		<Item Name="LoadingfilesDesc">
+			<Text>
+				<![CDATA[Dateien werden geladen... bitte haben Sie Geduld.]]>
+			</Text>
+		</Item>		
+		<Item Name="FilesFoundDesc">
+			<Text>
+				<![CDATA[Dateien gefunden:]]>
+			</Text>
+		</Item>
+		<Item Name="ReadingSectorsDesc">
+			<Text>
+				<![CDATA[Gelesene Sektoren:]]>
+			</Text>
+		</Item>	
+		<Item Name="StopScanningDesc">
+			<Text>
+				<![CDATA[MÃ¶chten Sie den Scanvorgang vorzeitig beenden?<br><br><br>Warnung: Eine Unterbrechung des Scans fÃ¼hrt zu unvollstÃ¤ndigen Ergebnissen bei der Wiederherstellung.]]>
+			</Text>
+		</Item>
+		<Item Name="HomeStopScanningDesc">
+			<Text>
+				<![CDATA[MÃ¶chten Sie die aktuellen Scanergebnisse verlassen und zurÃ¼ck zur Startseite?<br><br><br>Warnung: Wenn Sie jetzt die Seite verlassen, kÃ¶nnen die aktuellen Scanergebnisse verloren gehen. Es wird empfohlen, die Dateien sofort wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningDesc">
+			<Text>
+				<![CDATA[MÃ¶chten Sie die aktuellen Scanergebnisse verwerfen und das Programm schlieÃŸen?<br><br><br>Warnung: Wenn Sie jetzt die Seite verlassen, kÃ¶nnen die aktuellen Scanergebnisse verloren gehen. Es wird empfohlen, die Dateien sofort wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningNoRecoverDesc">
+			<Text>
+				<![CDATA[MÃ¶chten Sie die aktuellen Scanergebnisse verwerfen und das Programm schlieÃŸen?<br><br><br>Warnung: Wenn Sie jetzt die Seite verlassen, kÃ¶nnen die aktuellen Scanergebnisse verloren gehen. Es wird empfohlen, die Dateien sofort wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ListViewDesc">
+			<Text>
+				<![CDATA[Listenansicht]]>
+			</Text>
+		</Item>
+		<Item Name="DetailViewDesc">
+			<Text>
+				<![CDATA[Detailansicht]]>
+			</Text>
+		</Item>
+		<Item Name="IconViewDesc">
+			<Text>
+				<![CDATA[Symbolansicht]]>
+			</Text>
+		</Item>		
+		<Item Name="ButtonBack">
+			<Text>
+				<![CDATA[ZurÃ¼ck]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonOk">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonCancel">
+			<Text>
+				<![CDATA[Abbrechen]]>
+			</Text>
+		</Item>
+		<Item Name ="ButtonRecover">
+			<Text>
+				<![CDATA[Wiederherstellen]]>
+			</Text>
+		</Item>
+		<Item Name ="ScanDesc">
+			<Text>
+				<![CDATA[Scannen]]>
+			</Text>
+		</Item>
+		<Item Name ="ButtonAdvanceRecover">
+			<Text>
+				<![CDATA[Erweiterte Videowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name ="AllVideosDesc">
+			<Text>
+				<![CDATA[Alle Videos]]>
+			</Text>
+		</Item>
+		<Item Name ="OtherVideosDesc">
+			<Text>
+				<![CDATA[Andere Videos]]>
+			</Text>
+		</Item>
+		<Item Name ="OtherPhotosDesc">
+			<Text>
+				<![CDATA[Andere Fotos]]>
+			</Text>
+		</Item>
+		<Item Name ="CorruptedVideoDesc">
+			<Text>
+				<![CDATA[BeschÃ¤digtes Video]]>
+			</Text>
+		</Item>
+		<Item Name ="VideoFormatDesc">
+			<Text>
+				<![CDATA[Videoformat]]>
+			</Text>
+		</Item>
+		<Item Name ="RecoveryFailDesc">
+			<Text>
+				<![CDATA[<a href="#"><font color=#FF644D>Wiederherstellung von %1 Datei(en) fehlgeschlagen</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name ="RecoveryCancelDesc">
+			<Text>
+				<![CDATA[Wiederherstellung von %1 Datei(en) abgebrochen.]]>
+			</Text>
+		</Item>
+		<Item Name ="SelectAllDesc">
+			<Text>
+				<![CDATA[Alle auswÃ¤hlen]]>
+			</Text>
+		</Item>
+		<Item Name ="OnlineSupportDesc">
+			<Text>
+				<![CDATA[Online Support]]>
+			</Text>
+		</Item>
+		<Item Name ="MoreDesc">
+			<Text>
+				<![CDATA[Mehr]]>
+			</Text>
+		</Item>
+		<Item Name ="checkboxScanningDesc">
+			<Text>
+				<![CDATA[Dateien kÃ¶nnen wÃ¤hrend des Scannens nicht Ã¼berprÃ¼ft werden. Bitte unterbrechen Sie den Scan, um Dateien wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name ="lostPartitionTooltipDesc">
+			<Text>
+				<![CDATA[Die Partition hat keinen Laufwerksbuchstaben und kann im Windows Explorer nicht aufgerufen werden.]]>
+			</Text>
+		</Item>
+		<Item Name ="NoReminderAgain">
+			<Text>
+				<![CDATA[Keine erneute Erinnerung]]>
+			</Text>
+		</Item>
+		<Item Name ="lockedDesc">
+			<Text>
+				<![CDATA[Gesperrt]]>
+			</Text>
+		</Item>
+		<Item Name ="lostFileNameDesc">
+			<Text>
+				<![CDATA[Verlorener Dateiname]]>
+			</Text>
+		</Item>
+	</Strings>
+	<Form Name="OldFrame">
+		<Item Name="OutofMemoryDesc">
+			<Text>
+				<![CDATA[Wenn der Computer keinen Speicher mehr hat, wird der Scanvorgang angehalten und Sie kÃ¶nnen die ausgelagerten Dateien wiederherstellen.<br><br><br>RAM-Info: %1, bitte stoppen Sie andere Programme mit hohem Speicherverbrauch, wÃ¤hrend Sie Recoverit verwenden.]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie einen Ort zum Starten der Wiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="FullDiskDesc_1" Property="string">
+			<Text><![CDATA[Sie kÃ¶nnen %1 Dateien kostenlos wiederherstellen, <Font color="#FF641D">jetzt noch %2 verfÃ¼gbar.</Font>]]></Text>
+		</Item>
+		<Item Name ="m_free" Property="string">
+			<Text><![CDATA[Kostenlos]]></Text>
+		</Item>
+		<Item Name ="m_stillrecover" Property="string">
+			<Text><![CDATA[Sie kÃ¶nnen noch %1 Dateien fÃ¼r die kostenlose Version wiederherstellen, ]]></Text>
+		</Item>
+		<Item Name ="m_recoverSelected" Property="string">
+			<Text><![CDATA[%1 Dateien ausgewÃ¤hlt.]]></Text>
+		</Item>
+		<Item Name ="lblFreeDesc" Property="string">
+			<Text><![CDATA[Kaufen Sie eine Lizenz, um die Vorteile der Advanced-Version zu nutzen.]]></Text>
+		</Item>
+		<Item Name ="lblFreeWarning" Property="string">
+			<Text><![CDATA[Die GrÃ¶ÃŸe der ausgewÃ¤hlten Datei ist grÃ¶ÃŸer als die verfÃ¼gbare GrÃ¶ÃŸe.]]></Text>
+		</Item>  
+
+		<Item Name="availableDesc" Property="string">
+			<Text>
+				<![CDATA[verfÃ¼gbar]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewUnkownFileDesc1" Property="string">
+			<Text>
+				<![CDATA[Sie kÃ¶nnen diese Datei zuerst auf dem Computer wiederherstellen und dann in der Vorschau ansehen.]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewFileMaxDesc" Property="string">
+			<Text>
+				<![CDATA[Diese Datei Ã¼berschreitet die maximale GrÃ¶ÃŸe fÃ¼r die Vorschau <font color=#FF644D>(> 1 GB)</font>]]>
+			</Text>
+		</Item>
+		<Item Name="ScanningPause" Property="string">
+			<Text>
+				<![CDATA[Scan pausiert]]>
+			</Text>
+		</Item>
+		<Item Name="AdvancedVideoScanHint" Property="string">
+			<Text>
+				<![CDATA[Wir suchen nun die Videodateien grÃ¼ndlich durch, was einige Zeit dauern kann. Bitte warten Sie einen Moment, bis Ihre Videos abgerufen werden.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc1" Property="string">
+			<Text>
+				<![CDATA[Es gibt viele fehlerhafte Sektoren auf dem DatentrÃ¤ger, bei denen der Scan nicht fortgesetzt werden kann. Es wird empfohlen, <b>die aktuell gescannten Dateien</b> so schnell wie mÃ¶glich wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="m_RenameText" Property="string">
+			<Text>
+				<![CDATA[Dieser Name wird bereits verwendet oder eine Datei mit gleichem Namen ist bereits geÃ¶ffnet.]]>
+			</Text>
+		</Item>
+		<Item Name="strStopTitle" Property="string">
+			<Text>
+				<![CDATA[Soll die Dateiwiederherstellung wirklich gestoppt werden?]]>
+			</Text>
+		</Item>
+		<Item Name="noDriver" Property="string">
+			<Text>
+				<![CDATA[Das GerÃ¤t wurde entfernt. Bitte verbinden Sie sich erneut und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverRemoveHint" Property="string">
+			<Text>
+				<![CDATA[Die Wiederherstellung von %1 Datei(en) ist fehlgeschlagen, weil %2 entfernt wurde.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverFat32" Property="string">
+			<Text>
+				<![CDATA[Eine einzelne Datei, die grÃ¶ÃŸer als 4 GB ist, kann aufgrund der EinschrÃ¤nkungen des FAT32-Dateisystems nicht wiederhergestellt werden, Sie kÃ¶nnen sie auf anderen Partitionstypen wiederherstellen.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverSuccessDesc" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung von <Font color="#00B0F5">%1</Font> Datei(en) abgeschlossen!]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverFailDesc1" Property="string">
+			<Text>
+				<![CDATA[<b>%1</b> Dateien erfolgreich wiederhergestellt! Einige Dateien werden aus folgendem Grund nicht wiederhergestellt:]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSaveDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung gescheitert, weil Speicherlaufwerk nicht verfÃ¼gbar ist, bitte verbinden Sie das externe Speichermedium erneut und stellen Sie Ihre Daten wieder her.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSourceDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung gescheitert, weil Quell-Laufwerk nicht verfÃ¼gbar ist, bitte verbinden Sie das externe Speichermedium erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameRecoverHint" Property="string">
+			<Text>
+				<![CDATA[Bitte wÃ¤hlen Sie eine Datei aus, die Sie wiederherstellen mÃ¶chten.]]>
+			</Text>
+		</Item>
+		<Item Name="SourceDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[QuelldatentrÃ¤ger wurde entfernt! Versuchen Sie, erneut eine Verbindung herzustellen und die Wiederherstellung fortzusetzen.]]>
+			</Text>
+		</Item>
+		<Item Name="DestDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[ZieldatentrÃ¤ger wurde entfernt! Versuchen Sie, erneut eine Verbindung herzustellen und die Wiederherstellung fortzusetzen.]]>
+			</Text>
+		</Item>	
+		<Item Name="strRecoverFilesNum" Property="string">
+			<Text>
+				<![CDATA[Dateien retten: ]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblname" Property="string">
+			<Text>
+				<![CDATA[Name:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lalsize" Property="string">
+			<Text>
+				<![CDATA[GrÃ¶ÃŸe:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblpath" Property="string">
+			<Text>
+				<![CDATA[Pfad:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblecrete" Property="string">
+			<Text>
+				<![CDATA[Erstelldatum:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblmodefy" Property="string">
+			<Text>
+				<![CDATA[GeÃ¤ndertes Datum:]]>
+			</Text>
+		</Item>
+		<Item Name="m_btperview" Property="string">
+			<Text>
+				<![CDATA[Vorschau]]>
+			</Text>
+		</Item>
+		<Item Name="UnNormalSector" Property="string">
+			<Text>
+				<![CDATA[Wir unterstÃ¼tzen Ihr GerÃ¤t derzeit nicht. <b>Wenn es sich bei dem angeschlossenen GerÃ¤t um eine Kamera handelt, sie kÃ¶nnen die SD-Karte herausnehmen, in einen Kartenleser einlegen und dann scannen</b>.]]>
+			</Text>
+		</Item>    
+
+		<Item Name="AllRoundScanCompleteed" ControlType = "11" >
+			<Text>
+				<![CDATA[Kann verlorene Dateien nicht finden? Versuchen Sie es mit einem Tiefenscan.]]>
+			</Text>
+		</Item>
+
+		<Item Name="RawScanCompleteed" Property="string">
+			<Text>
+				<![CDATA[Sie kÃ¶nnen Ihre verlorenen Dateien nicht finden? Bitte Deep Scan Mode wÃ¤hlen und try again.]]>
+			</Text>
+		</Item>
+
+		<Item Name="UnVerifyTrustDesc1" Property="string">
+			<Text>
+				<![CDATA[Sie laufen in Gefahr, eine Software-Raubkopien zu verwenden. Bitte verwenden Sie weiterhin die Original-Software.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc2" Property="string">
+			<Text>
+				<![CDATA[Kaufen]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc3" Property="string">
+			<Text>
+				<![CDATA[Herunterladen]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewLoadDesc" Property="string">
+			<Text>
+				<![CDATA[Datei wird geladen â€¦ bitte haben Sie Geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc4" ControlType="11">
+			<Text>
+				<![CDATA[Bitte laden Sie nach dem Kauf der Software die offizielle Version von der offiziellen Recoverit-Website herunter.  http://recoverit.wondershare.com]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs1" Property="string">
+			<Text>
+				<![CDATA[Tritt das Problem immer noch auf? <a href="#"><Font color="#00AEE6">Klicken Sie hier</Font></a>, um uns zu kontaktieren.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs2" Property="string">
+			<Text>
+				<![CDATA[Ã„ndern Sie das Beispielvideo und reparieren Sie es dann erneut. Wenn das Problem weiterhin auftritt, <a href="#"><Font color="#00AEE6">klicken Sie hier</Font></a>, um uns Bericht zu einreichen.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs3" Property="string">
+			<Text>
+				<![CDATA[Erstellen fehlgeschlagen! ÃœberprÃ¼fen Sie, ob Ihr GerÃ¤t eine ordnungsgemÃ¤ÃŸe Verbindung herstellt, oder <a href="#"><Font color="#00AEE6">reichen Sie uns Bericht ein</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs4" Property="string">
+			<Text>
+				<![CDATA[Behebt das erneute Scannen das Problem immer noch nicht? <a href="#"><Font color="#00AEE6">Klicken Sie hier</Font></a>, um uns Bericht zu einreichen.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs5" Property="string">
+			<Text>
+				<![CDATA[Eine Internetverbindung ist erforderlich, um die Software zu aktivieren. Bitte Ã¼berprÃ¼fen Sie Ihr Netzwerk oder wenden Sie sich an Ihren IT-Administrator.<a href="#"><Font color="#00AEE6">Sie kÃ¶nnen </Font></a> sich auch bei uns melden.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs6" Property="string">
+			<Text>
+				<![CDATA[Welchen Teil von Recoverit magst du nicht? <a href="#"><Font color="#00AEE6">Teilen</Font></a> kann es uns sehr helfen!]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs7" Property="string">
+			<Text>
+				<![CDATA[Keine Internetverbindung]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs8" Property="string">
+			<Text>
+				<![CDATA[Wir kÃ¶nnen keine Verbindung zum Internet herstellen. Bitte Ã¼berprÃ¼fen Sie Ihre Verbindung und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeepHint" Property="string">
+			<Text>
+				<![CDATA[Der Tiefer-Scan-Modus findet mehr Dateien, benÃ¶tigt aber mehr Zeit.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 EintrÃ¤ge, %2]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameSelectFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 Datei(en) ausgewÃ¤hlt in %2]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeep" Property="string">
+			<Text>
+				<![CDATA[<font color=#26324B>Sie kÃ¶nnen die verlorenen Dateien immer noch nicht finden? Versuchen Sie </font> <b><a href="#"><font color=#00AEE6>Tiefen-Scan</font></a></b>]]>
+			</Text>
+		</Item>
+		<Item Name="NoDataFrameDesc" Property="string">
+			<Text>
+				<![CDATA[<b>Keine Datei gefunden</b><br><br>Bitte wÃ¤hlen Sie andere zu Ã¼berprÃ¼fende Dateitypen aus]]>
+			</Text>
+		</Item>
+		<Item Name="PauseBeforeRecover" Property="string">
+			<Text>
+				<![CDATA[Bitte unterbrechen Sie den Scan, bevor Sie die Dateien wiederherstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture1" Property="string">
+			<Text>
+				<![CDATA[Vorschau nicht mÃ¶glich. Die Datei wurde mÃ¶glicherweise aus folgenden GrÃ¼nden beschÃ¤digt:]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture2"  Property="string">
+			<Text>
+				<![CDATA[1. Die Daten wurden Ã¼berschrieben.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture3"  Property="string">
+			<Text>
+				<![CDATA[2. Die Daten sind unvollstÃ¤ndig. (Bitte warten Sie, bis der Scan abgeschlossen ist und versuchen Sie, die Vorschau erneut anzuzeigen.)]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantQuit1" Property="string">
+			<Text>
+				<![CDATA[Es liegt ein Problem mit der Kontoautorisierung vor.]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantRetry"  Property="string">
+			<Text>
+				<![CDATA[Wiederholen]]>
+			</Text>
+		</Item>
+		<Item Name="m_BuyNowButton"  Property="string">
+			<Text>
+				<![CDATA[Jetzt kaufen]]>
+			</Text>
+		</Item>
+		<Item Name="bootretry"  Property="string">
+			<Text>
+				<![CDATA[Erneut versuchen]]>
+			</Text>
+		</Item>
+		<Item Name="bootformatnow"  Property="string">
+			<Text>
+				<![CDATA[Formatieren]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc3"  Property="string">
+			<Text>
+				<![CDATA[Pfad Ã¤ndern]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Ja]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_NoButton"  Property="string">
+			<Text>
+				<![CDATA[Nein]]>
+			</Text>
+		</Item>	 
+		<Item Name="Stop1_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Abbrechen]]>
+			</Text>
+		</Item>
+		<Item Name="Stop1_m_cancelButton"  Property="string">
+			<Text>
+				<![CDATA[Weiter]]>
+			</Text>
+		</Item>
+		<Item Name="Stop2_m_ExitButton" Property="string">
+			<Text>
+				<![CDATA[Verlassen]]>
+			</Text>
+		</Item>
+		<Item Name="Stop5_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Ãœberschreiben]]>
+			</Text>
+		</Item>
+
+		<Item Name="Stop6_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Speichern]]>
+			</Text>
+		</Item>
+		<Item Name="PasswordDialogText"  Property="string">
+			<Text>
+				<![CDATA[Die ausgewÃ¤hlte Festplatte wurde durch ein Passwort gesperrt. Bitte geben Sie das Passwort ein, um vollstÃ¤ndig zu scannen.]]>
+			</Text>
+		</Item>  
+		<Item Name="IsAdmin"  Property="string">
+			<Text>
+				<![CDATA[Sie mÃ¼ssen Administratorrechte erteilen, um dieses Programm ausfÃ¼hren zu kÃ¶nnen.]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strError"  Property="string">
+			<Text>
+				<![CDATA[Wondershare Recoverit wird noch ausgefÃ¼hrt!]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strWaring" Property="string">
+			<Text>
+				<![CDATA[Warnung]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyNetWorkDesc" Property="string">
+			<Text>
+				<![CDATA[FÃ¼r die Aktivierung der Software ist eine Internetverbindung erforderlich. Bitte Ã¼berprÃ¼fen Sie Ihr Netzwerk oder wenden Sie sich an Ihren IT-Administrator.]]>
+			</Text>
+		</Item>
+		<Item Name="NewAntiPiracyDesc" Property="string">
+			<Text>
+				<![CDATA[Die Software ist nicht echt. Jetzt herunterladen und auf echt aktualisieren.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc1" Property="string">
+			<Text>
+				<![CDATA[Sie laufen Gefahr, Raubkopien zu verwenden!]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc2" Property="string">
+			<Text>
+				<![CDATA[Warnung:]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc3" Property="string">
+			<Text>
+				<![CDATA[Ihr Computer kann durch Raubkopien mÃ¶glicherweise mit Viren infiziert werden. Das kann sogar dazu fÃ¼hren, dass Ihre Daten erneut verloren gehen.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc4" Property="string">
+			<Text>
+				<![CDATA[Hier ist ein zeitlich begrenztes Angebot fÃ¼r Sie]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc5" Property="string">
+			<Text>
+				<![CDATA[60% Rabatt auf den Kauf der Originallizenz.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc6" Property="string">
+			<Text>
+				<![CDATA[Hinweis: Wir empfehlen, die gescannten Dateien so bald wie mÃ¶glich wiederherzustellen. Andernfalls werden die Daten mÃ¶glicherweise Ã¼berschrieben und die Wiederherstellung schlÃ¤gt fehl.]]>
+			</Text>
+		</Item>	
+		<Item Name="PiracyDesc7" Property="string">
+			<Text>
+				<![CDATA[Ihr Programm scheint beschÃ¤digt oder unvollstÃ¤ndig zu sein. Laden Sie es herunter und installieren Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc8" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00AEE6>Offizielle Website</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="ScanFramePauseTooltip">
+			<Text>
+				<![CDATA[Pause]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameStopTooltip">
+			<Text>
+				<![CDATA[Stopp]]>
+			</Text>
+		</Item>
+		<Item Name="MulItemSelected">
+			<Text>
+				<![CDATA[%1 ausgewÃ¤hlt]]>
+			</Text>
+		</Item>	
+		<Item Name="m_strArchive">
+			<Text>
+				<![CDATA[Archiv]]>
+			</Text>
+		</Item>
+		<Item Name="m_strAudio">
+			<Text>
+				<![CDATA[Audio]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDataBase">
+			<Text>
+				<![CDATA[Datenbank]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDocument">
+			<Text>
+				<![CDATA[Dokument]]>
+			</Text>
+		</Item>
+		<Item Name="m_strEmail">
+			<Text>
+				<![CDATA[Email]]>
+			</Text>
+		</Item>
+		<Item Name="m_strGraphic">
+			<Text>
+				<![CDATA[Grafik]]>
+			</Text>
+		</Item>
+		<Item Name="m_strInternetWeb">
+			<Text>
+				<![CDATA[Internet & Seiten]]>
+			</Text>
+		</Item>
+		<Item Name="m_strMiscellaneous">
+			<Text>
+				<![CDATA[Verschiedenes]]>
+			</Text>
+		</Item>
+		<Item Name="m_strVideo">
+			<Text>
+				<![CDATA[Video]]>
+			</Text>
+		</Item>
+		<Item Name="m_strNoExtension">
+			<Text>
+				<![CDATA[Keine Erweiterung]]>
+			</Text>
+		</Item>
+		<Item Name="m_strFileNamePath">
+			<Text>
+				<![CDATA[Datei suchen]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip1">
+			<Text>
+				<![CDATA[Filter]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip2">
+			<Text>
+				<![CDATA[%1 Datei stimmt mit Filterbedingungen Ã¼berein.]]>
+			</Text>
+		</Item>		
+		<Item Name="UpdateAuthorDesc0">
+			<Text>
+				<![CDATA[Upgrade]]>
+			</Text>
+		</Item>
+		<Item Name="loginDesc">
+			<Text>
+				<![CDATA[Anmelden]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleRemoveDesc">
+			<Text>
+				<![CDATA[%1 wurde entfernt. Bitte verbinden Sie das GerÃ¤t und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="LostPartitionDesc">
+			<Text>
+				<![CDATA[Verlorene Partition]]>
+			</Text>
+		</Item>
+		<Item Name="LocalDiskDesc">
+			<Text>
+				<![CDATA[Lokaler DatentrÃ¤ger]]>
+			</Text>
+		</Item>
+		<Item Name="RawFilesDesc">
+			<Text>
+				<![CDATA[RAW-Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="FolderDesc">
+			<Text>
+				<![CDATA[Ordner]]>
+			</Text>
+		</Item>
+		<Item Name="lostlocationDesc">
+			<Text>
+				<![CDATA[Datei(en) mit fehlendem Pfad]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleBinDesc">
+			<Text>
+				<![CDATA[Papierkorb]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerDesc">
+			<Text>
+				<![CDATA[Die ausgewÃ¤hlte Festplatte wurde durch Windows BitLocker gesperrt. Bitte entsperren Sie sie und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="LostBitLockerDesc">
+			<Text>
+				<![CDATA[%1 ist durch BitLocker geschÃ¼tzt. Bitte entsperren Sie die Partition und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>		
+		<Item Name="DiskRefreshDesc">
+			<Text>
+				<![CDATA[Festplatteninformationen werden geladen, bitte warten...]]>
+			</Text>
+		</Item>
+		<Item Name="ScanWaitFrameDesc3">
+			<Text>
+				<![CDATA[Der Scanvorgang wurde angehalten und kann jetzt fortgesetzt werden. Bitte haben Sie etwas Geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="DesktopDesc">
+			<Text>
+				<![CDATA[Desktop]]>
+			</Text>
+		</Item>
+		<Item Name="SelectFolderkDesc">
+			<Text>
+				<![CDATA[Ordner auswÃ¤hlen]]>
+			</Text>
+		</Item>		
+		<Item Name="Unknown">
+			<Text>
+				<![CDATA[Unbekannt]]>
+			</Text>
+		</Item>
+		<Item Name="findHardDriver1">
+			<Text>
+				<![CDATA[Wir unterstÃ¼tzen Ihr Kameramodell noch nicht.<br><br><br>Sie kÃ¶nnen die SD-Karte herausnehmen, in einen Kartenleser einlegen und dann scannen.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2">
+			<Text>
+				<![CDATA[Ihre Festplatte ist ungesund. Es wird empfohlen, Ihre Dateien so schnell wie mÃ¶glich wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2_1">
+			<Text>
+				<![CDATA[Erkennt, dass auf Ihrer Festplatte einige Probleme auftreten.]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="CalendarFrame">	
+		<Item Name="Week1" Property="string">
+			<Text>
+				<![CDATA[Mo]]>
+			</Text>
+		</Item>
+		<Item Name="Week2" Property="string">
+			<Text>
+				<![CDATA[Di]]>
+			</Text>
+		</Item>
+		<Item Name="Week3" Property="string">
+			<Text>
+				<![CDATA[Mi]]>
+			</Text>
+		</Item>
+		<Item Name="Week4" Property="string">
+			<Text>
+				<![CDATA[Do]]>
+			</Text>
+		</Item>
+		<Item Name="Week5" Property="string">
+			<Text>
+				<![CDATA[Fr]]>
+			</Text>
+		</Item>
+		<Item Name="Week6" Property="string">
+			<Text>
+				<![CDATA[Sa]]>
+			</Text>
+		</Item>
+		<Item Name="Week7" Property="string">
+			<Text>
+				<![CDATA[So]]>
+			</Text>
+		</Item>	  
+		<Item Name="Mon1" Property="string">
+			<Text>
+				<![CDATA[Januar]]>
+			</Text>
+		</Item>
+		<Item Name="Mon2" Property="string">
+			<Text>
+				<![CDATA[Februar]]>
+			</Text>
+		</Item>
+		<Item Name="Mon3" Property="string">
+			<Text>
+				<![CDATA[MÃ¤rz]]>
+			</Text>
+		</Item>
+		<Item Name="Mon4" Property="string">
+			<Text>
+				<![CDATA[April]]>
+			</Text>
+		</Item>
+		<Item Name="Mon5" Property="string">
+			<Text>
+				<![CDATA[Mai]]>
+			</Text>
+		</Item>
+		<Item Name="Mon6" Property="string">
+			<Text>
+				<![CDATA[Juni]]>
+			</Text>
+		</Item>
+		<Item Name="Mon7" Property="string">
+			<Text>
+				<![CDATA[Juli]]>
+			</Text>
+		</Item>
+		<Item Name="Mon8" Property="string">
+			<Text>
+				<![CDATA[August]]>
+			</Text>
+		</Item>
+		<Item Name="Mon9" Property="string">
+			<Text>
+				<![CDATA[September]]>
+			</Text>
+		</Item>
+		<Item Name="Mon10" Property="string">
+			<Text>
+				<![CDATA[Oktober]]>
+			</Text>
+		</Item>
+		<Item Name="Mon11" Property="string">
+			<Text>
+				<![CDATA[November]]>
+			</Text>
+		</Item>
+		<Item Name="Mon12" Property="string">
+			<Text>
+				<![CDATA[Dezember]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RowHeaderFrame">	
+		<Item Name="Head0" Property="string">
+			<Text>
+				<![CDATA[      Name]]>
+			</Text>
+		</Item>
+		<Item Name="Head1"  Property="string">
+			<Text>
+				<![CDATA[GrÃ¶ÃŸe]]>
+			</Text>
+		</Item>
+		<Item Name="Head2"  Property="string">
+			<Text>
+				<![CDATA[Pfad]]>
+			</Text>
+		</Item>
+		<Item Name="Head3" Property="string">
+			<Text>
+				<![CDATA[Erst. Datum]]>
+			</Text>
+		</Item>
+		<Item Name="Head4"  Property="string">
+			<Text>
+				<![CDATA[Bearb. Datum]]>
+			</Text>
+		</Item>
+		<Item Name="Head5"  Property="string">
+			<Text>
+				<![CDATA[Typ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MainMenu">		
+		<Item Name="m_StrStatus" Property="string">
+			<Text>
+				<![CDATA[Feedback]]>
+			</Text>
+		</Item>	  
+		<Item Name="m_optionsAction" Property="string">
+			<Text>
+				<![CDATA[Sprache]]>
+			</Text>
+		</Item>
+		<Item Name="m_helpAction" Property="string">
+			<Text>
+				<![CDATA[Manuell integrieren       ]]>
+			</Text>
+		</Item>
+		<Item Name="m_purchaseAction" Property="string">
+			<Text>
+				<![CDATA[Kaufen]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction" Property="string">
+			<Text>
+				<![CDATA[Registrieren]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction1" Property="string">
+			<Text>
+				<![CDATA[Konto]]>
+			</Text>
+		</Item>
+		<Item Name="m_suppotAction" Property="string">
+			<Text>
+				<![CDATA[Support-Center]]>
+			</Text>
+		</Item>
+		<Item Name="m_diskToolAction" Property="string">
+			<Text>
+				<![CDATA[Festplattendienstprogramme]]>
+			</Text>
+		</Item>
+		<Item Name="m_logfilesAction" Property="string">
+			<Text>
+				<![CDATA[Log-Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="m_updateAction" Property="string">
+			<Text>
+				<![CDATA[Nach Updates suchen]]>
+			</Text>
+		</Item>
+		<Item Name="m_userGuideAction" Property="string">
+			<Text>
+				<![CDATA[Benutzerhandbuch]]>
+			</Text>
+		</Item>
+		<Item Name="m_aboutAction" Property="string">
+			<Text>
+				<![CDATA[Ãœber]]>
+			</Text>
+		</Item>
+		<Item Name="m_contactusAction" Property="string">
+			<Text>
+				<![CDATA[FAQ]]>
+			</Text>
+		</Item>	  
+	</Form>
+	<Form Name="cmenuOption">
+		<Item Name="Language" Property="string">
+			<Text>
+				<![CDATA[Sprache]]>
+			</Text>
+		</Item>
+		<Item Name="languageCombox" Property="string">
+			<Text>
+				<![CDATA[English(English),Japanese(æ—¥æœ¬èª),French(FranÃ§ais),German(Deutsch),Chinese Traditional(ä¸­å›½é¦™æ¸¯),Chinese Traditional(ä¸­å›½å°æ¹¾),Portuguese(Portuguese),Italiano(Italiano),Spanish(EspaÃ±ol),Netherland(Nederlands),Arab(Â Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©Â ),Korean(í•œêµ­ì–´),Sweden(SwÃ©dia),Indonesia(Indonesia),Russian(Ñ€ÑƒÑÑĞºĞ¸Ğ¹)]]>
+			</Text>
+		</Item>
+		<Item Name="okButton" Property="string">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+		<Item Name="cancelButton" Property="string">
+			<Text>
+				<![CDATA[SchlieÃŸen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BitLockerPasswordDialog">
+		<Item Name="lblTextValue" Property="string">
+			<Text>
+				<![CDATA[Die ausgewÃ¤hlte Festplatte ist mit Bitlocker verschlÃ¼sselt. Geben Sie zum Entsperren bitte Ihr Passwort ein.]]>
+			</Text>
+		</Item>
+		<Item Name="lineEditPlaceholderText" Property="string">
+			<Text>
+				<![CDATA[Passwort/WiederherstellungsschlÃ¼ssel]]>
+			</Text>
+		</Item>
+		<Item Name="lblHowTo" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Passwort vergessen?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc1" Property="string">
+			<Text>
+				<![CDATA["WiederherstellungsschlÃ¼ssel" auf diesem PC suchen]]>
+			</Text>
+		</Item>
+		<Item Name="labelError" Property="label">
+			<Text>
+				<![CDATA[Falsches Passwort]]>
+			</Text>
+		</Item>		
+		<Item Name="BtnSearch" Property="button">
+			<Text>
+				<![CDATA[durchsucht]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc2" Property="string">
+			<Text>
+				<![CDATA[Wird durchsucht...]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc3" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>Nicht gefunden</font>.Â <a href="#"><font color=#00B0F5>WiederherstellungsschlÃ¼ssel finden.</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc4" Property="string">
+			<Text>
+				<![CDATA[Erfolgreich entsperrt. ]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc5" Property="string">
+			<Text>
+				<![CDATA[Wir konnten den SchlÃ¼ssel finden. Erfolgreich entsperrt. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanNoDataFrame">
+		<Item Name="LastScanProgressSynced" Property="string">
+			<Text>
+				<![CDATA[Letzter Scanfortschritt synchronisiert.]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc1" Property="label">
+			<Text>
+				<![CDATA[Scanvorgang]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc2" Property="label">
+			<Text>
+				<![CDATA[Beenden Sie den aktuellen Prozess erst, wenn der Scanvorgang abgeschlossen ist.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="RepairFileDataFrame">
+		<Item Name="textDesc1" Property="string">
+			<Text>
+				<![CDATA[BeschÃ¤digte Datei wird versucht mit "Repairit" zu reparieren.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc2" Property="string">
+			<Text>
+				<![CDATA[BeschÃ¤digte Datei trotzdem wiederherstellen?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc3" Property="string">
+			<Text>
+				<![CDATA[Die Reparatur wurde nicht abgeschlossen. Die Datei ist nach der Wiederherstellung immer noch beschÃ¤digt.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc4" Property="string">
+			<Text>
+				<![CDATA[Weiter]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc5" Property="string">
+			<Text>
+				<![CDATA[Abbrechen]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc6" Property="string">
+			<Text>
+				<![CDATA[Toll, wir konnten die Datei erfolgreich reparieren!]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc7" Property="string">
+			<Text>
+				<![CDATA[Die Reparatur ist fehlgeschlagen. Die Datei kann nicht repariert und angezeigt werden.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc8" Property="string">
+			<Text>
+				<![CDATA[BeschÃ¤digte Datei trotzdem wiederherstellen?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc9" Property="string">
+			<Text>
+				<![CDATA[Die Datei kÃ¶nnte beschÃ¤digt sein. Bitte Ã¼berprÃ¼fen Sie sie sobald wie mÃ¶glich nach der Wiederherstellung und versuchen Sie, sie zu reparieren.]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="CrashContinueDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Mit unfertigem Scan fortfahren?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Es ist ein Softwareproblem aufgetreten und der soeben begonnene Scan ist noch nicht beendet. MÃ¶chten Sie fortfahren?]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOK" Property="button">
+			<Text>
+				<![CDATA[Fortsetzen]]>
+			</Text>
+		</Item>
+		<Item Name="BtnCancel" Property="button">
+			<Text>
+				<![CDATA[Weiter]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="LockDriverDialog">
+		<Item Name="LockDriverDialog1" Property="string">
+			<Text>
+				<![CDATA[Ãœberspringen]]>
+			</Text>
+		</Item>
+		<Item Name="LockDriverDialog2" Property="string">
+			<Text>
+				<![CDATA[Entsperren]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerLink" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Wie kann man ein Laufwerk freischalten?</font></a>]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="FilterFrame">
+		<Item Name="FilterDesc" Property="string">
+			<Text>
+				<![CDATA[Filter]]>
+			</Text>
+		</Item>
+		<Item Name="ResetDesc" Property="string">
+			<Text>
+				<![CDATA[ZurÃ¼cksetzen]]>
+			</Text>
+		</Item>
+		<Item Name="FileTypeDesc" Property="string">
+			<Text>
+				<![CDATA[Dateityp]]>
+			</Text>
+		</Item>		
+		<Item Name="TimeDesc" Property="string">
+			<Text>
+				<![CDATA[Zeit]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[DateigrÃ¶ÃŸe]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDescText" Property="string">
+			<Text>
+				<![CDATA[DateigrÃ¶ÃŸe]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText1" Property="string">
+			<Text>
+				<![CDATA[Alle Zeit]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText2" Property="string">
+			<Text>
+				<![CDATA[Gestern]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText3" Property="string">
+			<Text>
+				<![CDATA[Letzte Woche]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText4" Property="string">
+			<Text>
+				<![CDATA[Letzter Monat]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText5" Property="string">
+			<Text>
+				<![CDATA[Letztes Jahr]]>
+			</Text>
+		</Item>		
+		<Item Name="FilterDateTimeText6" Property="string">
+			<Text>
+				<![CDATA[Anpassen...]]>
+			</Text>
+		</Item>
+		<Item Name="Lessthan1MB" Property="string">
+			<Text>
+				<![CDATA[Weniger als 1 MB]]>
+			</Text>
+		</Item>
+		<Item Name="1GBabove" Property="string">
+			<Text>
+				<![CDATA[Ãœber 1 GB]]>
+			</Text>
+		</Item>
+		<Item Name="AllFiles" Property="string">
+			<Text>
+				<![CDATA[Alle Dateien]]>
+			</Text>
+		</Item>	
+		<Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[GelÃ¶schte Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="FilteringDesc" Property="string">
+			<Text>
+				<![CDATA[Filtern]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchingDesc" Property="string">
+			<Text>
+				<![CDATA[Suche]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFilesEx" Property="string">
+			<Text>
+				<![CDATA[Suchergebnis: %1 Objekt, %2 Dateien]]>
+			</Text>
+		</Item>		
+		<Item Name="SearchresultsFiles" Property="string">
+			<Text>
+				<![CDATA[Suchergebnisse: %1 Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="Searchresults" Property="string">
+			<Text>
+				<![CDATA[Suchergebnis fÃ¼r %1]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFile" Property="string">
+			<Text>
+				<![CDATA[Suchergebnisse: 0 Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="Less100MB" Property="string">
+			<Text>
+				<![CDATA[1MB~100MB]]>
+			</Text>
+		</Item>
+		<Item Name="Less1GB" Property="string">
+			<Text>
+				<![CDATA[100MB~1GB]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ShowBannerFrame">
+		<Item Name="ShowBannerFrameCrashSystem1_1" Property="string">
+			<Text>
+				<![CDATA[BootfÃ¤higes USB erstellen]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem1_2" Property="string">
+			<Text>
+				<![CDATA[Greifen Sie auf Ihre abgestÃ¼rzten Computerdaten zu, indem Sie ein bootfÃ¤higes USB-Laufwerk erstellen.]]>
+			</Text>
+		</Item>		
+		<Item Name="ShowBannerFrameCrashSystem2_1" Property="string">
+			<Text>
+				<![CDATA[Bluescreen des Todes]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem2_2" Property="string">
+			<Text>
+				<![CDATA[Stellen Sie die Boot-Optionen auf dem abgestÃ¼rzten PC ein, um die Rettungsdaten zu starten.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_1" Property="string">
+			<Text>
+				<![CDATA[Schwarzer Bildschirm des Todes]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_2" Property="string">
+			<Text>
+				<![CDATA[Einfach und einfach gelÃ¶schte Daten von einem abgestÃ¼rzten PC kopieren oder wiederherstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_1" Property="string">
+			<Text>
+				<![CDATA[#1 zum Wiederherstellen gelÃ¶schter oder tief versteckter Videos]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_2" Property="string">
+			<Text>
+				<![CDATA[Wenn Sie feststellen, dass bei der Aufnahme oder Bearbeitung eines Videos etwas Unerwartetes passiert ist.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_1" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung von Ultra HD-, 4K- und 8K-Videos]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_2" Property="string">
+			<Text>
+				<![CDATA[Wir unterstÃ¼tzen die Wiederherstellung von Ultra HD-, 4K- und sogar 8K-Videos, die leistungsfÃ¤higer als je zuvor sind.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_1" Property="string">
+			<Text>
+				<![CDATA[Video von allen GerÃ¤ten wiederherstellen]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_2" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung von DSLR, Digitalkameras, Drohnen, Dashcams, SD-Karten, etc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_1" Property="string">
+			<Text>
+				<![CDATA[SchÃ¤den durch unvorsichtige Bedienung]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_2" Property="string">
+			<Text>
+				<![CDATA[Aufzeichnung nach einem Absturz, Wasserschaden, ErschÃ¼tterung, Sturz, leerer Akku, unerwartetes Abschalten wÃ¤hrend der Videoaufzeichnung, etc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_1" Property="string">
+			<Text>
+				<![CDATA[Video wurde wiederhergestellt, aber nicht abgespielt]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_2" Property="string">
+			<Text>
+				<![CDATA[Verlorenes Video wurde wiederhergestellt, kann aber aus unbekannten GrÃ¼nden nicht abgespielt werden.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_1" Property="string">
+			<Text>
+				<![CDATA[Reparieren von Videos von bekannten Kameramarken]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_2" Property="string">
+			<Text>
+				<![CDATA[UnterstÃ¼tzt Cannon, Nikon, Sony, Panasonic, GoPro, DJI etc.]]>
+			</Text>
+		</Item>			
+	</Form>	
+	<Form Name="FindHardDriverDialog">
+		<Item Name="FindHardDriverDialogOtherState1" Property="string">
+			<Text>
+				<![CDATA[Ursache]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState2" Property="string">
+			<Text>
+				<![CDATA[Wenn Ihr Festplattenstatus den folgenden Status aufweist:<br>Offline/Fehlend/Unlesbar/Ausgefallen/Unbekannt/Fremd]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState3" Property="string">
+			<Text>
+				<![CDATA[LÃ¶sung]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState4" Property="string">
+			<Text>
+				<![CDATA[Bitte beachten Sie die Tipps von Microsoft, um das Problem zu lÃ¶sen:<a href="#"><font color=#00B0F5>Microsoft Fehlerbehebungg</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNotInitialized1" Property="string">
+			<Text>
+				<![CDATA[Ursache]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized2" Property="string">
+			<Text>
+				<![CDATA[Der DatentrÃ¤ger hat keine gÃ¼ltige DatentrÃ¤gersignatur.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNotInitialized3" Property="string">
+			<Text>
+				<![CDATA[LÃ¶sung]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized4" Property="string">
+			<Text>
+				<![CDATA[Klicken Sie mit der rechten Maustaste auf die DatentrÃ¤gerverwaltung, um das Laufwerk zu initialisieren. Verwenden Sie dann Recoverit zum Scannen und Wiederherstellen von Daten.]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNoMedia1" Property="string">
+			<Text>
+				<![CDATA[Ursache]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia2" Property="string">
+			<Text>
+				<![CDATA[Wenn der Status Ihres DatentrÃ¤gers "Keine Medien" lautet, liegt mÃ¶glicherweise ein schwerer Hardwareschaden vor.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNoMedia3" Property="string">
+			<Text>
+				<![CDATA[LÃ¶sung]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia4" Property="string">
+			<Text>
+				<![CDATA[Schicken Sie die Platte zur ÃœberprÃ¼fung an eine Reparaturwerkstatt.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="mainframe">
+		<Item Name="MainBannerFrameDataRecovery" Property="string">
+			<Text>
+				<![CDATA[Festplatten und Speicherorte]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameCrashSystem" Property="string">
+			<Text>
+				<![CDATA[AbgestÃ¼rzter Computer]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameAdvanceVideo" Property="string">
+			<Text>
+				<![CDATA[Erweiterte Videowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameVideoRepair" Property="string">
+			<Text>
+				<![CDATA[Reparatur von beschÃ¤digten Videos]]>
+			</Text>
+		</Item>
+		<Item Name="labelDataRecover" Property="label">
+			<Text>
+				<![CDATA[Dateiwiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="labelDataRepair" Property="label">
+			<Text>
+				<![CDATA[Datei Reparatur]]>
+			</Text>
+		</Item>
+		<Item Name="mainformlblDesc" Property="label">
+			<Text><![CDATA[Wir analysieren Ihr Video, bitte warten Sie geduldig.]]></Text>
+		</Item>
+	</Form>
+	<Form Name="fulldiskframe">
+		<Item Name="labelAdvanceText" Property="label">
+			<Text>
+				<![CDATA[Stellen Sie Ihre verlorenen Videos beliebiges GerÃ¤tes wieder her]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="label">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie einen Ort zum Starten der Wiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="lblHardTitle" Property="label">
+			<Text>
+				<![CDATA[Festplattenlaufwerke]]>
+			</Text>
+		</Item>
+		<Item Name="lblExternTitle" Property="label">
+			<Text>
+				<![CDATA[Externe Laufwerke]]>
+			</Text>
+		</Item>
+		<Item Name="lblSpecificTitle" Property="label">
+			<Text>
+				<![CDATA[Schneller Zugriff ]]>
+			</Text>
+		</Item>	
+		<Item Name="lblFeedback" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Kann Ihre Festplatte nicht erkannt werden?</font></a>]]>
+			</Text>
+		</Item>	
+		<Item Name="refreshbtn" Property="tooltip">
+			<Text>
+				<![CDATA[Aktualisieren]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Aktualisieren]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Aktualisieren]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Aktualisieren]]>
+			</Text>
+		</Item>
+		<Item Name="advanceVideoDesc" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie die Festplatte aus, um die professionelle Video-Wiederherstellung zu starten:]]>
+			</Text>
+		</Item>
+	</Form>
+
+	<Form Name="CrashSystemShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Retten Sie Ihre Daten vom abgestÃ¼rzten Computer]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Erstellen Sie einen bootfÃ¤higen USB-Stick, um den abgestÃ¼rzten Computer zu starten und Daten von ihm abzurufen:]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Starten]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Patentierte Technologie zur Wiederherstellung von tief verborgenen Videos]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Die exklusive patentierte Innovationstechnologie kommt von Recoverit - Videoclips extrahieren und integrieren]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Starten]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="VideoRepairShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Die schnelle & erweiterte Video-Reparatur schÃ¼tzt Sie vor VideobeschÃ¤digungen]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[3 Schritte zur Reparatur beschÃ¤digter Videos, ein All-in-One-Toolkit fÃ¼r BeschÃ¤digungen in unterschiedlichen Situationen]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Video hinzufÃ¼gen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CommonWaitFrame">
+		<Item Name="lblDiskDesc1" Property="label">
+			<Text>
+				<![CDATA[DatentrÃ¤ger wird geladen...]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Stecken Sie lange im Ladevorgang fest?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="RemoveExternalDisk">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Entfernen Sie alle externen GerÃ¤te und versuchen Sie es erneut]]>
+			</Text>
+		</Item>
+		<Item Name="labelTex1" Property="label">
+			<Text>
+				<![CDATA[Entfernen Sie alle externen Festplatten, die an den Computer angeschlossen sind und warten Sie, bis der Ladevorgang abgeschlossen ist.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelTex2" Property="label">
+			<Text>
+				<![CDATA[SchlieÃŸen Sie den wiederherzustellenden DatentrÃ¤ger wieder an und starten Sie den Scanvorgang.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Verstanden]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[Tritt das Problem weiterhin auf? <a href="#"><font color=#00B0F5> Klicken Sie hier</font></a> um uns Bescheid zu geben. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FindHardDriverDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Festplatte wurde nicht gefunden]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Ã–ffnen Sie die <a href="#"><font color=#00B0F5>DatentrÃ¤gerverwaltung</font></a>, prÃ¼fen Sie Ihren Festplattenstatus:]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNotInit" Property="button">
+			<Text>
+				<![CDATA[Nicht initialisiert]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNoMedia" Property="button">
+			<Text>
+				<![CDATA[Keine Medien]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOther" Property="button">
+			<Text>
+				<![CDATA[Weiterer Status]]>			    
+			</Text>
+		</Item>		
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Verstanden]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Kontaktieren Sie uns</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MobileDialog">
+		<Item Name="MobileDialogDownload">
+			<Text>
+				<![CDATA[Zu Download gehen]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recoverit]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1_1" Property="label">
+			<Text>
+				<![CDATA[SchlieÃŸen Sie den wiederherzustellenden DatentrÃ¤ger wieder an und starten Sie den Scanvorgang.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Dr.Fone - Datenrettung]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2_1" Property="label">
+			<Text>
+				<![CDATA[Daten von iOS/Android-GerÃ¤ten wiederherstellen.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BadSectorDialog">
+		<Item Name="BadSectorFrameDriver" Property="string">
+			<Text>
+				<![CDATA[Erkannte fehlerhafte Sektoren in (%1:).  ]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameViewDetails" Property="string">
+			<Text>
+				<![CDATA[Details einsehen]]>
+			</Text>
+		</Item>
+
+		<Item Name="BadSectorFrameSkipSector" Property="string">
+			<Text>
+				<![CDATA[Versuche, fehlerhafte Sektoren zu Ã¼berspringen, bitte warten...]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameLearnMore" Property="string">
+			<Text>
+				<![CDATA[Mehr erfahren]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDialogDesc" Property="string">
+			<Text>
+				<![CDATA[Es befinden sich %1 fehlerhafte Sektoren auf dem DatentrÃ¤ger]]>
+			</Text>
+		</Item>		
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Stellen Sie Ihre Dateien so schnell wie mÃ¶glich wieder her und erstellen Sie sofort ein Backup, um einen erneuten Datenverlust zu verhindern.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Sofortiges Backup]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblGoodText" Property="label">
+			<Text>
+				<![CDATA[Gut]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblPoorText" Property="label">
+			<Text>
+				<![CDATA[Schlecht]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblSevereText" Property="label">
+			<Text>
+				<![CDATA[Schwer]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblDamagedText" Property="label">
+			<Text>
+				<![CDATA[BeschÃ¤digt]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblUnkownText" Property="label">
+			<Text>
+				<![CDATA[Unbekannt]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchHintFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Entschuldigung, keine Datei gefunden!]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[1. Bei einigen Dateien fehlt der Original-Dateiname, bitte Ã¼berprÃ¼fen Sie diese unter den <a href="#"><font color=#00B0F5>nicht zugeordneten Dateien</font></a>]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[2. Bitte warten Sie, bis der Scanvorgang abgeschlossen ist und suchen Sie erneut.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[3. Versuchen Sie, Ihre Dateien mit dem Filter zu finden.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[So finden Sie Dateien in den nicht zugeordneten Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Nicht zugeordnete Dateien verlieren ihre Dateinamen, Sie kÃ¶nnen nicht nach den Originalnamen suchen. Hier finden Sie einige Tipps zum Auffinden von Dateien in "Nicht zugeordnete Dateien":]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[1. Klicken Sie auf [Nicht zugeordnete Dateien]]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[2. WÃ¤hlen Sie den Dateityp, der wiederhergestellt werden soll.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[3. Zeigen Sie eine Vorschau an, um zu prÃ¼fen, ob die Dateien Ihren Anforderungen entsprechen.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Verstanden]]>			    
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="PreviewSimilarErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Hoppla, die Dateivorschau ist aus folgendem Grund fehlgeschlagen:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Die Datei wurde mÃ¶glicherweise Ã¼berschrieben. Es wird empfohlen, auf dem Computer wiederherzustellen.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Welches ist die Datei, die Ã¼berschrieben wird?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Hoppla, die Dateivorschau ist aus folgendem Grund fehlgeschlagen:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Die Datei wurde mÃ¶glicherweise Ã¼berschrieben. Es wird empfohlen, auf dem Computer wiederherzustellen..]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Welches ist die Datei, die Ã¼berschrieben wird?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="ScanPreviewErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Hoppla, die Dateivorschau ist aus folgendem Grund fehlgeschlagen:]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[Die Datei ist noch unvollstÃ¤ndig, bitte sehen Sie sich die Datei nach Abschluss des Scanvorgangs an.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>PrÃ¼fen Sie die Formate, die die Vorschau unterstÃ¼tzen</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="PreviewUnkownFileFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Ups, das Dateiformat unterstÃ¼tzt keine Vorschau]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Keine Sorge, Sie kÃ¶nnen solche Dateien anzeigen, nachdem sie auf Ihrem Computer wiederhergestellt wurden.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>PrÃ¼fen Sie die Formate, die die Vorschau unterstÃ¼tzen</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewAdanceVideoErrorFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Ups, die Videovorschau ist fehlgeschlagen.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Versuchen Sie die <b>Optimierte Wiederherstellung</b>, um nach den versteckten Videofragmenten zu suchen.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[Hinweis: Speichern Sie die gescannten Dateien, bevor Sie die Optimierte Wiederherstellung starten]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewVideoErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Ups, die Videovorschau ist fehlgeschlagen.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[Stellen Sie sie auf dem Computer wieder her und versuchen Sie die Videoreparatur, um die beschÃ¤digten Videos zu reparieren.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DocumentViewOrderFrame">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Die Videovorschau ist auf 30 Sekunden begrenzt. Wenn Sie das komplette Video abspielen mÃ¶chten, kÃ¶nnen Sie es auf Ihrem Computer wiederherstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="labelOfficeText" Property="label">
+			<Text>
+				<![CDATA[Nur die erste Seite der Datei kann in der Vorschau angezeigt werden.<br>Wenn Sie weitere Inhalte anzeigen mÃ¶chten, stellen Sie die Datei auf Ihrem Computer wieder her.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFrameTree">
+		<Item Name="TipDiskRawDesc" Property="string">
+			<Text>
+				<![CDATA[Diese Dateien haben nicht mehr ihre ursprÃ¼nglichen Dateinamen, DateigrÃ¶ÃŸen und Zeitstempel. Aber sie kÃ¶nnten genau das sein, was Sie suchen.]]>
+			</Text>
+		</Item>
+		<Item Name="TipLostLocationDesc" Property="string">
+			<Text>
+				<![CDATA[Diese Dateien haben keine Informationen Ã¼ber ihren ursprÃ¼nglichen Speicherpfad, Sie kÃ¶nnen prÃ¼fen, ob es das ist, was Sie suchen.]]>
+			</Text>
+		</Item>
+		<Item Name="btnpath" Property="button">
+			<Text>
+				<![CDATA[Dateispeicherort]]>
+			</Text>
+		</Item>
+		<Item Name="btntype" Property="button">
+			<Text>
+				<![CDATA[Dateityp]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ReconnectDialog">
+		<Item Name="ReconnectDiskDesc" Property="string">
+			<Text>
+				<![CDATA[DatentrÃ¤ger (%1:) nicht angeschlossen, erneut anschlieÃŸen und erneut scannen.]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Erneut scannen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDRlibDialog">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Softwarefehler, zurÃ¼ck zur Startseite und erneut scannen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[ZurÃ¼ck]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFinishDialog">
+		<Item Name="ScanCompleteedAdvanceDesc" Property="string">
+			<Text>
+				<![CDATA[Scan abgeschlossen! Entschuldigung, wir konnten Ihre Dateien nicht finden, <a href="#"><Font color="#00B0F5">geben Sie uns RÃ¼ckmeldung</Font></a> zur weiteren ÃœberprÃ¼fung.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanCompleteedDesc" Property="string">
+			<Text>
+				<![CDATA[Scan abgeschlossen! %1 Dateien wurden gefunden!]]>
+			</Text>
+		</Item>
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Hinweis: Bitte stellen Sie die Daten so schnell wie mÃ¶glich wieder her, damit die Dateien nicht Ã¼berschrieben werden.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideo">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Sie kÃ¶nnen das gewÃ¼nschte Video nicht finden?]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Wir empfehlen Ihnen, die Funktion "Erweiterte Videowiederherstellung" zu verwenden.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Mehr erfahren]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideoDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Erweiterte Videowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Speichern Sie die aktuell gescannten Dateien, die Sie benÃ¶tigen.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[ZurÃ¼ck zur Homepage, klicken Sie auf [Erweiterte Videowiederherstellung].]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie die Videoformate und starten Sie die Erweiterte Videowiederherstellung.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Compris]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurntoDeepRecycleFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Wenn Sie gelÃ¶schte Dateien nicht finden kÃ¶nnen, versuchen Sie einen Tiefenscan.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Ein tiefer Scan dauert lÃ¤nger, um alle Festplattensektoren zu scannen, um mehr Dateien zu finden.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Tiefen-Scan]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectPathDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie einen Speicherort, um mit der Dateiwiederherstellung zu beginnen.]]>
+			</Text>
+		</Item>
+		<Item Name="label" Property="label">
+			<Text>
+				<![CDATA[Pfad eingeben:]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblHint" Property="label">
+			<Text>
+				<![CDATA[UngÃ¼ltiger Dateipfad!]]>			    
+			</Text>
+		</Item>			
+		<Item Name="m_sDocumentItem" Property="string">
+			<Text>
+				<![CDATA[Meine Dokumente]]>
+			</Text>
+		</Item>
+		<Item Name="m_sDeskTopItem" Property="string">
+			<Text>
+				<![CDATA[Desktop]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Mein Computer]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[OK]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProtectedDialog">
+		<Item Name="ProtectedDialogTitle1" Property="string">
+			<Text>
+				<![CDATA[Unzureichende Berechtigungen!]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle2" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF0000><b>Unzureichende Berechtigungen<b></font><font color=#26324B> zum Speichern der Dateien auf der ausgewÃ¤hlten Festplatte. Bitte wÃ¤hlen Sie ein anderes Laufwerk.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle4" Property="string">
+			<Text>
+				<![CDATA[Unzureichender Speicherplatz!]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">//ProtectedDialogTitle3
+			<Text>
+				<![CDATA[Auswahl wiederholen]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoveryDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie den Pfad zum Speichern der Dateien:]]>
+			</Text>
+		</Item>	
+		<Item Name="OverrideDesc" Property="string">
+			<Text>
+				<![CDATA[Speichern Sie die Datei nicht auf der Festplatte (%1:), wenn Sie sie verloren haben, da die Datei sonst Ã¼berschrieben wird.]]>
+			</Text>
+		</Item>
+		<Item Name="NewFolderDesc" Property="string">
+			<Text>
+				<![CDATA[Neuer Ordner]]>
+			</Text>
+		</Item>
+		<Item Name="t_strNewName" Property="string">
+			<Text>
+				<![CDATA[Neuer Ordner]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle5" Property="string">
+			<Text>
+				<![CDATA[<font color=#26324B>FÃ¼r die ausgewÃ¤hlte(n) Datei(en) werden </font><font color=#FF644D>%1</font><font color=#26324B> in %2 Dateien benÃ¶tigt, fÃ¼r die nicht genÃ¼gend Speicherplatz auf der ausgewÃ¤hlten Festplatte vorhanden ist. Bitte wÃ¤hlen Sie ein anderes Laufwerk.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="strWaring" Property="string">
+			<Text>
+				<![CDATA[Wenn Sie die Daten auf der Quellpartition speichern, verringert das die Chancen auf eine erfolgreiche Wiederherstellung. MÃ¶chten Sie die Dateien wirklich auf der Quellpartition speichern?]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Dieser PC]]>
+			</Text>
+		</Item>
+		<Item Name="strRecycleSave" Property="string">
+			<Text>
+				<![CDATA[Es wird empfohlen, die wiederhergestellten Dateien auf einem externen DatentrÃ¤ger zu speichern, um zu vermeiden, dass Dateien Ã¼berschrieben werden, falls die Wiederherstellung fehlschlÃ¤gt.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc1" Property="string">
+			<Text>
+				<![CDATA[Wir empfehlen Ihnen, Dateien auf einem externen Laufwerk zu speichern.<br><br>Da das Speichern von Dateien auf demselben Laufwerk, auf dem Sie sie verloren haben, die Wahrscheinlichkeit einer erfolgreichen Wiederherstellung verringert.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc2" Property="string">
+			<Text>
+				<![CDATA[Wir empfehlen Ihnen, Dateien auf einem anderen Laufwerk zu speichern.<br><br>Da das Speichern von Dateien auf demselben Laufwerk, auf dem Sie sie verloren haben, die Wahrscheinlichkeit einer erfolgreichen Wiederherstellung verringert.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnRecovery" Property="button">
+			<Text>
+				<![CDATA[Wiederherstellen]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoverSuccessDialog">
+		<Item Name="OpenFile" Property="string">
+			<Text>
+				<![CDATA[Ordner Ã¶ffnen]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText" Property="label">
+			<Text>
+				<![CDATA[GlÃ¼ckwunsch! Teilen Sie jetzt Ihre Wiederherstellungserfahrungen!]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText1" Property="label">
+			<Text>
+				<![CDATA[Einfach zu verwenden]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText2" Property="label">
+			<Text>
+				<![CDATA[Wiederherstellen erfolgreich]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectAdvanceVideoDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Videoformate auswÃ¤hlen]]>
+			</Text>
+		</Item>
+		<Item Name="labelCheckBoxDesc" Property="label">
+			<Text>
+				<![CDATA[Alle auswÃ¤hlen <font color=#8C9295>(Hinweis: Je mehr Formate ausgewÃ¤hlt werden, desto mehr Zeit wird fÃ¼r den Scanvorgang benÃ¶tigt)</font>]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Starten]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">//SelectAdvanceVideoDialogHint1
+			<Text>
+				<![CDATA[* Bitte wÃ¤hlen Sie die zu scannenden Formate aus!]]>
+			</Text>
+		</Item>
+		<Item Name="labelMoreText" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Sie benÃ¶tigen mehr Formate?</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MessagePushDialog">		
+		<Item Name="labelNoMessage" Property="string">
+			<Text>
+				<![CDATA[Keine Nachricht]]>
+			</Text>
+		</Item>
+		<Item Name="strSimilarLoading" Property="string">
+			<Text>
+				<![CDATA[Wird geladen]]>
+			</Text>
+		</Item>	
+		<Item Name="MessageCenter" Property="string">
+			<Text>
+				<![CDATA[Nachrichtenzentrum]]>
+			</Text>
+		</Item>
+		<Item Name="labelText" Property="string">
+			<Text>
+				<![CDATA[Recoverit Chatbot]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="HintDialog">		
+		<Item Name="lblMid3" Property="label">
+			<Text>
+				<![CDATA[Kaufen Sie Recoverit, um Dateien SOFORT WIEDERHERSTELLEN zu kÃ¶nnen]]>
+			</Text>
+		</Item>
+		<Item Name="labelTrail" Property="label">
+			<Text>
+				<![CDATA[Essential]]>
+			</Text>
+		</Item>	
+		<Item Name="labelTraiIText1" Property="label">
+			<Text>
+				<![CDATA[Datenwiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnBuy1" Property="button">
+			<Text>
+				<![CDATA[Kaufen]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasic" Property="label">
+			<Text>
+				<![CDATA[Standard]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText1" Property="label">
+			<Text>
+				<![CDATA[Datenwiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText2" Property="label">
+			<Text>
+				<![CDATA[Wiederherstellung eines abgestÃ¼rzten Computers]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy2" Property="button">
+			<Text>
+				<![CDATA[Kaufen]]>
+			</Text>
+		</Item>	
+
+		<Item Name="labelPro" Property="label">
+			<Text>
+				<![CDATA[Premium]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText1" Property="label">
+			<Text>
+				<![CDATA[Datenwiederherstellung]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText2" Property="label">
+			<Text>
+				<![CDATA[Wiederherstellung eines abgestÃ¼rzten Computers]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText3" Property="label">
+			<Text>
+				<![CDATA[Reparatur eines beschÃ¤digten Videos]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText4" Property="label">
+			<Text>
+				<![CDATA[Erweiterte Videowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy3" Property="button">
+			<Text>
+				<![CDATA[Kaufen]]>
+			</Text>
+		</Item>		
+		<Item Name="labelHint" Property="label">
+			<Text>
+				<![CDATA[Bereits gekauft?]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="UpdateAuthorDialog">		
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Upgrade auf das erweiterte Abo zur Nutzung dieser Funktion]]>
+			</Text>
+		</Item>
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Recoverit Premium]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Datenwiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Dateien vom abgestÃ¼rzten Computer wiederherstellen]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[BeschÃ¤digte Videos reparieren]]>
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[Erweiterte Videowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="UpgradeNowDesc" Property="string">
+			<Text>
+				<![CDATA[Jetzt upgraden]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProgressDialog">		
+		<Item Name="labelUBackitDesc1" Property="label">
+			<Text>
+				<![CDATA[Sichern Sie Ihre geschÃ¤tzten Daten und Erinnerungen und verlieren Sie sie nie wieder.]]>
+			</Text>
+		</Item>
+		<Item Name="labelUBackitDesc2" Property="label">
+			<Text>
+				<![CDATA[Automatisch, Einfach, Smart]]>
+			</Text>
+		</Item>	
+		<Item Name="labelUBackitDesc3" Property="label">
+			<Text>
+				<![CDATA[Inkrementelle Sicherung]]>
+			</Text>
+		</Item>
+		<Item Name="buttonUBackit" Property="button">
+			<Text>
+				<![CDATA[Starten Sie eine 1-monatige Testversion]]>
+			</Text>
+		</Item>
+		<Item Name="BackupDataDesc" Property="string">
+			<Text>
+				<![CDATA[Dateien sichern]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CorruptVideoFrame">	
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Sie kÃ¶nnen die beschÃ¤digten Videos auf dem Computer wiederherstellen und reparieren.]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Stellen Sie beschÃ¤digte Videos auf dem Computer wieder her.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Klicken Sie auf [Reparatur beschÃ¤digter Videos].]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[FÃ¼gen Sie das beschÃ¤digte Video hinzu, um die Reparatur zu starten.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDREDialog">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Softwarefehler.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Dateien auswÃ¤hlen und wiederherstellen, dann zurÃ¼ck zur Homepage, um es erneut zu versuchen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="OnlineWidget">
+		<Item Name="labelNetWorkText1" Property="label">
+			<Text>
+				<![CDATA[Ups, Netzwerkfehler.]]>
+			</Text>
+		</Item>
+		<Item Name="labelNetWorkText2" Property="label">
+			<Text>
+				<![CDATA[ÃœberprÃ¼fen Sie Ihr Netzwerk und versuchen Sie es erneut.]]>
+			</Text>
+		</Item>
+		<Item Name="buttonRefresh" Property="button">
+			<Text>
+				<![CDATA[Aktualisieren]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoSuffixDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Wenn Sie weitere Videoformate wiederherstellen mÃ¶chten, kÃ¶nnen Sie uns gerne Feedback zukommen lassen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Einreichen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FilterTipsFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Tipps fÃ¼r Filter:]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Verwenden Sie Filter, um die gewÃ¼nschten Dateien schnell zu finden.]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue1" Property="label">
+			<Text>
+				<![CDATA[Foto, Video, Audio...]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue2" Property="label">
+			<Text>
+				<![CDATA[Tag, Woche, Monat, Jahr...]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue3" Property="label">
+			<Text>
+				<![CDATA[1Â MB, 1â€“100Â MB, 100Â MBâ€“1Â GB...]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue4" Property="label">
+			<Text>
+				<![CDATA[Vorhandene Dateien, gelÃ¶schte Dateien]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="NewFilterModel">
+		<Item Name="FileStatusDesc" Property="string">
+			<Text>
+				<![CDATA[Dateistatus]]>
+			</Text>
+		</Item>
+		 <Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[GelÃ¶scht]]>
+			</Text>
+		</Item>
+	    <Item Name="ExistsFiles" Property="string">
+			<Text>
+				<![CDATA[Vorhanden]]>
+			</Text>
+		</Item>
+		<Item Name="WhatTypeText" Property="string">
+			<Text>
+				<![CDATA[Welcher Typ]]>
+			</Text>
+		</Item>
+		<Item Name="AlltypesText" Property="string">
+			<Text>
+				<![CDATA[Alle Typen]]>
+			</Text>
+		</Item>		
+		<Item Name="tagText" Property="string">
+			<Text>
+				<![CDATA[Tags]]>
+			</Text>
+		</Item>
+		<Item Name="alltagText" Property="string">
+			<Text>
+				<![CDATA[Alle Tags]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[MÃ¶chten Sie die Software wirklich beenden?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Tipps: Wenn Sie die Software jetzt beenden, werden wichtige Daten nicht wiederhergestellt. Wir empfehlen Ihnen, die Wiederherstellung abzuschlieÃŸen, bevor Sie das Programm verlassen.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseFeedbackDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Es tut uns leid, dass unser Angebot nicht Ihren Vorstellungen entsprochen hat.]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Bitte teilen Sie uns mit, warum Sie Recoverit beenden.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemText1" Property="string">
+			<Text>
+				<![CDATA[Es enthÃ¤lt nicht die Funktion, die ich brauche.]]>
+			</Text>
+		</Item>
+		<Item Name="itemText2" Property="string">
+			<Text>
+				<![CDATA[Ich habe das Laufwerk mit den verlorenen Daten nicht gefunden.]]>
+			</Text>
+		</Item>
+		<Item Name="itemText3" Property="string">
+			<Text>
+				<![CDATA[Das Design der Software-OberflÃ¤che gefÃ¤llt mir nicht.]]>
+			</Text>
+		</Item>
+		<Item Name="itemText4" Property="string">
+			<Text>
+				<![CDATA[Ich habe nicht verstanden, wie diese Software funktioniert.]]>
+			</Text>
+		</Item>
+		<Item Name="itemText5" Property="string">
+			<Text>
+				<![CDATA[Sonstige (geben Sie gern weitere Informationen an)]]>
+			</Text>
+		</Item>
+		<Item Name="lblText3" Property="label">
+			<Text>
+				<![CDATA[Vielen Dank fÃ¼r Ihr Feedback.]]>
+			</Text>
+		</Item>
+		<Item Name="btnSubmit" Property="button">
+			<Text>
+				<![CDATA[Senden]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1064">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[Video-/Fotowiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Optimierte Wiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung verlorener Videos/Fotos von beliebigen GerÃ¤ten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[EinschlieÃŸlich Canon, Sony, DJI, GoPro, Seagate, SD-Karte usw. Einfach alle.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie ein Laufwerk zur Wiederherstellung Ihrer verlorenen Videos und Fotos aus:]]>
+			</Text>
+		</Item>	
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[Was ist die â€Optimierte Wiederherstellungâ€œ?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[1. Wiederherstellung von verlorenen oder tief versteckten Videos.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[2. Zwei Wiederherstellungsmodi fÃ¼r Videos und Fotos: Schnell- und Tiefmodus.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie Videoformate zum Scannen im Tiefmodus aus]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[Nur 11 spezifische Formate kÃ¶nnen im Tiefmodus wiederhergestellt werden. Sie kÃ¶nnen hier die Formate auswÃ¤hlen, die Sie benÃ¶tigen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellungsdauer: Je mehr Dateitypen ausgewÃ¤hlt werden, desto lÃ¤nger dauert die Wiederherstellung.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie mindestens ein Format zum Scannen im Tiefmodus aus.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Das Scannen des Videos wird einige Zeit in Anspruch nehmen, also haben Sie bitte etwas Geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellungsmodus:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[Es steht Ihnen eine Vorschau der angezeigten Video- und Fotodateien zur VerfÃ¼gung]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Schnell]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Tief]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[Aufgewendete Zeit:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[Der Scan im Schnellmodus ist abgeschlossen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[Ein GroÃŸteil der Videos und Fotos kann gescannt werden. Sie kÃ¶nnen Vorschauen der Dateien <b>ansehen und diese wiederherstellen</b>.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[Tipps: Der Scan im Tiefmodus sucht nach weiteren Dateien fÃ¼r Sie. Es wird einige Zeit dauern, bitte haben Sie etwas Geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[Was ist der Scan im Tiefmodus?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Wenn der Scan im Schnellmodus Ihre Dateien nicht findet, sucht der Scan im Tiefmodus weitere Dateien fÃ¼r Sie. ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Optimierte Wiederherstellung testen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[Wenn Sie Dateien von der SD-Karte einer Kamera wiederherstellen mÃ¼ssen, empfehlen wir dringend die Verwendung der â€Optimierten Wiederherstellungâ€œ, um Ihre Videos und Fotos wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[Mit dem Scannen fortfahren]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Jetzt testen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[Wir empfehlen die Verwendung der Funktion â€Optimierte Wiederherstellungâ€œ.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[Klicken Sie auf der Startseite auf [Optimierte Wiederherstellung].]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie das Ziellaufwerk aus und starten Sie [Optimierte Wiederherstellung].]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1066">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[NAS und Linux]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Daten problemlos aus NAS-/Linux-Systemen wiederherstellen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[Drei Schritte zur Wiederherstellung Ihrer Dateien]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[NAS-Server/Linux-System auswÃ¤hlen ---- Verbindung zum Server herstellen ---- Wiederherstellen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[Ihr Server muss nicht heruntergefahren werden]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[Wiederherstellung in Echtzeit ohne Unterbrechung des NAS-Services]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[UnterstÃ¼tzt die Wiederherstellung aus <font color=#00B0F5>NAS-Servern</font> und <font color=#00B0F5>Linux-Systemen</font>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie den Server oder das System aus, geben Sie Ihre IP-Adresse und andere Informationen ein und stellen Sie Ihre Daten im Handumdrehen wieder her]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[NAS-Wiederherstellung]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Linux-Wiederherstellung]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[Lokales Netzwerk wird nach NAS-Servern durchsucht]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Wenn auch nach lÃ¤ngerer Wartezeit kein NAS-GerÃ¤t erkannt wird, klicken Sie auf <font color=#00B0F5>â€Manuell verbindenâ€œ</font>, geben Sie Ihre IP-Adresse und andere Informationen ein und stellen Sie eine Verbindung zu dem GerÃ¤t her, auf dem Sie Dateien wiederherstellen mÃ¶chten.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Suche abbrechen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[Manuell verbinden]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Suche nach einem NAS-Server ist fehlgeschlagen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Kein NAS-Server im lokalen Netzwerk gefunden. Versuchen Sie Ã¼ber <font color=#00B0F5>Manuell verbinden</font>, eine Verbindung zum Server herzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie einen NAS-Server aus, um die Wiederherstellung zu starten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[NAS-Server ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[Hersteller:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Sie kÃ¶nnen keine Verbindung zu Ihrem NAS-Server herstellen?</font></a>]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[Problembehebung fÃ¼r NAS-Verbindungsfehler]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Wenn Verbindungsfehler auftreten, ist SSH mÃ¶glicherweise nicht aktiviert, oder Sie haben kein Konto mit Root-Berechtigungen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Wie aktiviere ich SSH?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[1) WÃ¤hlen Sie â€Systemsteuerungâ€œ aus und klicken Sie dann auf â€Terminal & SNMPâ€œ.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[2) Suchen Sie Ã¼ber Google nach â€Wie aktiviere ich SSH?â€œ oder wenden Sie sich direkt an den Hersteller des NAS-GerÃ¤ts.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Wenn das Problem weiterhin auftritt, <a href="#"><font color=#00B0F5>klicken Sie hier</font></a>, um uns zu kontaktieren.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Weitere Informationen</font></a>]]>
+			</Text>
+		</Item>				
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA['s Computer]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[Zielserver:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue30" Property="string">
+			<Text>
+				<![CDATA[Geben Sie die Informationen ein, um eine Remote-Verbindung zum NAS-Server herzustellen und die Wiederherstellung zu starten.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue31" Property="string">
+			<Text>
+				<![CDATA[IP-Adresse/DomÃ¤nenname des Zielservers]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue32" Property="string">
+			<Text>
+				<![CDATA[Geben Sie die IP-Adresse ein]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue33" Property="string">
+			<Text>
+				<![CDATA[Port:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue34" Property="string">
+			<Text>
+				<![CDATA[Port des Zielservers]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue35" Property="string">
+			<Text>
+				<![CDATA[Geben Sie die Portnummer ein]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue36" Property="string">
+			<Text>
+				<![CDATA[Der Standardport ist 22. Sie finden die Portnummer unter â€Terminal & SNMPâ€œ.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue37" Property="string">
+			<Text>
+				<![CDATA[Benutzerkonto:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue38" Property="string">
+			<Text>
+				<![CDATA[Konto des Zielservers]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue39" Property="string">
+			<Text>
+				<![CDATA[Geben Sie das Benutzerkonto ein]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue40" Property="string">
+			<Text>
+				<![CDATA[Passwort:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue41" Property="string">
+			<Text>
+				<![CDATA[Passwort des Zielservers]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue42" Property="string">
+			<Text>
+				<![CDATA[Geben Sie das Passwort ein]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue43" Property="string">
+			<Text>
+				<![CDATA[Verbinden ]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue44" Property="string">
+			<Text>
+				<![CDATA[FÃ¼r dieses Konto gelten ZugriffsbeschrÃ¤nkungen. Versuchen Sie es mit einem anderen Konto mit Root-Berechtigungen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue45" Property="string">
+			<Text>
+				<![CDATA[Warnung: Informationen sind fehlerhaft. ÃœberprÃ¼fen Sie die IP-Adresse, den Port, den Benutzer und das Passwort auf Richtigkeit.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue46" Property="string">
+			<Text>
+				<![CDATA[1. SSH-Service Ã¼berprÃ¼fen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue47" Property="string">
+			<Text>
+				<![CDATA[WÃ¤hlen Sie â€Systemsteuerungâ€œ aus, klicken Sie dann auf â€Terminal & SNMPâ€œ und Ã¼berprÃ¼fen Sie den SSH-Service und den Port. Der Standardport ist 22.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue48" Property="string">
+			<Text>
+				<![CDATA[2. Angaben Ã¼berprÃ¼fen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue49" Property="string">
+			<Text>
+				<![CDATA[1) ÃœberprÃ¼fen Sie, ob Sie die richtige IP-Adresse eingegeben haben, oder verwenden Sie den DomÃ¤nennamen, um eine Verbindung herzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue50" Property="string">
+			<Text>
+				<![CDATA[2) Stellen Sie sicher, dass Ihr Benutzerkonto Ã¼ber Root-Berechtigungen verfÃ¼gt.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue51" Property="string">
+			<Text>
+				<![CDATA[3) Wir empfehlen Ihnen, bei der Eingabe des Passworts die Klartextanzeige auszuwÃ¤hlen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue52" Property="string">
+			<Text>
+				<![CDATA[4) ÃœberprÃ¼fen Sie den SSH-Service und den Port noch einmal.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue53" Property="string">
+			<Text>
+				<![CDATA[Geben Sie die Informationen ein, um eine Remote-Verbindung zum Linux-System herzustellen und die Wiederherstellung zu starten.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue54" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Sie kÃ¶nnen keine Verbindung zu Ihrem Linux-System herstellen?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue55" Property="string">
+			<Text>
+				<![CDATA[Problembehebung fÃ¼r Linux-Verbindungsfehler]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue56" Property="string">
+			<Text>
+				<![CDATA[NAS- und Linux-Wiederherstellung]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue57" Property="string">
+			<Text>
+				<![CDATA[Vielen Dank fÃ¼r die Bewertung. MÃ¶chten Sie auf unserer Bewertungswebsite mitteilen, wie Ihnen die Wiederherstellung gefallen hat? Wir geben unser Bestes, um Ihre Zufriedenheit zu gewÃ¤hrleisten.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue58" Property="string">
+			<Text>
+				<![CDATA[Los]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue59" Property="string">
+			<Text>
+				<![CDATA[Verbindung zum Zielserver wird hergestellt, bitte warten.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue60" Property="string">
+			<Text>
+				<![CDATA[Server (%1) wurde getrennt. ÃœberprÃ¼fen Sie Ihre Netzwerkumgebung und stellen Sie die Verbindung wieder her.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[Versuchen Sie es nochmal]]>
+			</Text>
+		</Item>
+		<Item Name="itemValueHome" Property="string">
+			<Text>
+				<![CDATA[Startseite]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="DetentionHintDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Verlorene Daten mÃ¼ssen so bald wie mÃ¶glich wiederhergestellt werden. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Warnung: Je lÃ¤nger Sie warten, desto hÃ¶her ist die Wahrscheinlichkeit, dass Dateien nicht wiederhergestellt werden kÃ¶nnen. Es wird empfohlen, die gescannten Daten sofort wiederherzustellen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Verstanden]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="MessageDisplayWidget">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Sichern Sie wichtige Daten und ErinnerungsstÃ¼cke fÃ¼r die Ewigkeit]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Automatisch, einfach, intelligente]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[stufenweise Sicherung]]>
+			</Text>
+		</Item>
+		<Item Name="buttonMore" Property="button">
+			<Text>
+				<![CDATA[Einmonatige Testversion starten]]>
+			</Text>
+		</Item>		
+	</Form>
+</Language>
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Ú	¹f£’æ›¢,ÿx ÕÁ™kd1²ƒ²¥•rOĞ}Ğ@şí©Õ @ß­úµë ùûì/Êv™Œ¼s.ëÒ¿¯ßåéÿ¿Ä{tG‚şşG.0††¾—ºÿúŞ“ÃÑnÿôXş’sm_‹ïè}½hú~»­ï;[­MÆyìÁ™ÆdfŠúÎ ƒ¸Ë?¬ƒFôIğ_ÿÿ®ßÜ±úWzË,zÚ Ó7 ÂJà™ŠP3A”Fyv¦eë”ì‡ø|'§®A‹OÈ1¬,WûíıËÿ­á>-;ì Ğa0A‚/M¡]‚!pœŒãÁÍ³ìÛ<ÌO>!öGÌeãlû>(@òyéºY§ı}¥	&ÿÿ}ö¿şõõûTÓí<nŸÖúş˜OÓÓôßõú!oõ™„ã¿ÿ¿÷ÇzşJü¾J%oŞ^eÅv‰Û—_õ]/_×Õ=}>/'_ÿëáwÔ5ÿÛÒøkı7¥ôİ>·ô^Ì°ËÏa—€¹;h8ıı»DŸÚú¯ÿå×Y~şY€¥Ïûñ{ÿÿ_CÓ¤øØ×c7íğÒğAÿ‚<$_¹<Ëï¢|Ãÿÿ:~ÿÈP8tÿÛµÛş¿ÿ÷ÿƒ¿aİ}Šÿ«J÷ûşş7]>ÿOÿïí÷®u|±mßüiÿëÿÿçÂèrˆN„ò¿!5ÿãÿüVEÿ7üìïÿöş×{ÿ×oŞ¿ş¾Âöl=†Ãßo¯ë—OÓ¿šÃ—?ÿñëÿÿzÛuÿ–~İo,ï×ÿÿ×İ½Ûı†ÿÿ¿úø,ıÿöşÂì0½®ğÿÕoµı÷ïÿû4^¨„Øa†åÌa‡ı»_î»ÿü7ßİ~¾ÂG©/±æ{.ÃÛkÿO¶»¯¾Çÿúê_ùg’ ñ:Ak’äİËÿò#Á½åÕï^N­Š[ÿN*@%Û,…ƒk°’ş–ÿ¿ïÿÿş¶b_|Ò11‡oÃëşg®¿Éôÿ×ß¿ûûØb¶â¢S¸Ò½Šô¯ÎÖş»ûaxa,.–ªƒáªè>×!½µşĞ³íV×_éL0úÙÿù§Ã	ªè1şÂÜ/á~Öû{§¿ñ]¥kÓÚM«k]'®øi~è›¿Kí[_ÿÛ_ÖÖÓâ""8ˆ`aÃ	Ü0¿ª|5µ_ÿ¿õÇ¼q±±QÇØ+a‡Úœãµc°¾¶ºZü5umy’‡ˆˆˆ0„\2n}…ûïÿşÿm4Õ~ÆÄ/â˜Ó¨øø¸£n6?c*¤"""""""""4*pÁrÇêœ0˜L Ğa`˜_†˜\ áßÃ\&½İü0¢""8ˆˆˆh0ƒ	„ÓBM;L Ó°¤odŸ"Ùí=5ìò(ö¼V""""" Óˆaá¡a°¸&A­¬0Äq'”DEÄDMâ¢"6¾×‡Á”ÏzŠX¨âÓUªˆi¨w©€Áˆå	ö»şş‰Û–§şşhøæ§‚_ß#‹øN…È?tJ½áÃÿo'ÚüßöåÕâ=?¯ÿÿûËMÿı¥şgşğÂœıa…8¬R±IÚıÚ»ÿµÁ›v
+"?    À 0€
+endstream
+endobj
+44 0 obj
+12286
+endobj
+45 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj3
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 24 /Rows 12>>
+/Width 24
+/Height 12
+/BitsPerComponent 1
+/Length 46 0 R
+/ImageMask true
+>>
+stream
+òB™¥xø €  À 0€
+endstream
+endobj
+46 0 obj
+20
+endobj
+47 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj4
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 672 /Rows 376>>
+/Width 672
+/Height 376
+/BitsPerComponent 1
+/Length 48 0 R
+/ImageMask true
+>>
+stream
+ü´r4)h"Nå”’µá6> ŠŠ“õÕıİ|²*åFb<Ë!^	‚uòCêÿ–B	4qÖô¤#Ëü²X.C¯énM!‘ûµjj–5ú`‹­—Ë¢ğOòÿİ\ˆ9tqG^£&Ãhü·8âÿ‚#ïM‰¨ÂÜZï‹mò:YCäOÅAÔğCşíğ¨¤Úÿİ·”>ºxå¹ä;àê7XJğO¸Ùİ†
+Xé¸":r?¶S’—RìÃãÿçğˆëvx½”?ˆ.´-Ğ">¨/Œ\¡ôşw³»®WQ‘cZòúÄ&šàˆô":¯õ¬$•Bøâ¼"‡…Šq¸O¬iÖû;¾†"‚)í?2$_o¿×õ°{ÅAA›è%…¿ô?–:{¨uä‹Ğ]Lè[Q”ïÁØ%vÙu;[Ñ
+Ÿ]¼>¾®º÷;Íàˆ.„Â ŠÎ>.5‡qµª}¸M/~GôÊıoc†CÿçuñüE·¯vëÚz¾Ã„"Èé9téönoRêí¶ßï#G©í;±{û!G×¬ ¿ßÇ]öGûÿïD|¹t\¾¾!ÈƒØûáÚzVÛïUÂİ}‘¥ëxU×²>ŞÃ„nûÃwâ?Õ‹¿´ä8ÿîÁBµŒÁÿ„N#†ß¼5ışÈØôï·ø/„×¿kİ†f>Á:#áY
+8ğ„Şî=ÎÁ†wÂ„—×ø´Ù‡)MòéÃÎÉƒÿ¸/ú@Ğuo¯aØÕ^”¸p`ä8àˆëõ´Ò(xaÆŞ¼5h~#½‡TXúù	ˆ»AÄwù©}»ñün4;ïl.ÿªT]/}Ôh^L:+j?ñß”;Å‚r3hƒOzÛö“ïşÓÄ†!
+2ÿÜ‚î²ÏÃa…_ä/ğƒÕ¿ÿØiîİj´‰Ğß__vÌ8B?º÷ø<Gøjö¸[}¼8ûÿ¾Pî}tğŠuñÛk| l£bŠ¾üB]şü0’±ßu]sñ›g£ÿ»¸‹Ze·îÃŒz~Èë÷Œ/® –Ü?¾÷¢n6eÑ¼—EÎ{ú÷rna$kÃ$‘ÛtI2o<!w1şâ	Ì8 `ˆüa%ôè,ãîœ¦­sLu»›­wŸø”>¸0Ğ“tˆ¢®=¸Ûc‚‚8ïV‘Ö}¶’*øÇcµì¹XaøBşÒ˜ş—á”nªRÎüka‘ø©+V˜kÆY<—ôÈôğ¾>½ínbğíÇæfÜ§&àzüh$4GĞI?; N»Q#â-è®Ì<FÃÍvÛ&øÄ76»òÜobã÷
+vdƒŠMÔ ªG¹u“9­p@¸®º@¢G‰Bj®ê°„jø^Û‚àŠåÖ‡ë+×œ\xÁÓğ¹^˜¨ù#zbš¦ğsÔHı"où‘xä_/èQÙĞÃéqù‘	Av"ìHˆíOÛÁµàˆêeÿöÕ/­Øwë™°’—VÌM*÷‚)fma'©ÙQ›ËÁ8ZÓcë¬m ±A^>‚ˆÆ”õsE±}IFN0œ`˜9Ä¤QÜÑ…ÀŠzMX‘é8†T8R(EäC9‚Üp@…Á-oë^+Wâ¿[X‰ÇÒ„¾Èâ¡ „x?‘ie^GØ‹
+èÇ¶GPf’gjŸnGÁ~…‘ÜOƒ¶C`÷ªaA/ÑÚpèWDuLyƒ…A4Zé`±‹‹e:…5èf¢#Ëğî.Ô TˆêĞàİÂ§œv]ğÄù?¤$1
+ã„_Fvv:¡7øxDuwĞ×t¡	0[§ –áëœWz>ä,	Ä,t”ˆêâê §yÙZR.a÷ü7‡b(~òFV€„D9ÚC/úXêG›# Áˆƒ‚>üR½uXâ#½…(UP@’#<ï²	$|aìÇZPáTxAX°U“+°ˆëû‚)ÈeLÎS”9Ü±âÂ˜‡ª]q(tl!§»ÈÜ'Ä3š#­°F´µâ!e<äG4H	ü0@„…î…¡‡‚¤Æ¾ûê-(v—F<î™|m -‚)Æcâ»#"üd(æ§…{.©T Á9QíB">¬§(¿‚|Í÷{§‹÷dTùä¨±ÓRÿŞA³¿úhcòï‡ºGø‘E~)åÃ‰¢¯úmGG™¯Ö*}-lÕ²7"¦Ë­Å7êGÕU$Ã áXœ¡±óÃĞü-8à	!ğˆê¯!é8Dğà•.¿ÎX~qå^7\ÿPyØ…I(¿è‡‡æœjÌé)û°ŠÚ°•jÚğè*oèºc¼ÎÙOü=D‚Q‘a÷‚ønŒ8m8æê¢8ïáwĞqg´¢è8§{hFÕ‚<\îLrp«0º‚)Õæ²U?Â;«ÂŠÿ*Ø±
+
+ ŠvĞ í=RáZ“ ¡KñA,ÑP#LtcT»‚anHÃŠCÂ#®‡.ˆò»4ÎÍrûDV­Ì“ÿÅœTÊĞãÁ+lç—'àoìkÆ„b|Ò# ¥ÖÁ¡nç$ƒÇúÌ&aÎóçıëQèã«ŠPç`Š~5Ú„‡dvBÒLÇË¬xâıá©Á$¿ò<‡ÃlÎå@">¸ş¡:c¡S»PĞ¥ZDÇqÇT
+w³kÒòN¼…°SÕ­½êúO!ÇàÜ&qùšRf¸ WÖğùSïvâ+—àœÂ¨ĞQˆş]7»¸du­ùC”òg—‘ÑuÁB!Èô·Åãl;}‘#|QCğ@“‰1çÁ1:ãµåİb±ÁĞO©BS±^"„G^5eû#Îf½ôíGG+°FmWO¸ÃH}†ØÖû[Š†Å0¡.ïvÑPÔM ŠÃ‹#‘·é²°])Ü>¢ï¼B_èâ÷‘F8‰/¢…¥8ãÓt§aÛ|a¤\öYC‰‡qWËŠGG”~cx"?~B‚#¦V¸„9Ç¿ş3w©Ñ‡ÿˆ9¬4G\9 ~OÎûJàÛi‘G¼HQèG‘Púp¶, ÆGT0AY#Ã‚@ˆø”t²p‹†ãºó²”¨°D~ˆèîğ¸ÄXè¡ŞövuGø&!,öA<	P28ñ¾5¢q¤U•±¯‚l¨Q‹¦#§Ş#œBmÂáîYÄ]oÙÂ#â]b”?¹™NûÁDq#¯ë‘ôÈ:Í¬g ‚ˆêD‰-hEV
+v1i¨¯ÄN9O1§^]YqVXãOáp¬%+h Çß±¡wÔ‹Âˆ.=ñèâaJ}´2èÂ&<R
+ĞÌ#²%ÚÇOŒœAº‚°AŒ¬®A‡©‚L¡Ñ[rœ_P†qÉÂ·ò>Æì!º0şMÕ…?Ê|!î]p[bñ„0ÃØ°ªÁÿ‰öŞ2P0@—)ˆêÃGX"‡Yî¾Şë¼ ¼[V\l±íÊÑ	ÚeFO!ã±bôé?±w„qÒ´¼8îÇ~ğˆàÃôH</‹ÇâÂŞıŒâ1aÂGx0X»o¯Á NìÛñ$9îvpE<BíEØˆy®‰‡¢‡‹ÑÅ/v…|&¡{è Œ*” „±Ì8†Å˜Ä‰&)h·-ü'd1ulî¥XiHëÛ±&9cñSŸ¬ßC \tšTÊˆŞĞ@œz}Ô¡Â#¦Põ/ø¡i<ßU°`‹ä|ÑøãTvGC ¸ì]Ã}†¨ÃäAÇBúÇ§Ó\ìœ;‰}ëƒÄ ˆè¡Òyôö±‰§¼k.CäWB#>õœsAs¾äpOíBGDI[‚V/m»!s¾1w„#ØõŒ&ä``Â Dtù¬l«?FD#H1š‚§¹Açˆlgs#¿ãºáqAP÷°‚8ûn8ı<$Ì/EPæwÿ„LrŸ„SØxaŠÂFõˆ¬Èõ¡á‚#ôGÁ×ÇAêÏIÓ®ÉVÇp…Æ‡-Ø4™çB[’8¤úÌ:âF8ğï¼,¾”ˆö×S|§Âû‡TcâaÆØ ^Cã£#ô'ˆËqì| N7¶ÏŞ
+aöSªù!Éß?„GRv£ÆB»é
+¼u‡İlw DùÚ- ˆëeo“K£ø"†ÓWA$8·dGN=ÃeE„åğUƒè ¼ºˆñ	('xKäA÷tjøa}üPA~4¡‚#ö5##¢áRÉwòëƒÚVóAa,©¢YĞ_'pÆ`c¨Ğ V7°[ƒDë1ıGä
+N”`ˆè&ÈâĞ×m‚#û(w¿‚c|2:L)t™ºê!ÇVŠy´\ÇÎğx F2éí]¯‚1ql8ÎÒ§ƒ)ÄkhÃı5èSMáCì ºıEiüîÁ%È;¬pêaã;ñe@Ò8¶ÅÂô!»…RğË˜Û#ÀCD¢õ¹t•	|&Q§‰7^™0@ªĞEt˜” !‚&ô×ü.HH# ˆéÂBˆ9C„pˆø#"ÚnC„;W¨‹+†ˆi":ı!á.ñÆĞîÑC‚t²:ü.Œê-AM¹qÄ0Š±øDr¿é†X]!Ás«0ã*Ôu+!DºV&¨àE@~°ü%0çxÄEßô£<Ğ<H_‘Ò°¸8Ã(tƒZÌÑŒl0÷a³dÂ†Z²,FÅ·Ç¡ç4Â(x¤f°A^0°âşÒ©N,CGS.&·è:Ğ‹$"ø¬FˆW)pËÒéB¿[¦¾Š`È£”?†]Ğ,ˆ=_P0„{;á°Ğ";¡¡cÜRÎ?ôCS‚#¡ÁAûßPİ¸¨bqÌ9	X“cE9!ĞˆÿÖàˆé[Ÿ?#xƒÈ09‡KŠ8à‡‚8àb6©ó¿0é_Í¶.1¼R¢‡°Ö±#¢;ĞQŒ:àÈá´ã¡ŒÏ”ì#ôÊr ø-£Î\ÕÄ!pG{”=qN= @¶Pò;#ïë! |1ŞƒXØâºaè^„{\Gá_¡¿íB	Î<Hën@¸ì—àxOKâ¸”;Cb'$99mÔ!õ£0æ¬[~ƒ!±Ö"²¡ïÎ>¢Úis¼2Üã„
+2¤0?†PïmCH ™¦¡æ.# |ä"ø°Ğ~ÁrÃB-‡Ä¾x$1áHGÈ7!~GLã‡˜ì0D|’ „Š9ÙÜ—©üêqúŒÇÊò‡(pS„DíO
+‚xÇdz<"?"" ƒÉY%”,¡Å.‡4ŠxA¥K…²*äLÅbË˜ø‚]*şÊ.´¸Šùt]ğ ãğ”8ˆŒêŸ’bş‚şÂ	W•Š	Õ…Z\i¿ªJEÃKT):T½´º¬0—J›KªL:úAŠğ”?Z~Tô‘¯ö•	wa…PI_Â ‚{k	Ka„¢‚—m ÁÁ%´ªÂV8HBƒ•
+ÁŒáNÅr—aÂÈÅ@ó²`æ`Ü¡`‘ê. ”^Uu½BÁÓÔàxN¤3HÚ¤‚È5 Üş‚EÁù‰ám$- úÆ’‚(tá¨#‰XˆyBQÈ9²\Œpÿ1\(!¦İØx,„»8-úÊBô£·¿úşákvşİ{ÙßÛòÇT?¾<§WwÈ#(˜ıMvŸnAæ/ÿ—ãûwÄ;ü}ü¿ş÷{0¼~ñ|PMè‚ãÚĞğ{z8ş¸X÷B#…ßÂÈQĞd‘vAİ>J=X3ºÓ”è´â9
+ÎjÁGÿó¿9ÂrX'‡ÈÊÂá‘Ü:ÆGV¶XáX?-†m8JˆÇ °‚ÅbµÚÈÇ&:«¿d#§é“‚_‡Ğ">úC ¯Y…9pÁÈşµAÂ"£;ˆè½¿J>¤, `¢£kwİûë5``ŠÕŒbhM~‚´¶ì1”9O*û¾0OÅ»‰è3„! ÁGÀ @  À 0€
+endstream
+endobj
+48 0 obj
+4681
+endobj
+49 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj5
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 16 /Rows 20>>
+/Width 16
+/Height 20
+/BitsPerComponent 1
+/Length 50 0 R
+/ImageMask true
+>>
+stream
+ÿóÿ„Ä~    À 0€
+endstream
+endobj
+50 0 obj
+21
+endobj
+51 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj6
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 56 /Rows 48>>
+/Width 56
+/Height 48
+/BitsPerComponent 1
+/Length 52 0 R
+/ImageMask true
+>>
+stream
+şC*—±}Cãö¯Âk‘æPçs.+Û_Æî4H_Èëã´1(Ddu¸œs L§u\fµÇÁå	¢?ÔMJ åĞØH3ªàİÄGÀ @  À 0€
+endstream
+endobj
+52 0 obj
+88
+endobj
+53 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj7
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 32 /Rows 24>>
+/Width 32
+/Height 24
+/BitsPerComponent 1
+/Length 54 0 R
+/ImageMask true
+>>
+stream
+şP©á8;/úSÓğ„kz„GFô£i„¸ ¢?À @  À 0€
+endstream
+endobj
+54 0 obj
+44
+endobj
+55 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj8
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 304 /Rows 12>>
+/Width 304
+/Height 12
+/BitsPerComponent 1
+/Length 56 0 R
+/ImageMask true
+>>
+stream
+ÿğ   À 0€
+endstream
+endobj
+56 0 obj
+15
+endobj
+57 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj9
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 24 /Rows 20>>
+/Width 24
+/Height 20
+/BitsPerComponent 1
+/Length 58 0 R
+/ImageMask true
+>>
+stream
+ò¬'½üïì(µà    À 0€
+endstream
+endobj
+58 0 obj
+25
+endobj
+59 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj10
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 16 /Rows 24>>
+/Width 16
+/Height 24
+/BitsPerComponent 1
+/Length 60 0 R
+/ImageMask true
+>>
+stream
+óÏÿÿ×õûöµ    À 0€
+endstream
+endobj
+60 0 obj
+24
+endobj
+61 0 obj
+<</Type /XObject
+/Subtype /Image
+/Name /TI2Obj11
+/Filter /CCITTFaxDecode
+/DecodeParms <</K -1 /Columns 32 /Rows 24>>
+/Width 32
+/Height 24
+/BitsPerComponent 1
+/Length 62 0 R
+/ImageMask true
+>>
+stream
+ù¯…ğAáúê¾Â°£ü @  À 0€
+endstream
+endobj
+62 0 obj
+26
+endobj
+38 0 obj
+<< /Filter /FlateDecode /Length 63 0 R >>
+stream
+xœí’;NÄ@†©sŠ9ñ{<=4‰@„„Ğrÿ‚y$Ù$ËV´ëÂÖ$ò§ß¿}šœ1á&ñ‹oï_ÓıÓ#?¿}Rzø^&Kköœ~>¦Ó$ºïd…â˜¨Ôg`rRĞøº’åÔjÄ{Šur¥p-¾£ğB	)µ'0j.„C–Aöƒ,ˆªF¤t¬Z†Â[¬c×Ñ6f<rƒmC…÷ª"¤®Ì›ĞbWÓ:E*Âw<[x–sÛAx<Û,Q@@"°J`´şKE»	g¢/Ä,è¥uôAÌà‡‘‡­RR­ªæ[^^öYÕ¥)äÙÄÌı2.·Âî½ª¡g`,@™oår±Ã5ÁnVA:ÊJpJû>˜ŠİözBın7÷Š+Bâš1ê½µwMÄ|ów·¸Å-ş¿mÉ·ğ
+endstream
+endobj
+63 0 obj
+331
+endobj
+37 0 obj
+<</JI2Obj1 39 0 R
+/TI2Obj1 41 0 R
+/TI2Obj2 43 0 R
+/TI2Obj3 45 0 R
+/TI2Obj4 47 0 R
+/TI2Obj5 49 0 R
+/TI2Obj6 51 0 R
+/TI2Obj7 53 0 R
+/TI2Obj8 55 0 R
+/TI2Obj9 57 0 R
+/TI2Obj10 59 0 R
+/TI2Obj11 61 0 R
+>>
+endobj
+2 0 obj
+<</Type /Pages
+/Count 2
+/Kids [ 1 0 R 36 0 R ]
+>>
+endobj
+64 0 obj
+<</Type/Metadata/Subtype/XML/Length 65 0 R>>
+stream
+<?xpacket begin="ï»¿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.2-c001 63.139439, 2010/09/27-13:37:26        ">
+	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+		<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3/">
+			<pdf:Producer>Develop ineo 287</pdf:Producer>
+		</rdf:Description>
+		<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+			<xmp:CreateDate>2024-09-16T14:19:09+08:00</xmp:CreateDate>
+			<xmp:ModifyDate>2024-09-16T14:19:09+08:00</xmp:ModifyDate>
+			<xmp:MetadataDate>2024-09-16T14:19:09+08:00</xmp:MetadataDate>
+			<xmp:CreatorTool>28BW-8</xmp:CreatorTool>
+		</rdf:Description>
+		<rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/" xmlns:stRef="http://ns.adobe.com/xap/1.0/sType/ResourceRef#" xmlns:stEvt="http://ns.adobe.com/xap/1.0/sType/ResourceEvent#">
+			<xmpMM:DocumentID>uuid:6b3b264507e8100e13099542fbd8b142</xmpMM:DocumentID>
+			<xmpMM:InstanceID>uuid:6b3b264507e8100e13099542fbd8b142</xmpMM:InstanceID>
+			<xmpMM:RenditionClass>default</xmpMM:RenditionClass>
+			<xmpMM:VersionID>1</xmpMM:VersionID>
+			<xmpMM:DerivedFrom rdf:parseType="Resource">
+				<stRef:instanceID>uuid:6b3b2645-07e8-100e-1309-9542fbd8b142</stRef:instanceID>
+				<stRef:documentID>uuid:6b3b2645-07e8-100e-1309-9542fbd8b142</stRef:documentID>
+			</xmpMM:DerivedFrom>
+		</rdf:Description>
+		<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">
+			<dc:format>application/pdf</dc:format>
+		</rdf:Description>
+	</rdf:RDF>
+</x:xmpmeta>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<?xpacket end="w"?>
+endstream
+endobj
+65 0 obj
+3724
+endobj
+66 0 obj
+<<
+/Creator(28BW-8)/Producer(Develop ineo 287)/CreationDate(D:20240916141909+08'00')/ModDate(D:20240916141909+08'00')>>
+endobj
+67 0 obj
+<</Type /Catalog
+/Pages 2 0 R
+/Metadata 64 0 R
+/OpenAction [ 1 0 R /Fit ]
+>>
+endobj
+xref
+0 68
+0000000000 65535 f
+0000000016 00000 n
+0000103268 00000 n
+0000071918 00000 n
+0000071436 00000 n
+0000000206 00000 n
+0000012327 00000 n
+0000012348 00000 n
+0000012652 00000 n
+0000012670 00000 n
+0000062918 00000 n
+0000062940 00000 n
+0000063187 00000 n
+0000063206 00000 n
+0000063451 00000 n
+0000063470 00000 n
+0000063809 00000 n
+0000063829 00000 n
+0000064105 00000 n
+0000064124 00000 n
+0000069305 00000 n
+0000069326 00000 n
+0000069764 00000 n
+0000069784 00000 n
+0000070057 00000 n
+0000070076 00000 n
+0000070325 00000 n
+0000070344 00000 n
+0000070597 00000 n
+0000070616 00000 n
+0000070869 00000 n
+0000070888 00000 n
+0000071142 00000 n
+0000071161 00000 n
+0000071417 00000 n
+0000071898 00000 n
+0000072181 00000 n
+0000103052 00000 n
+0000102623 00000 n
+0000072374 00000 n
+0000082588 00000 n
+0000082610 00000 n
+0000082883 00000 n
+0000082902 00000 n
+0000095424 00000 n
+0000095446 00000 n
+0000095694 00000 n
+0000095713 00000 n
+0000100626 00000 n
+0000100647 00000 n
+0000100896 00000 n
+0000100915 00000 n
+0000101231 00000 n
+0000101250 00000 n
+0000101522 00000 n
+0000101541 00000 n
+0000101786 00000 n
+0000101805 00000 n
+0000102058 00000 n
+0000102077 00000 n
+0000102330 00000 n
+0000102349 00000 n
+0000102604 00000 n
+0000103032 00000 n
+0000103334 00000 n
+0000107139 00000 n
+0000107160 00000 n
+0000107297 00000 n
+trailer
+<</Size 68
+/Info 66 0 R
+/Root 67 0 R
+>>
+startxref
+107391
+%%EOF

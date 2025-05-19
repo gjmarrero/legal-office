@@ -1,0 +1,1955 @@
+var regex = leadingParameterNameCommentRegexFactory(name);
+                return ts.some(ranges, function (range) { return regex.test(sourceFileText.substring(range.pos, range.end)); });
+            }
+            function isHintableLiteral(node) {
+                switch (node.kind) {
+                    case 221 /* SyntaxKind.PrefixUnaryExpression */: {
+                        var operand = node.operand;
+                        return ts.isLiteralExpression(operand) || ts.isIdentifier(operand) && ts.isInfinityOrNaNString(operand.escapedText);
+                    }
+                    case 110 /* SyntaxKind.TrueKeyword */:
+                    case 95 /* SyntaxKind.FalseKeyword */:
+                    case 104 /* SyntaxKind.NullKeyword */:
+                    case 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */:
+                    case 225 /* SyntaxKind.TemplateExpression */:
+                        return true;
+                    case 79 /* SyntaxKind.Identifier */: {
+                        var name = node.escapedText;
+                        return isUndefined(name) || ts.isInfinityOrNaNString(name);
+                    }
+                }
+                return ts.isLiteralExpression(node);
+            }
+            function visitFunctionDeclarationLikeForReturnType(decl) {
+                if (ts.isArrowFunction(decl)) {
+                    if (!ts.findChildOfKind(decl, 20 /* SyntaxKind.OpenParenToken */, file)) {
+                        return;
+                    }
+                }
+                var effectiveTypeAnnotation = ts.getEffectiveReturnTypeNode(decl);
+                if (effectiveTypeAnnotation || !decl.body) {
+                    return;
+                }
+                var signature = checker.getSignatureFromDeclaration(decl);
+                if (!signature) {
+                    return;
+                }
+                var returnType = checker.getReturnTypeOfSignature(signature);
+                if (isModuleReferenceType(returnType)) {
+                    return;
+                }
+                var typeDisplayString = printTypeInSingleLine(returnType);
+                if (!typeDisplayString) {
+                    return;
+                }
+                addTypeHints(typeDisplayString, getTypeAnnotationPosition(decl));
+            }
+            function getTypeAnnotationPosition(decl) {
+                var closeParenToken = ts.findChildOfKind(decl, 21 /* SyntaxKind.CloseParenToken */, file);
+                if (closeParenToken) {
+                    return closeParenToken.end;
+                }
+                return decl.parameters.end;
+            }
+            function visitFunctionLikeForParameterType(node) {
+                var signature = checker.getSignatureFromDeclaration(node);
+                if (!signature) {
+                    return;
+                }
+                for (var i = 0; i < node.parameters.length && i < signature.parameters.length; ++i) {
+                    var param = node.parameters[i];
+                    if (!isHintableDeclaration(param)) {
+                        continue;
+                    }
+                    var effectiveTypeAnnotation = ts.getEffectiveTypeAnnotationNode(param);
+                    if (effectiveTypeAnnotation) {
+                        continue;
+                    }
+                    var typeDisplayString = getParameterDeclarationTypeDisplayString(signature.parameters[i]);
+                    if (!typeDisplayString) {
+                        continue;
+                    }
+                    addTypeHints(typeDisplayString, param.questionToken ? param.questionToken.end : param.name.end);
+                }
+            }
+            function getParameterDeclarationTypeDisplayString(symbol) {
+                var valueDeclaration = symbol.valueDeclaration;
+                if (!valueDeclaration || !ts.isParameter(valueDeclaration)) {
+                    return undefined;
+                }
+                var signatureParamType = checker.getTypeOfSymbolAtLocation(symbol, valueDeclaration);
+                if (isModuleReferenceType(signatureParamType)) {
+                    return undefined;
+                }
+                return printTypeInSingleLine(signatureParamType);
+            }
+            function truncation(text, maxLength) {
+                if (text.length > maxLength) {
+                    return text.substr(0, maxLength - "...".length) + "...";
+                }
+                return text;
+            }
+            function printTypeInSingleLine(type) {
+                var flags = 70221824 /* NodeBuilderFlags.IgnoreErrors */ | 1048576 /* TypeFormatFlags.AllowUniqueESSymbolType */ | 16384 /* TypeFormatFlags.UseAliasDefinedOutsideCurrentScope */;
+                var options = { removeComments: true };
+                var printer = ts.createPrinter(options);
+                return ts.usingSingleLineStringWriter(function (writer) {
+                    var typeNode = checker.typeToTypeNode(type, /*enclosingDeclaration*/ undefined, flags, writer);
+                    ts.Debug.assertIsDefined(typeNode, "should always get typenode");
+                    printer.writeNode(4 /* EmitHint.Unspecified */, typeNode, /*sourceFile*/ file, writer);
+                });
+            }
+            function isUndefined(name) {
+                return name === "undefined";
+            }
+            function isHintableDeclaration(node) {
+                if ((ts.isParameterDeclaration(node) || ts.isVariableDeclaration(node) && ts.isVarConst(node)) && node.initializer) {
+                    var initializer = ts.skipParentheses(node.initializer);
+                    return !(isHintableLiteral(initializer) || ts.isNewExpression(initializer) || ts.isObjectLiteralExpression(initializer) || ts.isAssertionExpression(initializer));
+                }
+                return true;
+            }
+        }
+        InlayHints.provideInlayHints = provideInlayHints;
+    })(InlayHints = ts.InlayHints || (ts.InlayHints = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var base64UrlRegExp = /^data:(?:application\/json(?:;charset=[uU][tT][fF]-8);base64,([A-Za-z0-9+\/=]+)$)?/;
+    function getSourceMapper(host) {
+        var getCanonicalFileName = ts.createGetCanonicalFileName(host.useCaseSensitiveFileNames());
+        var currentDirectory = host.getCurrentDirectory();
+        var sourceFileLike = new ts.Map();
+        var documentPositionMappers = new ts.Map();
+        return { tryGetSourcePosition: tryGetSourcePosition, tryGetGeneratedPosition: tryGetGeneratedPosition, toLineColumnOffset: toLineColumnOffset, clearCache: clearCache };
+        function toPath(fileName) {
+            return ts.toPath(fileName, currentDirectory, getCanonicalFileName);
+        }
+        function getDocumentPositionMapper(generatedFileName, sourceFileName) {
+            var path = toPath(generatedFileName);
+            var value = documentPositionMappers.get(path);
+            if (value)
+                return value;
+            var mapper;
+            if (host.getDocumentPositionMapper) {
+                mapper = host.getDocumentPositionMapper(generatedFileName, sourceFileName);
+            }
+            else if (host.readFile) {
+                var file = getSourceFileLike(generatedFileName);
+                mapper = file && ts.getDocumentPositionMapper({ getSourceFileLike: getSourceFileLike, getCanonicalFileName: getCanonicalFileName, log: function (s) { return host.log(s); } }, generatedFileName, ts.getLineInfo(file.text, ts.getLineStarts(file)), function (f) { return !host.fileExists || host.fileExists(f) ? host.readFile(f) : undefined; });
+            }
+            documentPositionMappers.set(path, mapper || ts.identitySourceMapConsumer);
+            return mapper || ts.identitySourceMapConsumer;
+        }
+        function tryGetSourcePosition(info) {
+            if (!ts.isDeclarationFileName(info.fileName))
+                return undefined;
+            var file = getSourceFile(info.fileName);
+            if (!file)
+                return undefined;
+            var newLoc = getDocumentPositionMapper(info.fileName).getSourcePosition(info);
+            return !newLoc || newLoc === info ? undefined : tryGetSourcePosition(newLoc) || newLoc;
+        }
+        function tryGetGeneratedPosition(info) {
+            if (ts.isDeclarationFileName(info.fileName))
+                return undefined;
+            var sourceFile = getSourceFile(info.fileName);
+            if (!sourceFile)
+                return undefined;
+            var program = host.getProgram();
+            // If this is source file of project reference source (instead of redirect) there is no generated position
+            if (program.isSourceOfProjectReferenceRedirect(sourceFile.fileName)) {
+                return undefined;
+            }
+            var options = program.getCompilerOptions();
+            var outPath = ts.outFile(options);
+            var declarationPath = outPath ?
+                ts.removeFileExtension(outPath) + ".d.ts" /* Extension.Dts */ :
+                ts.getDeclarationEmitOutputFilePathWorker(info.fileName, program.getCompilerOptions(), currentDirectory, program.getCommonSourceDirectory(), getCanonicalFileName);
+            if (declarationPath === undefined)
+                return undefined;
+            var newLoc = getDocumentPositionMapper(declarationPath, info.fileName).getGeneratedPosition(info);
+            return newLoc === info ? undefined : newLoc;
+        }
+        function getSourceFile(fileName) {
+            var program = host.getProgram();
+            if (!program)
+                return undefined;
+            var path = toPath(fileName);
+            // file returned here could be .d.ts when asked for .ts file if projectReferences and module resolution created this source file
+            var file = program.getSourceFileByPath(path);
+            return file && file.resolvedPath === path ? file : undefined;
+        }
+        function getOrCreateSourceFileLike(fileName) {
+            var path = toPath(fileName);
+            var fileFromCache = sourceFileLike.get(path);
+            if (fileFromCache !== undefined)
+                return fileFromCache ? fileFromCache : undefined;
+            if (!host.readFile || host.fileExists && !host.fileExists(path)) {
+                sourceFileLike.set(path, false);
+                return undefined;
+            }
+            // And failing that, check the disk
+            var text = host.readFile(path);
+            var file = text ? createSourceFileLike(text) : false;
+            sourceFileLike.set(path, file);
+            return file ? file : undefined;
+        }
+        // This can be called from source mapper in either source program or program that includes generated file
+        function getSourceFileLike(fileName) {
+            return !host.getSourceFileLike ?
+                getSourceFile(fileName) || getOrCreateSourceFileLike(fileName) :
+                host.getSourceFileLike(fileName);
+        }
+        function toLineColumnOffset(fileName, position) {
+            var file = getSourceFileLike(fileName); // TODO: GH#18217
+            return file.getLineAndCharacterOfPosition(position);
+        }
+        function clearCache() {
+            sourceFileLike.clear();
+            documentPositionMappers.clear();
+        }
+    }
+    ts.getSourceMapper = getSourceMapper;
+    function getDocumentPositionMapper(host, generatedFileName, generatedFileLineInfo, readMapFile) {
+        var mapFileName = ts.tryGetSourceMappingURL(generatedFileLineInfo);
+        if (mapFileName) {
+            var match = base64UrlRegExp.exec(mapFileName);
+            if (match) {
+                if (match[1]) {
+                    var base64Object = match[1];
+                    return convertDocumentToSourceMapper(host, ts.base64decode(ts.sys, base64Object), generatedFileName);
+                }
+                // Not a data URL we can parse, skip it
+                mapFileName = undefined;
+            }
+        }
+        var possibleMapLocations = [];
+        if (mapFileName) {
+            possibleMapLocations.push(mapFileName);
+        }
+        possibleMapLocations.push(generatedFileName + ".map");
+        var originalMapFileName = mapFileName && ts.getNormalizedAbsolutePath(mapFileName, ts.getDirectoryPath(generatedFileName));
+        for (var _i = 0, possibleMapLocations_1 = possibleMapLocations; _i < possibleMapLocations_1.length; _i++) {
+            var location = possibleMapLocations_1[_i];
+            var mapFileName_1 = ts.getNormalizedAbsolutePath(location, ts.getDirectoryPath(generatedFileName));
+            var mapFileContents = readMapFile(mapFileName_1, originalMapFileName);
+            if (ts.isString(mapFileContents)) {
+                return convertDocumentToSourceMapper(host, mapFileContents, mapFileName_1);
+            }
+            if (mapFileContents !== undefined) {
+                return mapFileContents || undefined;
+            }
+        }
+        return undefined;
+    }
+    ts.getDocumentPositionMapper = getDocumentPositionMapper;
+    function convertDocumentToSourceMapper(host, contents, mapFileName) {
+        var map = ts.tryParseRawSourceMap(contents);
+        if (!map || !map.sources || !map.file || !map.mappings) {
+            // obviously invalid map
+            return undefined;
+        }
+        // Dont support sourcemaps that contain inlined sources
+        if (map.sourcesContent && map.sourcesContent.some(ts.isString))
+            return undefined;
+        return ts.createDocumentPositionMapper(host, map, mapFileName);
+    }
+    function createSourceFileLike(text, lineMap) {
+        return {
+            text: text,
+            lineMap: lineMap,
+            getLineAndCharacterOfPosition: function (pos) {
+                return ts.computeLineAndCharacterOfPosition(ts.getLineStarts(this), pos);
+            }
+        };
+    }
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var visitedNestedConvertibleFunctions = new ts.Map();
+    function computeSuggestionDiagnostics(sourceFile, program, cancellationToken) {
+        program.getSemanticDiagnostics(sourceFile, cancellationToken);
+        var diags = [];
+        var checker = program.getTypeChecker();
+        var isCommonJSFile = sourceFile.impliedNodeFormat === ts.ModuleKind.CommonJS || ts.fileExtensionIsOneOf(sourceFile.fileName, [".cts" /* Extension.Cts */, ".cjs" /* Extension.Cjs */]);
+        if (!isCommonJSFile &&
+            sourceFile.commonJsModuleIndicator &&
+            (ts.programContainsEsModules(program) || ts.compilerOptionsIndicateEsModules(program.getCompilerOptions())) &&
+            containsTopLevelCommonjs(sourceFile)) {
+            diags.push(ts.createDiagnosticForNode(getErrorNodeFromCommonJsIndicator(sourceFile.commonJsModuleIndicator), ts.Diagnostics.File_is_a_CommonJS_module_it_may_be_converted_to_an_ES_module));
+        }
+        var isJsFile = ts.isSourceFileJS(sourceFile);
+        visitedNestedConvertibleFunctions.clear();
+        check(sourceFile);
+        if (ts.getAllowSyntheticDefaultImports(program.getCompilerOptions())) {
+            for (var _i = 0, _a = sourceFile.imports; _i < _a.length; _i++) {
+                var moduleSpecifier = _a[_i];
+                var importNode = ts.importFromModuleSpecifier(moduleSpecifier);
+                var name = importNameForConvertToDefaultImport(importNode);
+                if (!name)
+                    continue;
+                var module_1 = ts.getResolvedModule(sourceFile, moduleSpecifier.text, ts.getModeForUsageLocation(sourceFile, moduleSpecifier));
+                var resolvedFile = module_1 && program.getSourceFile(module_1.resolvedFileName);
+                if (resolvedFile && resolvedFile.externalModuleIndicator && resolvedFile.externalModuleIndicator !== true && ts.isExportAssignment(resolvedFile.externalModuleIndicator) && resolvedFile.externalModuleIndicator.isExportEquals) {
+                    diags.push(ts.createDiagnosticForNode(name, ts.Diagnostics.Import_may_be_converted_to_a_default_import));
+                }
+            }
+        }
+        ts.addRange(diags, sourceFile.bindSuggestionDiagnostics);
+        ts.addRange(diags, program.getSuggestionDiagnostics(sourceFile, cancellationToken));
+        return diags.sort(function (d1, d2) { return d1.start - d2.start; });
+        function check(node) {
+            if (isJsFile) {
+                if (canBeConvertedToClass(node, checker)) {
+                    diags.push(ts.createDiagnosticForNode(ts.isVariableDeclaration(node.parent) ? node.parent.name : node, ts.Diagnostics.This_constructor_function_may_be_converted_to_a_class_declaration));
+                }
+            }
+            else {
+                if (ts.isVariableStatement(node) &&
+                    node.parent === sourceFile &&
+                    node.declarationList.flags & 2 /* NodeFlags.Const */ &&
+                    node.declarationList.declarations.length === 1) {
+                    var init = node.declarationList.declarations[0].initializer;
+                    if (init && ts.isRequireCall(init, /*checkArgumentIsStringLiteralLike*/ true)) {
+                        diags.push(ts.createDiagnosticForNode(init, ts.Diagnostics.require_call_may_be_converted_to_an_import));
+                    }
+                }
+                if (ts.codefix.parameterShouldGetTypeFromJSDoc(node)) {
+                    diags.push(ts.createDiagnosticForNode(node.name || node, ts.Diagnostics.JSDoc_types_may_be_moved_to_TypeScript_types));
+                }
+            }
+            if (canBeConvertedToAsync(node)) {
+                addConvertToAsyncFunctionDiagnostics(node, checker, diags);
+            }
+            node.forEachChild(check);
+        }
+    }
+    ts.computeSuggestionDiagnostics = computeSuggestionDiagnostics;
+    // convertToEsModule only works on top-level, so don't trigger it if commonjs code only appears in nested scopes.
+    function containsTopLevelCommonjs(sourceFile) {
+        return sourceFile.statements.some(function (statement) {
+            switch (statement.kind) {
+                case 240 /* SyntaxKind.VariableStatement */:
+                    return statement.declarationList.declarations.some(function (decl) {
+                        return !!decl.initializer && ts.isRequireCall(propertyAccessLeftHandSide(decl.initializer), /*checkArgumentIsStringLiteralLike*/ true);
+                    });
+                case 241 /* SyntaxKind.ExpressionStatement */: {
+                    var expression = statement.expression;
+                    if (!ts.isBinaryExpression(expression))
+                        return ts.isRequireCall(expression, /*checkArgumentIsStringLiteralLike*/ true);
+                    var kind = ts.getAssignmentDeclarationKind(expression);
+                    return kind === 1 /* AssignmentDeclarationKind.ExportsProperty */ || kind === 2 /* AssignmentDeclarationKind.ModuleExports */;
+                }
+                default:
+                    return false;
+            }
+        });
+    }
+    function propertyAccessLeftHandSide(node) {
+        return ts.isPropertyAccessExpression(node) ? propertyAccessLeftHandSide(node.expression) : node;
+    }
+    function importNameForConvertToDefaultImport(node) {
+        switch (node.kind) {
+            case 269 /* SyntaxKind.ImportDeclaration */:
+                var importClause = node.importClause, moduleSpecifier = node.moduleSpecifier;
+                return importClause && !importClause.name && importClause.namedBindings && importClause.namedBindings.kind === 271 /* SyntaxKind.NamespaceImport */ && ts.isStringLiteral(moduleSpecifier)
+                    ? importClause.namedBindings.name
+                    : undefined;
+            case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                return node.name;
+            default:
+                return undefined;
+        }
+    }
+    function addConvertToAsyncFunctionDiagnostics(node, checker, diags) {
+        // need to check function before checking map so that deeper levels of nested callbacks are checked
+        if (isConvertibleFunction(node, checker) && !visitedNestedConvertibleFunctions.has(getKeyFromNode(node))) {
+            diags.push(ts.createDiagnosticForNode(!node.name && ts.isVariableDeclaration(node.parent) && ts.isIdentifier(node.parent.name) ? node.parent.name : node, ts.Diagnostics.This_may_be_converted_to_an_async_function));
+        }
+    }
+    function isConvertibleFunction(node, checker) {
+        return !ts.isAsyncFunction(node) &&
+            node.body &&
+            ts.isBlock(node.body) &&
+            hasReturnStatementWithPromiseHandler(node.body, checker) &&
+            returnsPromise(node, checker);
+    }
+    function returnsPromise(node, checker) {
+        var signature = checker.getSignatureFromDeclaration(node);
+        var returnType = signature ? checker.getReturnTypeOfSignature(signature) : undefined;
+        return !!returnType && !!checker.getPromisedTypeOfPromise(returnType);
+    }
+    ts.returnsPromise = returnsPromise;
+    function getErrorNodeFromCommonJsIndicator(commonJsModuleIndicator) {
+        return ts.isBinaryExpression(commonJsModuleIndicator) ? commonJsModuleIndicator.left : commonJsModuleIndicator;
+    }
+    function hasReturnStatementWithPromiseHandler(body, checker) {
+        return !!ts.forEachReturnStatement(body, function (statement) { return isReturnStatementWithFixablePromiseHandler(statement, checker); });
+    }
+    function isReturnStatementWithFixablePromiseHandler(node, checker) {
+        return ts.isReturnStatement(node) && !!node.expression && isFixablePromiseHandler(node.expression, checker);
+    }
+    ts.isReturnStatementWithFixablePromiseHandler = isReturnStatementWithFixablePromiseHandler;
+    // Should be kept up to date with transformExpression in convertToAsyncFunction.ts
+    function isFixablePromiseHandler(node, checker) {
+        // ensure outermost call exists and is a promise handler
+        if (!isPromiseHandler(node) || !hasSupportedNumberOfArguments(node) || !node.arguments.every(function (arg) { return isFixablePromiseArgument(arg, checker); })) {
+            return false;
+        }
+        // ensure all chained calls are valid
+        var currentNode = node.expression.expression;
+        while (isPromiseHandler(currentNode) || ts.isPropertyAccessExpression(currentNode)) {
+            if (ts.isCallExpression(currentNode)) {
+                if (!hasSupportedNumberOfArguments(currentNode) || !currentNode.arguments.every(function (arg) { return isFixablePromiseArgument(arg, checker); })) {
+                    return false;
+                }
+                currentNode = currentNode.expression.expression;
+            }
+            else {
+                currentNode = currentNode.expression;
+            }
+        }
+        return true;
+    }
+    ts.isFixablePromiseHandler = isFixablePromiseHandler;
+    function isPromiseHandler(node) {
+        return ts.isCallExpression(node) && (ts.hasPropertyAccessExpressionWithName(node, "then") ||
+            ts.hasPropertyAccessExpressionWithName(node, "catch") ||
+            ts.hasPropertyAccessExpressionWithName(node, "finally"));
+    }
+    function hasSupportedNumberOfArguments(node) {
+        var name = node.expression.name.text;
+        var maxArguments = name === "then" ? 2 : name === "catch" ? 1 : name === "finally" ? 1 : 0;
+        if (node.arguments.length > maxArguments)
+            return false;
+        if (node.arguments.length < maxArguments)
+            return true;
+        return maxArguments === 1 || ts.some(node.arguments, function (arg) {
+            return arg.kind === 104 /* SyntaxKind.NullKeyword */ || ts.isIdentifier(arg) && arg.text === "undefined";
+        });
+    }
+    // should be kept up to date with getTransformationBody in convertToAsyncFunction.ts
+    function isFixablePromiseArgument(arg, checker) {
+        switch (arg.kind) {
+            case 259 /* SyntaxKind.FunctionDeclaration */:
+            case 215 /* SyntaxKind.FunctionExpression */:
+                var functionFlags = ts.getFunctionFlags(arg);
+                if (functionFlags & 1 /* FunctionFlags.Generator */) {
+                    return false;
+                }
+            // falls through
+            case 216 /* SyntaxKind.ArrowFunction */:
+                visitedNestedConvertibleFunctions.set(getKeyFromNode(arg), true);
+            // falls through
+            case 104 /* SyntaxKind.NullKeyword */:
+                return true;
+            case 79 /* SyntaxKind.Identifier */:
+            case 208 /* SyntaxKind.PropertyAccessExpression */: {
+                var symbol = checker.getSymbolAtLocation(arg);
+                if (!symbol) {
+                    return false;
+                }
+                return checker.isUndefinedSymbol(symbol) ||
+                    ts.some(ts.skipAlias(symbol, checker).declarations, function (d) { return ts.isFunctionLike(d) || ts.hasInitializer(d) && !!d.initializer && ts.isFunctionLike(d.initializer); });
+            }
+            default:
+                return false;
+        }
+    }
+    function getKeyFromNode(exp) {
+        return "".concat(exp.pos.toString(), ":").concat(exp.end.toString());
+    }
+    function canBeConvertedToClass(node, checker) {
+        var _a, _b, _c, _d;
+        if (node.kind === 215 /* SyntaxKind.FunctionExpression */) {
+            if (ts.isVariableDeclaration(node.parent) && ((_a = node.symbol.members) === null || _a === void 0 ? void 0 : _a.size)) {
+                return true;
+            }
+            var symbol = checker.getSymbolOfExpando(node, /*allowDeclaration*/ false);
+            return !!(symbol && (((_b = symbol.exports) === null || _b === void 0 ? void 0 : _b.size) || ((_c = symbol.members) === null || _c === void 0 ? void 0 : _c.size)));
+        }
+        if (node.kind === 259 /* SyntaxKind.FunctionDeclaration */) {
+            return !!((_d = node.symbol.members) === null || _d === void 0 ? void 0 : _d.size);
+        }
+        return false;
+    }
+    function canBeConvertedToAsync(node) {
+        switch (node.kind) {
+            case 259 /* SyntaxKind.FunctionDeclaration */:
+            case 171 /* SyntaxKind.MethodDeclaration */:
+            case 215 /* SyntaxKind.FunctionExpression */:
+            case 216 /* SyntaxKind.ArrowFunction */:
+                return true;
+            default:
+                return false;
+        }
+    }
+    ts.canBeConvertedToAsync = canBeConvertedToAsync;
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var SymbolDisplay;
+    (function (SymbolDisplay) {
+        var symbolDisplayNodeBuilderFlags = 8192 /* NodeBuilderFlags.OmitParameterModifiers */ | 70221824 /* NodeBuilderFlags.IgnoreErrors */ | 16384 /* NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope */;
+        // TODO(drosen): use contextual SemanticMeaning.
+        function getSymbolKind(typeChecker, symbol, location) {
+            var result = getSymbolKindOfConstructorPropertyMethodAccessorFunctionOrVar(typeChecker, symbol, location);
+            if (result !== "" /* ScriptElementKind.unknown */) {
+                return result;
+            }
+            var flags = ts.getCombinedLocalAndExportSymbolFlags(symbol);
+            if (flags & 32 /* SymbolFlags.Class */) {
+                return ts.getDeclarationOfKind(symbol, 228 /* SyntaxKind.ClassExpression */) ?
+                    "local class" /* ScriptElementKind.localClassElement */ : "class" /* ScriptElementKind.classElement */;
+            }
+            if (flags & 384 /* SymbolFlags.Enum */)
+                return "enum" /* ScriptElementKind.enumElement */;
+            if (flags & 524288 /* SymbolFlags.TypeAlias */)
+                return "type" /* ScriptElementKind.typeElement */;
+            if (flags & 64 /* SymbolFlags.Interface */)
+                return "interface" /* ScriptElementKind.interfaceElement */;
+            if (flags & 262144 /* SymbolFlags.TypeParameter */)
+                return "type parameter" /* ScriptElementKind.typeParameterElement */;
+            if (flags & 8 /* SymbolFlags.EnumMember */)
+                return "enum member" /* ScriptElementKind.enumMemberElement */;
+            if (flags & 2097152 /* SymbolFlags.Alias */)
+                return "alias" /* ScriptElementKind.alias */;
+            if (flags & 1536 /* SymbolFlags.Module */)
+                return "module" /* ScriptElementKind.moduleElement */;
+            return result;
+        }
+        SymbolDisplay.getSymbolKind = getSymbolKind;
+        function getSymbolKindOfConstructorPropertyMethodAccessorFunctionOrVar(typeChecker, symbol, location) {
+            var roots = typeChecker.getRootSymbols(symbol);
+            // If this is a method from a mapped type, leave as a method so long as it still has a call signature.
+            if (roots.length === 1
+                && ts.first(roots).flags & 8192 /* SymbolFlags.Method */
+                // Ensure the mapped version is still a method, as opposed to `{ [K in keyof I]: number }`.
+                && typeChecker.getTypeOfSymbolAtLocation(symbol, location).getNonNullableType().getCallSignatures().length !== 0) {
+                return "method" /* ScriptElementKind.memberFunctionElement */;
+            }
+            if (typeChecker.isUndefinedSymbol(symbol)) {
+                return "var" /* ScriptElementKind.variableElement */;
+            }
+            if (typeChecker.isArgumentsSymbol(symbol)) {
+                return "local var" /* ScriptElementKind.localVariableElement */;
+            }
+            if (location.kind === 108 /* SyntaxKind.ThisKeyword */ && ts.isExpression(location) || ts.isThisInTypeQuery(location)) {
+                return "parameter" /* ScriptElementKind.parameterElement */;
+            }
+            var flags = ts.getCombinedLocalAndExportSymbolFlags(symbol);
+            if (flags & 3 /* SymbolFlags.Variable */) {
+                if (ts.isFirstDeclarationOfSymbolParameter(symbol)) {
+                    return "parameter" /* ScriptElementKind.parameterElement */;
+                }
+                else if (symbol.valueDeclaration && ts.isVarConst(symbol.valueDeclaration)) {
+                    return "const" /* ScriptElementKind.constElement */;
+                }
+                else if (ts.forEach(symbol.declarations, ts.isLet)) {
+                    return "let" /* ScriptElementKind.letElement */;
+                }
+                return isLocalVariableOrFunction(symbol) ? "local var" /* ScriptElementKind.localVariableElement */ : "var" /* ScriptElementKind.variableElement */;
+            }
+            if (flags & 16 /* SymbolFlags.Function */)
+                return isLocalVariableOrFunction(symbol) ? "local function" /* ScriptElementKind.localFunctionElement */ : "function" /* ScriptElementKind.functionElement */;
+            // FIXME: getter and setter use the same symbol. And it is rare to use only setter without getter, so in most cases the symbol always has getter flag.
+            // So, even when the location is just on the declaration of setter, this function returns getter.
+            if (flags & 32768 /* SymbolFlags.GetAccessor */)
+                return "getter" /* ScriptElementKind.memberGetAccessorElement */;
+            if (flags & 65536 /* SymbolFlags.SetAccessor */)
+                return "setter" /* ScriptElementKind.memberSetAccessorElement */;
+            if (flags & 8192 /* SymbolFlags.Method */)
+                return "method" /* ScriptElementKind.memberFunctionElement */;
+            if (flags & 16384 /* SymbolFlags.Constructor */)
+                return "constructor" /* ScriptElementKind.constructorImplementationElement */;
+            if (flags & 131072 /* SymbolFlags.Signature */)
+                return "index" /* ScriptElementKind.indexSignatureElement */;
+            if (flags & 4 /* SymbolFlags.Property */) {
+                if (flags & 33554432 /* SymbolFlags.Transient */ && symbol.checkFlags & 6 /* CheckFlags.Synthetic */) {
+                    // If union property is result of union of non method (property/accessors/variables), it is labeled as property
+                    var unionPropertyKind = ts.forEach(typeChecker.getRootSymbols(symbol), function (rootSymbol) {
+                        var rootSymbolFlags = rootSymbol.getFlags();
+                        if (rootSymbolFlags & (98308 /* SymbolFlags.PropertyOrAccessor */ | 3 /* SymbolFlags.Variable */)) {
+                            return "property" /* ScriptElementKind.memberVariableElement */;
+                        }
+                    });
+                    if (!unionPropertyKind) {
+                        // If this was union of all methods,
+                        // make sure it has call signatures before we can label it as method
+                        var typeOfUnionProperty = typeChecker.getTypeOfSymbolAtLocation(symbol, location);
+                        if (typeOfUnionProperty.getCallSignatures().length) {
+                            return "method" /* ScriptElementKind.memberFunctionElement */;
+                        }
+                        return "property" /* ScriptElementKind.memberVariableElement */;
+                    }
+                    return unionPropertyKind;
+                }
+                return "property" /* ScriptElementKind.memberVariableElement */;
+            }
+            return "" /* ScriptElementKind.unknown */;
+        }
+        function getNormalizedSymbolModifiers(symbol) {
+            if (symbol.declarations && symbol.declarations.length) {
+                var _a = symbol.declarations, declaration = _a[0], declarations = _a.slice(1);
+                // omit deprecated flag if some declarations are not deprecated
+                var excludeFlags = ts.length(declarations) && ts.isDeprecatedDeclaration(declaration) && ts.some(declarations, function (d) { return !ts.isDeprecatedDeclaration(d); })
+                    ? 8192 /* ModifierFlags.Deprecated */
+                    : 0 /* ModifierFlags.None */;
+                var modifiers = ts.getNodeModifiers(declaration, excludeFlags);
+                if (modifiers) {
+                    return modifiers.split(",");
+                }
+            }
+            return [];
+        }
+        function getSymbolModifiers(typeChecker, symbol) {
+            if (!symbol) {
+                return "" /* ScriptElementKindModifier.none */;
+            }
+            var modifiers = new ts.Set(getNormalizedSymbolModifiers(symbol));
+            if (symbol.flags & 2097152 /* SymbolFlags.Alias */) {
+                var resolvedSymbol = typeChecker.getAliasedSymbol(symbol);
+                if (resolvedSymbol !== symbol) {
+                    ts.forEach(getNormalizedSymbolModifiers(resolvedSymbol), function (modifier) {
+                        modifiers.add(modifier);
+                    });
+                }
+            }
+            if (symbol.flags & 16777216 /* SymbolFlags.Optional */) {
+                modifiers.add("optional" /* ScriptElementKindModifier.optionalModifier */);
+            }
+            return modifiers.size > 0 ? ts.arrayFrom(modifiers.values()).join(",") : "" /* ScriptElementKindModifier.none */;
+        }
+        SymbolDisplay.getSymbolModifiers = getSymbolModifiers;
+        // TODO(drosen): Currently completion entry details passes the SemanticMeaning.All instead of using semanticMeaning of location
+        function getSymbolDisplayPartsDocumentationAndSymbolKind(typeChecker, symbol, sourceFile, enclosingDeclaration, location, semanticMeaning, alias) {
+            var _a;
+            if (semanticMeaning === void 0) { semanticMeaning = ts.getMeaningFromLocation(location); }
+            var displayParts = [];
+            var documentation = [];
+            var tags = [];
+            var symbolFlags = ts.getCombinedLocalAndExportSymbolFlags(symbol);
+            var symbolKind = semanticMeaning & 1 /* SemanticMeaning.Value */ ? getSymbolKindOfConstructorPropertyMethodAccessorFunctionOrVar(typeChecker, symbol, location) : "" /* ScriptElementKind.unknown */;
+            var hasAddedSymbolInfo = false;
+            var isThisExpression = location.kind === 108 /* SyntaxKind.ThisKeyword */ && ts.isInExpressionContext(location) || ts.isThisInTypeQuery(location);
+            var type;
+            var printer;
+            var documentationFromAlias;
+            var tagsFromAlias;
+            var hasMultipleSignatures = false;
+            if (location.kind === 108 /* SyntaxKind.ThisKeyword */ && !isThisExpression) {
+                return { displayParts: [ts.keywordPart(108 /* SyntaxKind.ThisKeyword */)], documentation: [], symbolKind: "primitive type" /* ScriptElementKind.primitiveType */, tags: undefined };
+            }
+            // Class at constructor site need to be shown as constructor apart from property,method, vars
+            if (symbolKind !== "" /* ScriptElementKind.unknown */ || symbolFlags & 32 /* SymbolFlags.Class */ || symbolFlags & 2097152 /* SymbolFlags.Alias */) {
+                // If symbol is accessor, they are allowed only if location is at declaration identifier of the accessor
+                if (symbolKind === "getter" /* ScriptElementKind.memberGetAccessorElement */ || symbolKind === "setter" /* ScriptElementKind.memberSetAccessorElement */) {
+                    var declaration = ts.find(symbol.declarations, function (declaration) { return declaration.name === location; });
+                    if (declaration) {
+                        switch (declaration.kind) {
+                            case 174 /* SyntaxKind.GetAccessor */:
+                                symbolKind = "getter" /* ScriptElementKind.memberGetAccessorElement */;
+                                break;
+                            case 175 /* SyntaxKind.SetAccessor */:
+                                symbolKind = "setter" /* ScriptElementKind.memberSetAccessorElement */;
+                                break;
+                            case 169 /* SyntaxKind.PropertyDeclaration */:
+                                symbolKind = "accessor" /* ScriptElementKind.memberAccessorVariableElement */;
+                                break;
+                            default:
+                                ts.Debug.assertNever(declaration);
+                        }
+                    }
+                    else {
+                        symbolKind = "property" /* ScriptElementKind.memberVariableElement */;
+                    }
+                }
+                var signature = void 0;
+                type = isThisExpression ? typeChecker.getTypeAtLocation(location) : typeChecker.getTypeOfSymbolAtLocation(symbol, location);
+                if (location.parent && location.parent.kind === 208 /* SyntaxKind.PropertyAccessExpression */) {
+                    var right = location.parent.name;
+                    // Either the location is on the right of a property access, or on the left and the right is missing
+                    if (right === location || (right && right.getFullWidth() === 0)) {
+                        location = location.parent;
+                    }
+                }
+                // try get the call/construct signature from the type if it matches
+                var callExpressionLike = void 0;
+                if (ts.isCallOrNewExpression(location)) {
+                    callExpressionLike = location;
+                }
+                else if (ts.isCallExpressionTarget(location) || ts.isNewExpressionTarget(location)) {
+                    callExpressionLike = location.parent;
+                }
+                else if (location.parent && (ts.isJsxOpeningLikeElement(location.parent) || ts.isTaggedTemplateExpression(location.parent)) && ts.isFunctionLike(symbol.valueDeclaration)) {
+                    callExpressionLike = location.parent;
+                }
+                if (callExpressionLike) {
+                    signature = typeChecker.getResolvedSignature(callExpressionLike); // TODO: GH#18217
+                    var useConstructSignatures = callExpressionLike.kind === 211 /* SyntaxKind.NewExpression */ || (ts.isCallExpression(callExpressionLike) && callExpressionLike.expression.kind === 106 /* SyntaxKind.SuperKeyword */);
+                    var allSignatures = useConstructSignatures ? type.getConstructSignatures() : type.getCallSignatures();
+                    if (signature && !ts.contains(allSignatures, signature.target) && !ts.contains(allSignatures, signature)) {
+                        // Get the first signature if there is one -- allSignatures may contain
+                        // either the original signature or its target, so check for either
+                        signature = allSignatures.length ? allSignatures[0] : undefined;
+                    }
+                    if (signature) {
+                        if (useConstructSignatures && (symbolFlags & 32 /* SymbolFlags.Class */)) {
+                            // Constructor
+                            symbolKind = "constructor" /* ScriptElementKind.constructorImplementationElement */;
+                            addPrefixForAnyFunctionOrVar(type.symbol, symbolKind);
+                        }
+                        else if (symbolFlags & 2097152 /* SymbolFlags.Alias */) {
+                            symbolKind = "alias" /* ScriptElementKind.alias */;
+                            pushSymbolKind(symbolKind);
+                            displayParts.push(ts.spacePart());
+                            if (useConstructSignatures) {
+                                if (signature.flags & 4 /* SignatureFlags.Abstract */) {
+                                    displayParts.push(ts.keywordPart(126 /* SyntaxKind.AbstractKeyword */));
+                                    displayParts.push(ts.spacePart());
+                                }
+                                displayParts.push(ts.keywordPart(103 /* SyntaxKind.NewKeyword */));
+                                displayParts.push(ts.spacePart());
+                            }
+                            addFullSymbolName(symbol);
+                        }
+                        else {
+                            addPrefixForAnyFunctionOrVar(symbol, symbolKind);
+                        }
+                        switch (symbolKind) {
+                            case "JSX attribute" /* ScriptElementKind.jsxAttribute */:
+                            case "property" /* ScriptElementKind.memberVariableElement */:
+                            case "var" /* ScriptElementKind.variableElement */:
+                            case "const" /* ScriptElementKind.constElement */:
+                            case "let" /* ScriptElementKind.letElement */:
+                            case "parameter" /* ScriptElementKind.parameterElement */:
+                            case "local var" /* ScriptElementKind.localVariableElement */:
+                                // If it is call or construct signature of lambda's write type name
+                                displayParts.push(ts.punctuationPart(58 /* SyntaxKind.ColonToken */));
+                                displayParts.push(ts.spacePart());
+                                if (!(ts.getObjectFlags(type) & 16 /* ObjectFlags.Anonymous */) && type.symbol) {
+                                    ts.addRange(displayParts, ts.symbolToDisplayParts(typeChecker, type.symbol, enclosingDeclaration, /*meaning*/ undefined, 4 /* SymbolFormatFlags.AllowAnyNodeKind */ | 1 /* SymbolFormatFlags.WriteTypeParametersOrArguments */));
+                                    displayParts.push(ts.lineBreakPart());
+                                }
+                                if (useConstructSignatures) {
+                                    if (signature.flags & 4 /* SignatureFlags.Abstract */) {
+                                        displayParts.push(ts.keywordPart(126 /* SyntaxKind.AbstractKeyword */));
+                                        displayParts.push(ts.spacePart());
+                                    }
+                                    displayParts.push(ts.keywordPart(103 /* SyntaxKind.NewKeyword */));
+                                    displayParts.push(ts.spacePart());
+                                }
+                                addSignatureDisplayParts(signature, allSignatures, 262144 /* TypeFormatFlags.WriteArrowStyleSignature */);
+                                break;
+                            default:
+                                // Just signature
+                                addSignatureDisplayParts(signature, allSignatures);
+                        }
+                        hasAddedSymbolInfo = true;
+                        hasMultipleSignatures = allSignatures.length > 1;
+                    }
+                }
+                else if ((ts.isNameOfFunctionDeclaration(location) && !(symbolFlags & 98304 /* SymbolFlags.Accessor */)) || // name of function declaration
+                    (location.kind === 135 /* SyntaxKind.ConstructorKeyword */ && location.parent.kind === 173 /* SyntaxKind.Constructor */)) { // At constructor keyword of constructor declaration
+                    // get the signature from the declaration and write it
+                    var functionDeclaration_1 = location.parent;
+                    // Use function declaration to write the signatures only if the symbol corresponding to this declaration
+                    var locationIsSymbolDeclaration = symbol.declarations && ts.find(symbol.declarations, function (declaration) {
+                        return declaration === (location.kind === 135 /* SyntaxKind.ConstructorKeyword */ ? functionDeclaration_1.parent : functionDeclaration_1);
+                    });
+                    if (locationIsSymbolDeclaration) {
+                        var allSignatures = functionDeclaration_1.kind === 173 /* SyntaxKind.Constructor */ ? type.getNonNullableType().getConstructSignatures() : type.getNonNullableType().getCallSignatures();
+                        if (!typeChecker.isImplementationOfOverload(functionDeclaration_1)) {
+                            signature = typeChecker.getSignatureFromDeclaration(functionDeclaration_1); // TODO: GH#18217
+                        }
+                        else {
+                            signature = allSignatures[0];
+                        }
+                        if (functionDeclaration_1.kind === 173 /* SyntaxKind.Constructor */) {
+                            // show (constructor) Type(...) signature
+                            symbolKind = "constructor" /* ScriptElementKind.constructorImplementationElement */;
+                            addPrefixForAnyFunctionOrVar(type.symbol, symbolKind);
+                        }
+                        else {
+                            // (function/method) symbol(..signature)
+                            addPrefixForAnyFunctionOrVar(functionDeclaration_1.kind === 176 /* SyntaxKind.CallSignature */ &&
+                                !(type.symbol.flags & 2048 /* SymbolFlags.TypeLiteral */ || type.symbol.flags & 4096 /* SymbolFlags.ObjectLiteral */) ? type.symbol : symbol, symbolKind);
+                        }
+                        if (signature) {
+                            addSignatureDisplayParts(signature, allSignatures);
+                        }
+                        hasAddedSymbolInfo = true;
+                        hasMultipleSignatures = allSignatures.length > 1;
+                    }
+                }
+            }
+            if (symbolFlags & 32 /* SymbolFlags.Class */ && !hasAddedSymbolInfo && !isThisExpression) {
+                addAliasPrefixIfNecessary();
+                if (ts.getDeclarationOfKind(symbol, 228 /* SyntaxKind.ClassExpression */)) {
+                    // Special case for class expressions because we would like to indicate that
+                    // the class name is local to the class body (similar to function expression)
+                    //      (local class) class <className>
+                    pushSymbolKind("local class" /* ScriptElementKind.localClassElement */);
+                }
+                else {
+                    // Class declaration has name which is not local.
+                    displayParts.push(ts.keywordPart(84 /* SyntaxKind.ClassKeyword */));
+                }
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+                writeTypeParametersOfSymbol(symbol, sourceFile);
+            }
+            if ((symbolFlags & 64 /* SymbolFlags.Interface */) && (semanticMeaning & 2 /* SemanticMeaning.Type */)) {
+                prefixNextMeaning();
+                displayParts.push(ts.keywordPart(118 /* SyntaxKind.InterfaceKeyword */));
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+                writeTypeParametersOfSymbol(symbol, sourceFile);
+            }
+            if ((symbolFlags & 524288 /* SymbolFlags.TypeAlias */) && (semanticMeaning & 2 /* SemanticMeaning.Type */)) {
+                prefixNextMeaning();
+                displayParts.push(ts.keywordPart(154 /* SyntaxKind.TypeKeyword */));
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+                writeTypeParametersOfSymbol(symbol, sourceFile);
+                displayParts.push(ts.spacePart());
+                displayParts.push(ts.operatorPart(63 /* SyntaxKind.EqualsToken */));
+                displayParts.push(ts.spacePart());
+                ts.addRange(displayParts, ts.typeToDisplayParts(typeChecker, ts.isConstTypeReference(location.parent) ? typeChecker.getTypeAtLocation(location.parent) : typeChecker.getDeclaredTypeOfSymbol(symbol), enclosingDeclaration, 8388608 /* TypeFormatFlags.InTypeAlias */));
+            }
+            if (symbolFlags & 384 /* SymbolFlags.Enum */) {
+                prefixNextMeaning();
+                if (ts.some(symbol.declarations, function (d) { return ts.isEnumDeclaration(d) && ts.isEnumConst(d); })) {
+                    displayParts.push(ts.keywordPart(85 /* SyntaxKind.ConstKeyword */));
+                    displayParts.push(ts.spacePart());
+                }
+                displayParts.push(ts.keywordPart(92 /* SyntaxKind.EnumKeyword */));
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+            }
+            if (symbolFlags & 1536 /* SymbolFlags.Module */ && !isThisExpression) {
+                prefixNextMeaning();
+                var declaration = ts.getDeclarationOfKind(symbol, 264 /* SyntaxKind.ModuleDeclaration */);
+                var isNamespace = declaration && declaration.name && declaration.name.kind === 79 /* SyntaxKind.Identifier */;
+                displayParts.push(ts.keywordPart(isNamespace ? 143 /* SyntaxKind.NamespaceKeyword */ : 142 /* SyntaxKind.ModuleKeyword */));
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+            }
+            if ((symbolFlags & 262144 /* SymbolFlags.TypeParameter */) && (semanticMeaning & 2 /* SemanticMeaning.Type */)) {
+                prefixNextMeaning();
+                displayParts.push(ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */));
+                displayParts.push(ts.textPart("type parameter"));
+                displayParts.push(ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */));
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+                if (symbol.parent) {
+                    // Class/Interface type parameter
+                    addInPrefix();
+                    addFullSymbolName(symbol.parent, enclosingDeclaration);
+                    writeTypeParametersOfSymbol(symbol.parent, enclosingDeclaration);
+                }
+                else {
+                    // Method/function type parameter
+                    var decl = ts.getDeclarationOfKind(symbol, 165 /* SyntaxKind.TypeParameter */);
+                    if (decl === undefined)
+                        return ts.Debug.fail();
+                    var declaration = decl.parent;
+                    if (declaration) {
+                        if (ts.isFunctionLikeKind(declaration.kind)) {
+                            addInPrefix();
+                            var signature = typeChecker.getSignatureFromDeclaration(declaration); // TODO: GH#18217
+                            if (declaration.kind === 177 /* SyntaxKind.ConstructSignature */) {
+                                displayParts.push(ts.keywordPart(103 /* SyntaxKind.NewKeyword */));
+                                displayParts.push(ts.spacePart());
+                            }
+                            else if (declaration.kind !== 176 /* SyntaxKind.CallSignature */ && declaration.name) {
+                                addFullSymbolName(declaration.symbol);
+                            }
+                            ts.addRange(displayParts, ts.signatureToDisplayParts(typeChecker, signature, sourceFile, 32 /* TypeFormatFlags.WriteTypeArgumentsOfSignature */));
+                        }
+                        else if (declaration.kind === 262 /* SyntaxKind.TypeAliasDeclaration */) {
+                            // Type alias type parameter
+                            // For example
+                            //      type list<T> = T[]; // Both T will go through same code path
+                            addInPrefix();
+                            displayParts.push(ts.keywordPart(154 /* SyntaxKind.TypeKeyword */));
+                            displayParts.push(ts.spacePart());
+                            addFullSymbolName(declaration.symbol);
+                            writeTypeParametersOfSymbol(declaration.symbol, sourceFile);
+                        }
+                    }
+                }
+            }
+            if (symbolFlags & 8 /* SymbolFlags.EnumMember */) {
+                symbolKind = "enum member" /* ScriptElementKind.enumMemberElement */;
+                addPrefixForAnyFunctionOrVar(symbol, "enum member");
+                var declaration = (_a = symbol.declarations) === null || _a === void 0 ? void 0 : _a[0];
+                if ((declaration === null || declaration === void 0 ? void 0 : declaration.kind) === 302 /* SyntaxKind.EnumMember */) {
+                    var constantValue = typeChecker.getConstantValue(declaration);
+                    if (constantValue !== undefined) {
+                        displayParts.push(ts.spacePart());
+                        displayParts.push(ts.operatorPart(63 /* SyntaxKind.EqualsToken */));
+                        displayParts.push(ts.spacePart());
+                        displayParts.push(ts.displayPart(ts.getTextOfConstantValue(constantValue), typeof constantValue === "number" ? ts.SymbolDisplayPartKind.numericLiteral : ts.SymbolDisplayPartKind.stringLiteral));
+                    }
+                }
+            }
+            // don't use symbolFlags since getAliasedSymbol requires the flag on the symbol itself
+            if (symbol.flags & 2097152 /* SymbolFlags.Alias */) {
+                prefixNextMeaning();
+                if (!hasAddedSymbolInfo) {
+                    var resolvedSymbol = typeChecker.getAliasedSymbol(symbol);
+                    if (resolvedSymbol !== symbol && resolvedSymbol.declarations && resolvedSymbol.declarations.length > 0) {
+                        var resolvedNode = resolvedSymbol.declarations[0];
+                        var declarationName = ts.getNameOfDeclaration(resolvedNode);
+                        if (declarationName) {
+                            var isExternalModuleDeclaration = ts.isModuleWithStringLiteralName(resolvedNode) &&
+                                ts.hasSyntacticModifier(resolvedNode, 2 /* ModifierFlags.Ambient */);
+                            var shouldUseAliasName = symbol.name !== "default" && !isExternalModuleDeclaration;
+                            var resolvedInfo = getSymbolDisplayPartsDocumentationAndSymbolKind(typeChecker, resolvedSymbol, ts.getSourceFileOfNode(resolvedNode), resolvedNode, declarationName, semanticMeaning, shouldUseAliasName ? symbol : resolvedSymbol);
+                            displayParts.push.apply(displayParts, resolvedInfo.displayParts);
+                            displayParts.push(ts.lineBreakPart());
+                            documentationFromAlias = resolvedInfo.documentation;
+                            tagsFromAlias = resolvedInfo.tags;
+                        }
+                        else {
+                            documentationFromAlias = resolvedSymbol.getContextualDocumentationComment(resolvedNode, typeChecker);
+                            tagsFromAlias = resolvedSymbol.getJsDocTags(typeChecker);
+                        }
+                    }
+                }
+                if (symbol.declarations) {
+                    switch (symbol.declarations[0].kind) {
+                        case 267 /* SyntaxKind.NamespaceExportDeclaration */:
+                            displayParts.push(ts.keywordPart(93 /* SyntaxKind.ExportKeyword */));
+                            displayParts.push(ts.spacePart());
+                            displayParts.push(ts.keywordPart(143 /* SyntaxKind.NamespaceKeyword */));
+                            break;
+                        case 274 /* SyntaxKind.ExportAssignment */:
+                            displayParts.push(ts.keywordPart(93 /* SyntaxKind.ExportKeyword */));
+                            displayParts.push(ts.spacePart());
+                            displayParts.push(ts.keywordPart(symbol.declarations[0].isExportEquals ? 63 /* SyntaxKind.EqualsToken */ : 88 /* SyntaxKind.DefaultKeyword */));
+                            break;
+                        case 278 /* SyntaxKind.ExportSpecifier */:
+                            displayParts.push(ts.keywordPart(93 /* SyntaxKind.ExportKeyword */));
+                            break;
+                        default:
+                            displayParts.push(ts.keywordPart(100 /* SyntaxKind.ImportKeyword */));
+                    }
+                }
+                displayParts.push(ts.spacePart());
+                addFullSymbolName(symbol);
+                ts.forEach(symbol.declarations, function (declaration) {
+                    if (declaration.kind === 268 /* SyntaxKind.ImportEqualsDeclaration */) {
+                        var importEqualsDeclaration = declaration;
+                        if (ts.isExternalModuleImportEqualsDeclaration(importEqualsDeclaration)) {
+                            displayParts.push(ts.spacePart());
+                            displayParts.push(ts.operatorPart(63 /* SyntaxKind.EqualsToken */));
+                            displayParts.push(ts.spacePart());
+                            displayParts.push(ts.keywordPart(147 /* SyntaxKind.RequireKeyword */));
+                            displayParts.push(ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */));
+                            displayParts.push(ts.displayPart(ts.getTextOfNode(ts.getExternalModuleImportEqualsDeclarationExpression(importEqualsDeclaration)), ts.SymbolDisplayPartKind.stringLiteral));
+                            displayParts.push(ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */));
+                        }
+                        else {
+                            var internalAliasSymbol = typeChecker.getSymbolAtLocation(importEqualsDeclaration.moduleReference);
+                            if (internalAliasSymbol) {
+                                displayParts.push(ts.spacePart());
+                                displayParts.push(ts.operatorPart(63 /* SyntaxKind.EqualsToken */));
+                                displayParts.push(ts.spacePart());
+                                addFullSymbolName(internalAliasSymbol, enclosingDeclaration);
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }
+            if (!hasAddedSymbolInfo) {
+                if (symbolKind !== "" /* ScriptElementKind.unknown */) {
+                    if (type) {
+                        if (isThisExpression) {
+                            prefixNextMeaning();
+                            displayParts.push(ts.keywordPart(108 /* SyntaxKind.ThisKeyword */));
+                        }
+                        else {
+                            addPrefixForAnyFunctionOrVar(symbol, symbolKind);
+                        }
+                        // For properties, variables and local vars: show the type
+                        if (symbolKind === "property" /* ScriptElementKind.memberVariableElement */ ||
+                            symbolKind === "accessor" /* ScriptElementKind.memberAccessorVariableElement */ ||
+                            symbolKind === "getter" /* ScriptElementKind.memberGetAccessorElement */ ||
+                            symbolKind === "setter" /* ScriptElementKind.memberSetAccessorElement */ ||
+                            symbolKind === "JSX attribute" /* ScriptElementKind.jsxAttribute */ ||
+                            symbolFlags & 3 /* SymbolFlags.Variable */ ||
+                            symbolKind === "local var" /* ScriptElementKind.localVariableElement */ ||
+                            symbolKind === "index" /* ScriptElementKind.indexSignatureElement */ ||
+                            isThisExpression) {
+                            displayParts.push(ts.punctuationPart(58 /* SyntaxKind.ColonToken */));
+                            displayParts.push(ts.spacePart());
+                            // If the type is type parameter, format it specially
+                            if (type.symbol && type.symbol.flags & 262144 /* SymbolFlags.TypeParameter */ && symbolKind !== "index" /* ScriptElementKind.indexSignatureElement */) {
+                                var typeParameterParts = ts.mapToDisplayParts(function (writer) {
+                                    var param = typeChecker.typeParameterToDeclaration(type, enclosingDeclaration, symbolDisplayNodeBuilderFlags);
+                                    getPrinter().writeNode(4 /* EmitHint.Unspecified */, param, ts.getSourceFileOfNode(ts.getParseTreeNode(enclosingDeclaration)), writer);
+                                });
+                                ts.addRange(displayParts, typeParameterParts);
+                            }
+                            else {
+                                ts.addRange(displayParts, ts.typeToDisplayParts(typeChecker, type, enclosingDeclaration));
+                            }
+                            if (symbol.target && symbol.target.tupleLabelDeclaration) {
+                                var labelDecl = symbol.target.tupleLabelDeclaration;
+                                ts.Debug.assertNode(labelDecl.name, ts.isIdentifier);
+                                displayParts.push(ts.spacePart());
+                                displayParts.push(ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */));
+                                displayParts.push(ts.textPart(ts.idText(labelDecl.name)));
+                                displayParts.push(ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */));
+                            }
+                        }
+                        else if (symbolFlags & 16 /* SymbolFlags.Function */ ||
+                            symbolFlags & 8192 /* SymbolFlags.Method */ ||
+                            symbolFlags & 16384 /* SymbolFlags.Constructor */ ||
+                            symbolFlags & 131072 /* SymbolFlags.Signature */ ||
+                            symbolFlags & 98304 /* SymbolFlags.Accessor */ ||
+                            symbolKind === "method" /* ScriptElementKind.memberFunctionElement */) {
+                            var allSignatures = type.getNonNullableType().getCallSignatures();
+                            if (allSignatures.length) {
+                                addSignatureDisplayParts(allSignatures[0], allSignatures);
+                                hasMultipleSignatures = allSignatures.length > 1;
+                            }
+                        }
+                    }
+                }
+                else {
+                    symbolKind = getSymbolKind(typeChecker, symbol, location);
+                }
+            }
+            if (documentation.length === 0 && !hasMultipleSignatures) {
+                documentation = symbol.getContextualDocumentationComment(enclosingDeclaration, typeChecker);
+            }
+            if (documentation.length === 0 && symbolFlags & 4 /* SymbolFlags.Property */) {
+                // For some special property access expressions like `exports.foo = foo` or `module.exports.foo = foo`
+                // there documentation comments might be attached to the right hand side symbol of their declarations.
+                // The pattern of such special property access is that the parent symbol is the symbol of the file.
+                if (symbol.parent && symbol.declarations && ts.forEach(symbol.parent.declarations, function (declaration) { return declaration.kind === 308 /* SyntaxKind.SourceFile */; })) {
+                    for (var _i = 0, _b = symbol.declarations; _i < _b.length; _i++) {
+                        var declaration = _b[_i];
+                        if (!declaration.parent || declaration.parent.kind !== 223 /* SyntaxKind.BinaryExpression */) {
+                            continue;
+                        }
+                        var rhsSymbol = typeChecker.getSymbolAtLocation(declaration.parent.right);
+                        if (!rhsSymbol) {
+                            continue;
+                        }
+                        documentation = rhsSymbol.getDocumentationComment(typeChecker);
+                        tags = rhsSymbol.getJsDocTags(typeChecker);
+                        if (documentation.length > 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (documentation.length === 0 && ts.isIdentifier(location) && symbol.valueDeclaration && ts.isBindingElement(symbol.valueDeclaration)) {
+                var declaration = symbol.valueDeclaration;
+                var parent = declaration.parent;
+                if (ts.isIdentifier(declaration.name) && ts.isObjectBindingPattern(parent)) {
+                    var name_4 = ts.getTextOfIdentifierOrLiteral(declaration.name);
+                    var objectType = typeChecker.getTypeAtLocation(parent);
+                    documentation = ts.firstDefined(objectType.isUnion() ? objectType.types : [objectType], function (t) {
+                        var prop = t.getProperty(name_4);
+                        return prop ? prop.getDocumentationComment(typeChecker) : undefined;
+                    }) || ts.emptyArray;
+                }
+            }
+            if (tags.length === 0 && !hasMultipleSignatures) {
+                tags = symbol.getContextualJsDocTags(enclosingDeclaration, typeChecker);
+            }
+            if (documentation.length === 0 && documentationFromAlias) {
+                documentation = documentationFromAlias;
+            }
+            if (tags.length === 0 && tagsFromAlias) {
+                tags = tagsFromAlias;
+            }
+            return { displayParts: displayParts, documentation: documentation, symbolKind: symbolKind, tags: tags.length === 0 ? undefined : tags };
+            function getPrinter() {
+                if (!printer) {
+                    printer = ts.createPrinter({ removeComments: true });
+                }
+                return printer;
+            }
+            function prefixNextMeaning() {
+                if (displayParts.length) {
+                    displayParts.push(ts.lineBreakPart());
+                }
+                addAliasPrefixIfNecessary();
+            }
+            function addAliasPrefixIfNecessary() {
+                if (alias) {
+                    pushSymbolKind("alias" /* ScriptElementKind.alias */);
+                    displayParts.push(ts.spacePart());
+                }
+            }
+            function addInPrefix() {
+                displayParts.push(ts.spacePart());
+                displayParts.push(ts.keywordPart(101 /* SyntaxKind.InKeyword */));
+                displayParts.push(ts.spacePart());
+            }
+            function addFullSymbolName(symbolToDisplay, enclosingDeclaration) {
+                var indexInfos;
+                if (alias && symbolToDisplay === symbol) {
+                    symbolToDisplay = alias;
+                }
+                if (symbolKind === "index" /* ScriptElementKind.indexSignatureElement */) {
+                    indexInfos = typeChecker.getIndexInfosOfIndexSymbol(symbolToDisplay);
+                }
+                var fullSymbolDisplayParts = [];
+                if (symbolToDisplay.flags & 131072 /* SymbolFlags.Signature */ && indexInfos) {
+                    if (symbolToDisplay.parent) {
+                        fullSymbolDisplayParts = ts.symbolToDisplayParts(typeChecker, symbolToDisplay.parent);
+                    }
+                    fullSymbolDisplayParts.push(ts.punctuationPart(22 /* SyntaxKind.OpenBracketToken */));
+                    //Needed to handle more than one type of index
+                    indexInfos.forEach(function (info, i) {
+                        //Needed to handle template literals
+                        fullSymbolDisplayParts.push.apply(fullSymbolDisplayParts, ts.typeToDisplayParts(typeChecker, info.keyType));
+                        if (i !== indexInfos.length - 1) {
+                            fullSymbolDisplayParts.push(ts.spacePart());
+                            fullSymbolDisplayParts.push(ts.punctuationPart(51 /* SyntaxKind.BarToken */));
+                            fullSymbolDisplayParts.push(ts.spacePart());
+                        }
+                    });
+                    fullSymbolDisplayParts.push(ts.punctuationPart(23 /* SyntaxKind.CloseBracketToken */));
+                }
+                else {
+                    fullSymbolDisplayParts = ts.symbolToDisplayParts(typeChecker, symbolToDisplay, enclosingDeclaration || sourceFile, /*meaning*/ undefined, 1 /* SymbolFormatFlags.WriteTypeParametersOrArguments */ | 2 /* SymbolFormatFlags.UseOnlyExternalAliasing */ | 4 /* SymbolFormatFlags.AllowAnyNodeKind */);
+                }
+                ts.addRange(displayParts, fullSymbolDisplayParts);
+                if (symbol.flags & 16777216 /* SymbolFlags.Optional */) {
+                    displayParts.push(ts.punctuationPart(57 /* SyntaxKind.QuestionToken */));
+                }
+            }
+            function addPrefixForAnyFunctionOrVar(symbol, symbolKind) {
+                prefixNextMeaning();
+                if (symbolKind) {
+                    pushSymbolKind(symbolKind);
+                    if (symbol && !ts.some(symbol.declarations, function (d) { return ts.isArrowFunction(d) || (ts.isFunctionExpression(d) || ts.isClassExpression(d)) && !d.name; })) {
+                        displayParts.push(ts.spacePart());
+                        addFullSymbolName(symbol);
+                    }
+                }
+            }
+            function pushSymbolKind(symbolKind) {
+                switch (symbolKind) {
+                    case "var" /* ScriptElementKind.variableElement */:
+                    case "function" /* ScriptElementKind.functionElement */:
+                    case "let" /* ScriptElementKind.letElement */:
+                    case "const" /* ScriptElementKind.constElement */:
+                    case "constructor" /* ScriptElementKind.constructorImplementationElement */:
+                        displayParts.push(ts.textOrKeywordPart(symbolKind));
+                        return;
+                    default:
+                        displayParts.push(ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */));
+                        displayParts.push(ts.textOrKeywordPart(symbolKind));
+                        displayParts.push(ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */));
+                        return;
+                }
+            }
+            function addSignatureDisplayParts(signature, allSignatures, flags) {
+                if (flags === void 0) { flags = 0 /* TypeFormatFlags.None */; }
+                ts.addRange(displayParts, ts.signatureToDisplayParts(typeChecker, signature, enclosingDeclaration, flags | 32 /* TypeFormatFlags.WriteTypeArgumentsOfSignature */));
+                if (allSignatures.length > 1) {
+                    displayParts.push(ts.spacePart());
+                    displayParts.push(ts.punctuationPart(20 /* SyntaxKind.OpenParenToken */));
+                    displayParts.push(ts.operatorPart(39 /* SyntaxKind.PlusToken */));
+                    displayParts.push(ts.displayPart((allSignatures.length - 1).toString(), ts.SymbolDisplayPartKind.numericLiteral));
+                    displayParts.push(ts.spacePart());
+                    displayParts.push(ts.textPart(allSignatures.length === 2 ? "overload" : "overloads"));
+                    displayParts.push(ts.punctuationPart(21 /* SyntaxKind.CloseParenToken */));
+                }
+                documentation = signature.getDocumentationComment(typeChecker);
+                tags = signature.getJsDocTags();
+                if (allSignatures.length > 1 && documentation.length === 0 && tags.length === 0) {
+                    documentation = allSignatures[0].getDocumentationComment(typeChecker);
+                    tags = allSignatures[0].getJsDocTags().filter(function (tag) { return tag.name !== "deprecated"; }); // should only include @deprecated JSDoc tag on the first overload (#49368)
+                }
+            }
+            function writeTypeParametersOfSymbol(symbol, enclosingDeclaration) {
+                var typeParameterParts = ts.mapToDisplayParts(function (writer) {
+                    var params = typeChecker.symbolToTypeParameterDeclarations(symbol, enclosingDeclaration, symbolDisplayNodeBuilderFlags);
+                    getPrinter().writeList(53776 /* ListFormat.TypeParameters */, params, ts.getSourceFileOfNode(ts.getParseTreeNode(enclosingDeclaration)), writer);
+                });
+                ts.addRange(displayParts, typeParameterParts);
+            }
+        }
+        SymbolDisplay.getSymbolDisplayPartsDocumentationAndSymbolKind = getSymbolDisplayPartsDocumentationAndSymbolKind;
+        function isLocalVariableOrFunction(symbol) {
+            if (symbol.parent) {
+                return false; // This is exported symbol
+            }
+            return ts.forEach(symbol.declarations, function (declaration) {
+                // Function expressions are local
+                if (declaration.kind === 215 /* SyntaxKind.FunctionExpression */) {
+                    return true;
+                }
+                if (declaration.kind !== 257 /* SyntaxKind.VariableDeclaration */ && declaration.kind !== 259 /* SyntaxKind.FunctionDeclaration */) {
+                    return false;
+                }
+                // If the parent is not sourceFile or module block it is local variable
+                for (var parent = declaration.parent; !ts.isFunctionBlock(parent); parent = parent.parent) {
+                    // Reached source file or module block
+                    if (parent.kind === 308 /* SyntaxKind.SourceFile */ || parent.kind === 265 /* SyntaxKind.ModuleBlock */) {
+                        return false;
+                    }
+                }
+                // parent is in function block
+                return true;
+            });
+        }
+    })(SymbolDisplay = ts.SymbolDisplay || (ts.SymbolDisplay = {}));
+})(ts || (ts = {}));
+var ts;
+(function (ts) {
+    /*
+     * This function will compile source text from 'input' argument using specified compiler options.
+     * If not options are provided - it will use a set of default compiler options.
+     * Extra compiler options that will unconditionally be used by this function are:
+     * - isolatedModules = true
+     * - allowNonTsExtensions = true
+     * - noLib = true
+     * - noResolve = true
+     */
+    function transpileModule(input, transpileOptions) {
+        var diagnostics = [];
+        var options = transpileOptions.compilerOptions ? fixupCompilerOptions(transpileOptions.compilerOptions, diagnostics) : {};
+        // mix in default options
+        var defaultOptions = ts.getDefaultCompilerOptions();
+        for (var key in defaultOptions) {
+            if (ts.hasProperty(defaultOptions, key) && options[key] === undefined) {
+                options[key] = defaultOptions[key];
+            }
+        }
+        for (var _i = 0, transpileOptionValueCompilerOptions_1 = ts.transpileOptionValueCompilerOptions; _i < transpileOptionValueCompilerOptions_1.length; _i++) {
+            var option = transpileOptionValueCompilerOptions_1[_i];
+            options[option.name] = option.transpileOptionValue;
+        }
+        // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
+        options.suppressOutputPathCheck = true;
+        // Filename can be non-ts file.
+        options.allowNonTsExtensions = true;
+        var newLine = ts.getNewLineCharacter(options);
+        // Create a compilerHost object to allow the compiler to read and write files
+        var compilerHost = {
+            getSourceFile: function (fileName) { return fileName === ts.normalizePath(inputFileName) ? sourceFile : undefined; },
+            writeFile: function (name, text) {
+                if (ts.fileExtensionIs(name, ".map")) {
+                    ts.Debug.assertEqual(sourceMapText, undefined, "Unexpected multiple source map outputs, file:", name);
+                    sourceMapText = text;
+                }
+                else {
+                    ts.Debug.assertEqual(outputText, undefined, "Unexpected multiple outputs, file:", name);
+                    outputText = text;
+                }
+            },
+            getDefaultLibFileName: function () { return "lib.d.ts"; },
+            useCaseSensitiveFileNames: function () { return false; },
+            getCanonicalFileName: function (fileName) { return fileName; },
+            getCurrentDirectory: function () { return ""; },
+            getNewLine: function () { return newLine; },
+            fileExists: function (fileName) { return fileName === inputFileName; },
+            readFile: function () { return ""; },
+            directoryExists: function () { return true; },
+            getDirectories: function () { return []; }
+        };
+        // if jsx is specified then treat file as .tsx
+        var inputFileName = transpileOptions.fileName || (transpileOptions.compilerOptions && transpileOptions.compilerOptions.jsx ? "module.tsx" : "module.ts");
+        var sourceFile = ts.createSourceFile(inputFileName, input, {
+            languageVersion: ts.getEmitScriptTarget(options),
+            impliedNodeFormat: ts.getImpliedNodeFormatForFile(ts.toPath(inputFileName, "", compilerHost.getCanonicalFileName), /*cache*/ undefined, compilerHost, options),
+            setExternalModuleIndicator: ts.getSetExternalModuleIndicator(options)
+        });
+        if (transpileOptions.moduleName) {
+            sourceFile.moduleName = transpileOptions.moduleName;
+        }
+        if (transpileOptions.renamedDependencies) {
+            sourceFile.renamedDependencies = new ts.Map(ts.getEntries(transpileOptions.renamedDependencies));
+        }
+        // Output
+        var outputText;
+        var sourceMapText;
+        var program = ts.createProgram([inputFileName], options, compilerHost);
+        if (transpileOptions.reportDiagnostics) {
+            ts.addRange(/*to*/ diagnostics, /*from*/ program.getSyntacticDiagnostics(sourceFile));
+            ts.addRange(/*to*/ diagnostics, /*from*/ program.getOptionsDiagnostics());
+        }
+        // Emit
+        program.emit(/*targetSourceFile*/ undefined, /*writeFile*/ undefined, /*cancellationToken*/ undefined, /*emitOnlyDtsFiles*/ undefined, transpileOptions.transformers);
+        if (outputText === undefined)
+            return ts.Debug.fail("Output generation failed");
+        return { outputText: outputText, diagnostics: diagnostics, sourceMapText: sourceMapText };
+    }
+    ts.transpileModule = transpileModule;
+    /*
+     * This is a shortcut function for transpileModule - it accepts transpileOptions as parameters and returns only outputText part of the result.
+     */
+    function transpile(input, compilerOptions, fileName, diagnostics, moduleName) {
+        var output = transpileModule(input, { compilerOptions: compilerOptions, fileName: fileName, reportDiagnostics: !!diagnostics, moduleName: moduleName });
+        // addRange correctly handles cases when wither 'from' or 'to' argument is missing
+        ts.addRange(diagnostics, output.diagnostics);
+        return output.outputText;
+    }
+    ts.transpile = transpile;
+    var commandLineOptionsStringToEnum;
+    /** JS users may pass in string values for enum compiler options (such as ModuleKind), so convert. */
+    /*@internal*/
+    function fixupCompilerOptions(options, diagnostics) {
+        // Lazily create this value to fix module loading errors.
+        commandLineOptionsStringToEnum = commandLineOptionsStringToEnum ||
+            ts.filter(ts.optionDeclarations, function (o) { return typeof o.type === "object" && !ts.forEachEntry(o.type, function (v) { return typeof v !== "number"; }); });
+        options = ts.cloneCompilerOptions(options);
+        var _loop_8 = function (opt) {
+            if (!ts.hasProperty(options, opt.name)) {
+                return "continue";
+            }
+            var value = options[opt.name];
+            // Value should be a key of opt.type
+            if (ts.isString(value)) {
+                // If value is not a string, this will fail
+                options[opt.name] = ts.parseCustomTypeOption(opt, value, diagnostics);
+            }
+            else {
+                if (!ts.forEachEntry(opt.type, function (v) { return v === value; })) {
+                    // Supplied value isn't a valid enum value.
+                    diagnostics.push(ts.createCompilerDiagnosticForInvalidCustomType(opt));
+                }
+            }
+        };
+        for (var _i = 0, commandLineOptionsStringToEnum_1 = commandLineOptionsStringToEnum; _i < commandLineOptionsStringToEnum_1.length; _i++) {
+            var opt = commandLineOptionsStringToEnum_1[_i];
+            _loop_8(opt);
+        }
+        return options;
+    }
+    ts.fixupCompilerOptions = fixupCompilerOptions;
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var formatting;
+    (function (formatting) {
+        var FormattingRequestKind;
+        (function (FormattingRequestKind) {
+            FormattingRequestKind[FormattingRequestKind["FormatDocument"] = 0] = "FormatDocument";
+            FormattingRequestKind[FormattingRequestKind["FormatSelection"] = 1] = "FormatSelection";
+            FormattingRequestKind[FormattingRequestKind["FormatOnEnter"] = 2] = "FormatOnEnter";
+            FormattingRequestKind[FormattingRequestKind["FormatOnSemicolon"] = 3] = "FormatOnSemicolon";
+            FormattingRequestKind[FormattingRequestKind["FormatOnOpeningCurlyBrace"] = 4] = "FormatOnOpeningCurlyBrace";
+            FormattingRequestKind[FormattingRequestKind["FormatOnClosingCurlyBrace"] = 5] = "FormatOnClosingCurlyBrace";
+        })(FormattingRequestKind = formatting.FormattingRequestKind || (formatting.FormattingRequestKind = {}));
+        var FormattingContext = /** @class */ (function () {
+            function FormattingContext(sourceFile, formattingRequestKind, options) {
+                this.sourceFile = sourceFile;
+                this.formattingRequestKind = formattingRequestKind;
+                this.options = options;
+            }
+            FormattingContext.prototype.updateContext = function (currentRange, currentTokenParent, nextRange, nextTokenParent, commonParent) {
+                this.currentTokenSpan = ts.Debug.checkDefined(currentRange);
+                this.currentTokenParent = ts.Debug.checkDefined(currentTokenParent);
+                this.nextTokenSpan = ts.Debug.checkDefined(nextRange);
+                this.nextTokenParent = ts.Debug.checkDefined(nextTokenParent);
+                this.contextNode = ts.Debug.checkDefined(commonParent);
+                // drop cached results
+                this.contextNodeAllOnSameLine = undefined;
+                this.nextNodeAllOnSameLine = undefined;
+                this.tokensAreOnSameLine = undefined;
+                this.contextNodeBlockIsOnOneLine = undefined;
+                this.nextNodeBlockIsOnOneLine = undefined;
+            };
+            FormattingContext.prototype.ContextNodeAllOnSameLine = function () {
+                if (this.contextNodeAllOnSameLine === undefined) {
+                    this.contextNodeAllOnSameLine = this.NodeIsOnOneLine(this.contextNode);
+                }
+                return this.contextNodeAllOnSameLine;
+            };
+            FormattingContext.prototype.NextNodeAllOnSameLine = function () {
+                if (this.nextNodeAllOnSameLine === undefined) {
+                    this.nextNodeAllOnSameLine = this.NodeIsOnOneLine(this.nextTokenParent);
+                }
+                return this.nextNodeAllOnSameLine;
+            };
+            FormattingContext.prototype.TokensAreOnSameLine = function () {
+                if (this.tokensAreOnSameLine === undefined) {
+                    var startLine = this.sourceFile.getLineAndCharacterOfPosition(this.currentTokenSpan.pos).line;
+                    var endLine = this.sourceFile.getLineAndCharacterOfPosition(this.nextTokenSpan.pos).line;
+                    this.tokensAreOnSameLine = (startLine === endLine);
+                }
+                return this.tokensAreOnSameLine;
+            };
+            FormattingContext.prototype.ContextNodeBlockIsOnOneLine = function () {
+                if (this.contextNodeBlockIsOnOneLine === undefined) {
+                    this.contextNodeBlockIsOnOneLine = this.BlockIsOnOneLine(this.contextNode);
+                }
+                return this.contextNodeBlockIsOnOneLine;
+            };
+            FormattingContext.prototype.NextNodeBlockIsOnOneLine = function () {
+                if (this.nextNodeBlockIsOnOneLine === undefined) {
+                    this.nextNodeBlockIsOnOneLine = this.BlockIsOnOneLine(this.nextTokenParent);
+                }
+                return this.nextNodeBlockIsOnOneLine;
+            };
+            FormattingContext.prototype.NodeIsOnOneLine = function (node) {
+                var startLine = this.sourceFile.getLineAndCharacterOfPosition(node.getStart(this.sourceFile)).line;
+                var endLine = this.sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line;
+                return startLine === endLine;
+            };
+            FormattingContext.prototype.BlockIsOnOneLine = function (node) {
+                var openBrace = ts.findChildOfKind(node, 18 /* SyntaxKind.OpenBraceToken */, this.sourceFile);
+                var closeBrace = ts.findChildOfKind(node, 19 /* SyntaxKind.CloseBraceToken */, this.sourceFile);
+                if (openBrace && closeBrace) {
+                    var startLine = this.sourceFile.getLineAndCharacterOfPosition(openBrace.getEnd()).line;
+                    var endLine = this.sourceFile.getLineAndCharacterOfPosition(closeBrace.getStart(this.sourceFile)).line;
+                    return startLine === endLine;
+                }
+                return false;
+            };
+            return FormattingContext;
+        }());
+        formatting.FormattingContext = FormattingContext;
+    })(formatting = ts.formatting || (ts.formatting = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var formatting;
+    (function (formatting) {
+        var standardScanner = ts.createScanner(99 /* ScriptTarget.Latest */, /*skipTrivia*/ false, 0 /* LanguageVariant.Standard */);
+        var jsxScanner = ts.createScanner(99 /* ScriptTarget.Latest */, /*skipTrivia*/ false, 1 /* LanguageVariant.JSX */);
+        var ScanAction;
+        (function (ScanAction) {
+            ScanAction[ScanAction["Scan"] = 0] = "Scan";
+            ScanAction[ScanAction["RescanGreaterThanToken"] = 1] = "RescanGreaterThanToken";
+            ScanAction[ScanAction["RescanSlashToken"] = 2] = "RescanSlashToken";
+            ScanAction[ScanAction["RescanTemplateToken"] = 3] = "RescanTemplateToken";
+            ScanAction[ScanAction["RescanJsxIdentifier"] = 4] = "RescanJsxIdentifier";
+            ScanAction[ScanAction["RescanJsxText"] = 5] = "RescanJsxText";
+            ScanAction[ScanAction["RescanJsxAttributeValue"] = 6] = "RescanJsxAttributeValue";
+        })(ScanAction || (ScanAction = {}));
+        function getFormattingScanner(text, languageVariant, startPos, endPos, cb) {
+            var scanner = languageVariant === 1 /* LanguageVariant.JSX */ ? jsxScanner : standardScanner;
+            scanner.setText(text);
+            scanner.setTextPos(startPos);
+            var wasNewLine = true;
+            var leadingTrivia;
+            var trailingTrivia;
+            var savedPos;
+            var lastScanAction;
+            var lastTokenInfo;
+            var res = cb({
+                advance: advance,
+                readTokenInfo: readTokenInfo,
+                readEOFTokenRange: readEOFTokenRange,
+                isOnToken: isOnToken,
+                isOnEOF: isOnEOF,
+                getCurrentLeadingTrivia: function () { return leadingTrivia; },
+                lastTrailingTriviaWasNewLine: function () { return wasNewLine; },
+                skipToEndOf: skipToEndOf,
+                skipToStartOf: skipToStartOf,
+                getStartPos: function () { var _a; return (_a = lastTokenInfo === null || lastTokenInfo === void 0 ? void 0 : lastTokenInfo.token.pos) !== null && _a !== void 0 ? _a : scanner.getTokenPos(); },
+            });
+            lastTokenInfo = undefined;
+            scanner.setText(undefined);
+            return res;
+            function advance() {
+                lastTokenInfo = undefined;
+                var isStarted = scanner.getStartPos() !== startPos;
+                if (isStarted) {
+                    wasNewLine = !!trailingTrivia && ts.last(trailingTrivia).kind === 4 /* SyntaxKind.NewLineTrivia */;
+                }
+                else {
+                    scanner.scan();
+                }
+                leadingTrivia = undefined;
+                trailingTrivia = undefined;
+                var pos = scanner.getStartPos();
+                // Read leading trivia and token
+                while (pos < endPos) {
+                    var t = scanner.getToken();
+                    if (!ts.isTrivia(t)) {
+                        break;
+                    }
+                    // consume leading trivia
+                    scanner.scan();
+                    var item = {
+                        pos: pos,
+                        end: scanner.getStartPos(),
+                        kind: t
+                    };
+                    pos = scanner.getStartPos();
+                    leadingTrivia = ts.append(leadingTrivia, item);
+                }
+                savedPos = scanner.getStartPos();
+            }
+            function shouldRescanGreaterThanToken(node) {
+                switch (node.kind) {
+                    case 33 /* SyntaxKind.GreaterThanEqualsToken */:
+                    case 71 /* SyntaxKind.GreaterThanGreaterThanEqualsToken */:
+                    case 72 /* SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken */:
+                    case 49 /* SyntaxKind.GreaterThanGreaterThanGreaterThanToken */:
+                    case 48 /* SyntaxKind.GreaterThanGreaterThanToken */:
+                        return true;
+                }
+                return false;
+            }
+            function shouldRescanJsxIdentifier(node) {
+                if (node.parent) {
+                    switch (node.parent.kind) {
+                        case 288 /* SyntaxKind.JsxAttribute */:
+                        case 283 /* SyntaxKind.JsxOpeningElement */:
+                        case 284 /* SyntaxKind.JsxClosingElement */:
+                        case 282 /* SyntaxKind.JsxSelfClosingElement */:
+                            // May parse an identifier like `module-layout`; that will be scanned as a keyword at first, but we should parse the whole thing to get an identifier.
+                            return ts.isKeyword(node.kind) || node.kind === 79 /* SyntaxKind.Identifier */;
+                    }
+                }
+                return false;
+            }
+            function shouldRescanJsxText(node) {
+                return ts.isJsxText(node) || ts.isJsxElement(node) && (lastTokenInfo === null || lastTokenInfo === void 0 ? void 0 : lastTokenInfo.token.kind) === 11 /* SyntaxKind.JsxText */;
+            }
+            function shouldRescanSlashToken(container) {
+                return container.kind === 13 /* SyntaxKind.RegularExpressionLiteral */;
+            }
+            function shouldRescanTemplateToken(container) {
+                return container.kind === 16 /* SyntaxKind.TemplateMiddle */ ||
+                    container.kind === 17 /* SyntaxKind.TemplateTail */;
+            }
+            function shouldRescanJsxAttributeValue(node) {
+                return node.parent && ts.isJsxAttribute(node.parent) && node.parent.initializer === node;
+            }
+            function startsWithSlashToken(t) {
+                return t === 43 /* SyntaxKind.SlashToken */ || t === 68 /* SyntaxKind.SlashEqualsToken */;
+            }
+            function readTokenInfo(n) {
+                ts.Debug.assert(isOnToken());
+                // normally scanner returns the smallest available token
+                // check the kind of context node to determine if scanner should have more greedy behavior and consume more text.
+                var expectedScanAction = shouldRescanGreaterThanToken(n) ? 1 /* ScanAction.RescanGreaterThanToken */ :
+                    shouldRescanSlashToken(n) ? 2 /* ScanAction.RescanSlashToken */ :
+                        shouldRescanTemplateToken(n) ? 3 /* ScanAction.RescanTemplateToken */ :
+                            shouldRescanJsxIdentifier(n) ? 4 /* ScanAction.RescanJsxIdentifier */ :
+                                shouldRescanJsxText(n) ? 5 /* ScanAction.RescanJsxText */ :
+                                    shouldRescanJsxAttributeValue(n) ? 6 /* ScanAction.RescanJsxAttributeValue */ :
+                                        0 /* ScanAction.Scan */;
+                if (lastTokenInfo && expectedScanAction === lastScanAction) {
+                    // readTokenInfo was called before with the same expected scan action.
+                    // No need to re-scan text, return existing 'lastTokenInfo'
+                    // it is ok to call fixTokenKind here since it does not affect
+                    // what portion of text is consumed. In contrast rescanning can change it,
+                    // i.e. for '>=' when originally scanner eats just one character
+                    // and rescanning forces it to consume more.
+                    return fixTokenKind(lastTokenInfo, n);
+                }
+                if (scanner.getStartPos() !== savedPos) {
+                    ts.Debug.assert(lastTokenInfo !== undefined);
+                    // readTokenInfo was called before but scan action differs - rescan text
+                    scanner.setTextPos(savedPos);
+                    scanner.scan();
+                }
+                var currentToken = getNextToken(n, expectedScanAction);
+                var token = formatting.createTextRangeWithKind(scanner.getStartPos(), scanner.getTextPos(), currentToken);
+                // consume trailing trivia
+                if (trailingTrivia) {
+                    trailingTrivia = undefined;
+                }
+                while (scanner.getStartPos() < endPos) {
+                    currentToken = scanner.scan();
+                    if (!ts.isTrivia(currentToken)) {
+                        break;
+                    }
+                    var trivia = formatting.createTextRangeWithKind(scanner.getStartPos(), scanner.getTextPos(), currentToken);
+                    if (!trailingTrivia) {
+                        trailingTrivia = [];
+                    }
+                    trailingTrivia.push(trivia);
+                    if (currentToken === 4 /* SyntaxKind.NewLineTrivia */) {
+                        // move past new line
+                        scanner.scan();
+                        break;
+                    }
+                }
+                lastTokenInfo = { leadingTrivia: leadingTrivia, trailingTrivia: trailingTrivia, token: token };
+                return fixTokenKind(lastTokenInfo, n);
+            }
+            function getNextToken(n, expectedScanAction) {
+                var token = scanner.getToken();
+                lastScanAction = 0 /* ScanAction.Scan */;
+                switch (expectedScanAction) {
+                    case 1 /* ScanAction.RescanGreaterThanToken */:
+                        if (token === 31 /* SyntaxKind.GreaterThanToken */) {
+                            lastScanAction = 1 /* ScanAction.RescanGreaterThanToken */;
+                            var newToken = scanner.reScanGreaterToken();
+                            ts.Debug.assert(n.kind === newToken);
+                            return newToken;
+                        }
+                        break;
+                    case 2 /* ScanAction.RescanSlashToken */:
+                        if (startsWithSlashToken(token)) {
+                            lastScanAction = 2 /* ScanAction.RescanSlashToken */;
+                            var newToken = scanner.reScanSlashToken();
+                            ts.Debug.assert(n.kind === newToken);
+                            return newToken;
+                        }
+                        break;
+                    case 3 /* ScanAction.RescanTemplateToken */:
+                        if (token === 19 /* SyntaxKind.CloseBraceToken */) {
+                            lastScanAction = 3 /* ScanAction.RescanTemplateToken */;
+                            return scanner.reScanTemplateToken(/* isTaggedTemplate */ false);
+                        }
+                        break;
+                    case 4 /* ScanAction.RescanJsxIdentifier */:
+                        lastScanAction = 4 /* ScanAction.RescanJsxIdentifier */;
+                        return scanner.scanJsxIdentifier();
+                    case 5 /* ScanAction.RescanJsxText */:
+                        lastScanAction = 5 /* ScanAction.RescanJsxText */;
+                        return scanner.reScanJsxToken(/* allowMultilineJsxText */ false);
+                    case 6 /* ScanAction.RescanJsxAttributeValue */:
+                        lastScanAction = 6 /* ScanAction.RescanJsxAttributeValue */;
+                        return scanner.reScanJsxAttributeValue();
+                    case 0 /* ScanAction.Scan */:
+                        break;
+                    default:
+                        ts.Debug.assertNever(expectedScanAction);
+                }
+                return token;
+            }
+            function readEOFTokenRange() {
+                ts.Debug.assert(isOnEOF());
+                return formatting.createTextRangeWithKind(scanner.getStartPos(), scanner.getTextPos(), 1 /* SyntaxKind.EndOfFileToken */);
+            }
+            function isOnToken() {
+                var current = lastTokenInfo ? lastTokenInfo.token.kind : scanner.getToken();
+                return current !== 1 /* SyntaxKind.EndOfFileToken */ && !ts.isTrivia(current);
+            }
+            function isOnEOF() {
+                var current = lastTokenInfo ? lastTokenInfo.token.kind : scanner.getToken();
+                return current === 1 /* SyntaxKind.EndOfFileToken */;
+            }
+            // when containing node in the tree is token
+            // but its kind differs from the kind that was returned by the scanner,
+            // then kind needs to be fixed. This might happen in cases
+            // when parser interprets token differently, i.e keyword treated as identifier
+            function fixTokenKind(tokenInfo, container) {
+                if (ts.isToken(container) && tokenInfo.token.kind !== container.kind) {
+                    tokenInfo.token.kind = container.kind;
+                }
+                return tokenInfo;
+            }
+            function skipToEndOf(node) {
+                scanner.setTextPos(node.end);
+                savedPos = scanner.getStartPos();
+                lastScanAction = undefined;
+                lastTokenInfo = undefined;
+                wasNewLine = false;
+                leadingTrivia = undefined;
+                trailingTrivia = undefined;
+            }
+            function skipToStartOf(node) {
+                scanner.setTextPos(node.pos);
+                savedPos = scanner.getStartPos();
+                lastScanAction = undefined;
+                lastTokenInfo = undefined;
+                wasNewLine = false;
+                leadingTrivia = undefined;
+                trailingTrivia = undefined;
+            }
+        }
+        formatting.getFormattingScanner = getFormattingScanner;
+    })(formatting = ts.formatting || (ts.formatting = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var formatting;
+    (function (formatting) {
+        formatting.anyContext = ts.emptyArray;
+        var RuleAction;
+        (function (RuleAction) {
+            RuleAction[RuleAction["StopProcessingSpaceActions"] = 1] = "StopProcessingSpaceActions";
+            RuleAction[RuleAction["StopProcessingTokenActions"] = 2] = "StopProcessingTokenActions";
+            RuleAction[RuleAction["InsertSpace"] = 4] = "InsertSpace";
+            RuleAction[RuleAction["InsertNewLine"] = 8] = "InsertNewLine";
+            RuleAction[RuleAction["DeleteSpace"] = 16] = "DeleteSpace";
+            RuleAction[RuleAction["DeleteToken"] = 32] = "DeleteToken";
+            RuleAction[RuleAction["InsertTrailingSemicolon"] = 64] = "InsertTrailingSemicolon";
+            RuleAction[RuleAction["StopAction"] = 3] = "StopAction";
+            RuleAction[RuleAction["ModifySpaceAction"] = 28] = "ModifySpaceAction";
+            RuleAction[RuleAction["ModifyTokenAction"] = 96] = "ModifyTokenAction";
+        })(RuleAction = formatting.RuleAction || (formatting.RuleAction = {}));
+        var RuleFlags;
+        (function (RuleFlags) {
+            RuleFlags[RuleFlags["None"] = 0] = "None";
+            RuleFlags[RuleFlags["CanDeleteNewLines"] = 1] = "CanDeleteNewLines";
+        })(RuleFlags = formatting.RuleFlags || (formatting.RuleFlags = {}));
+    })(formatting = ts.formatting || (ts.formatting = {}));
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    var formatting;
+    (function (formatting) {
+        function getAllRules() {
+            var allTokens = [];
+            for (var token = 0 /* SyntaxKind.FirstToken */; token <= 162 /* SyntaxKind.LastToken */; token++) {
+                if (token !== 1 /* SyntaxKind.EndOfFileToken */) {
+                    allTokens.push(token);
+                }
+            }
+            function anyTokenExcept() {
+                var tokens = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    tokens[_i] = arguments[_i];
+                }
+                return { tokens: allTokens.filter(function (t) { return !tokens.some(function (t2) { return t2 === t; }); }), isSpecific: false };
+            }
+            var anyToken = { tokens: allTokens, isSpecific: false };
+            var anyTokenIncludingMultilineComments = tokenRangeFrom(__spreadArray(__spreadArray([], allTokens, true), [3 /* SyntaxKind.MultiLineCommentTrivia */], false));
+            var anyTokenIncludingEOF = tokenRangeFrom(__spreadArray(__spreadArray([], allTokens, true), [1 /* SyntaxKind.EndOfFileToken */], false));
+            var keywords = tokenRangeFromRange(81 /* SyntaxKind.FirstKeyword */, 162 /* SyntaxKind.LastKeyword */);
+            var binaryOperators = tokenRangeFromRange(29 /* SyntaxKind.FirstBinaryOperator */, 78 /* SyntaxKind.LastBinaryOperator */);
+            var binaryKeywordOperators = [101 /* SyntaxKind.InKeyword */, 102 /* SyntaxKind.InstanceOfKeyword */, 162 /* SyntaxKind.OfKeyword */, 128 /* SyntaxKind.AsKeyword */, 140 /* SyntaxKind.IsKeyword */];
+            var unaryPrefixOperators = [45 /* SyntaxKind.PlusPlusToken */, 46 /* SyntaxKind.MinusMinusToken */, 54 /* SyntaxKind.TildeToken */, 53 /* SyntaxKind.ExclamationToken */];
+            var unaryPrefixExpressions = [
+                8 /* SyntaxKind.NumericLiteral */, 9 /* SyntaxKind.BigIntLiteral */, 79 /* SyntaxKind.Identifier */, 20 /* SyntaxKind.OpenParenToken */,
+                22 /* SyntaxKind.OpenBracketToken */, 18 /* SyntaxKind.OpenBraceToken */, 108 /* SyntaxKind.ThisKeyword */, 103 /* SyntaxKind.NewKeyword */
+            ];
+            var unaryPreincrementExpressions = [79 /* SyntaxKind.Identifier */, 20 /* SyntaxKind.OpenParenToken */, 108 /* SyntaxKind.ThisKeyword */, 103 /* SyntaxKind.NewKeyword */];
+            var unaryPostincrementExpressions = [79 /* SyntaxKind.Identifier */, 21 /* SyntaxKind.CloseParenToken */, 23 /* SyntaxKind.CloseBracketToken */, 103 /* SyntaxKind.NewKeyword */];
+            var unaryPredecrementExpressions = [79 /* SyntaxKind.Identifier */, 20 /* SyntaxKind.OpenParenToken */, 108 /* SyntaxKind.ThisKeyword */, 103 /* SyntaxKind.NewKeyword */];
+            var unaryPostdecrementExpressions = [79 /* SyntaxKind.Identifier */, 21 /* SyntaxKind.CloseParenToken */, 23 /* SyntaxKind.CloseBracketToken */, 103 /* SyntaxKind.NewKeyword */];
+            var comments = [2 /* SyntaxKind.SingleLineCommentTrivia */, 3 /* SyntaxKind.MultiLineCommentTrivia */];
+            var typeNames = __spreadArray([79 /* SyntaxKind.Identifier */], ts.typeKeywords, true);
+            // Place a space before open brace in a function declaration
+            // TypeScript: Function can have return types, which can be made of tons of different token kinds
+            var functionOpenBraceLeftTokenRange = anyTokenIncludingMultilineComments;
+            // Place a space before open brace in a TypeScript declaration that has braces as children (class, module, enum, etc)
+            var typeScriptOpenBraceLeftTokenRange = tokenRangeFrom([79 /* SyntaxKind.Identifier */, 3 /* SyntaxKind.MultiLineCommentTrivia */, 84 /* SyntaxKind.ClassKeyword */, 93 /* SyntaxKind.ExportKeyword */, 100 /* SyntaxKind.ImportKeyword */]);
+            // Place a space before open brace in a control flow construct
+            var controlOpenBraceLeftTokenRange = tokenRangeFrom([21 /* SyntaxKind.CloseParenToken */, 3 /* SyntaxKind.MultiLineCommentTrivia */, 90 /* SyntaxKind.DoKeyword */, 111 /* SyntaxKind.TryKeyword */, 96 /* SyntaxKind.FinallyKeyword */, 91 /* SyntaxKind.ElseKeyword */]);
+            // These rules are higher in priority than user-configurable
+            var highPriorityCommonRules = [
+                // Leave comments alone
+                rule("IgnoreBeforeComment", anyToken, comments, formatting.anyContext, 1 /* RuleAction.StopProcessingSpaceActions */),
+                rule("IgnoreAfterLineComment", 2 /* SyntaxKind.SingleLineCommentTrivia */, anyToken, formatting.anyContext, 1 /* RuleAction.StopProcessingSpaceActions */),
+                rule("NotSpaceBeforeColon", anyToken, 58 /* SyntaxKind.ColonToken */, [isNonJsxSameLineTokenContext, isNotBinaryOpContext, isNotTypeAnnotationContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceAfterColon", 58 /* SyntaxKind.ColonToken */, anyToken, [isNonJsxSameLineTokenContext, isNotBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeQuestionMark", anyToken, 57 /* SyntaxKind.QuestionToken */, [isNonJsxSameLineTokenContext, isNotBinaryOpContext, isNotTypeAnnotationContext], 16 /* RuleAction.DeleteSpace */),
+                // insert space after '?' only when it is used in conditional operator
+                rule("SpaceAfterQuestionMarkInConditionalOperator", 57 /* SyntaxKind.QuestionToken */, anyToken, [isNonJsxSameLineTokenContext, isConditionalOperatorContext], 4 /* RuleAction.InsertSpace */),
+                // in other cases there should be no space between '?' and next token
+                rule("NoSpaceAfterQuestionMark", 57 /* SyntaxKind.QuestionToken */, anyToken, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeDot", anyToken, [24 /* SyntaxKind.DotToken */, 28 /* SyntaxKind.QuestionDotToken */], [isNonJsxSameLineTokenContext, isNotPropertyAccessOnIntegerLiteral], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterDot", [24 /* SyntaxKind.DotToken */, 28 /* SyntaxKind.QuestionDotToken */], anyToken, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBetweenImportParenInImportType", 100 /* SyntaxKind.ImportKeyword */, 20 /* SyntaxKind.OpenParenToken */, [isNonJsxSameLineTokenContext, isImportTypeContext], 16 /* RuleAction.DeleteSpace */),
+                // Special handling of unary operators.
+                // Prefix operators generally shouldn't have a space between
+                // them and their target unary expression.
+                rule("NoSpaceAfterUnaryPrefixOperator", unaryPrefixOperators, unaryPrefixExpressions, [isNonJsxSameLineTokenContext, isNotBinaryOpContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterUnaryPreincrementOperator", 45 /* SyntaxKind.PlusPlusToken */, unaryPreincrementExpressions, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterUnaryPredecrementOperator", 46 /* SyntaxKind.MinusMinusToken */, unaryPredecrementExpressions, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeUnaryPostincrementOperator", unaryPostincrementExpressions, 45 /* SyntaxKind.PlusPlusToken */, [isNonJsxSameLineTokenContext, isNotStatementConditionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeUnaryPostdecrementOperator", unaryPostdecrementExpressions, 46 /* SyntaxKind.MinusMinusToken */, [isNonJsxSameLineTokenContext, isNotStatementConditionContext], 16 /* RuleAction.DeleteSpace */),
+                // More unary operator special-casing.
+                // DevDiv 181814: Be careful when removing leading whitespace
+                // around unary operators.  Examples:
+                //      1 - -2  --X--> 1--2
+                //      a + ++b --X--> a+++b
+                rule("SpaceAfterPostincrementWhenFollowedByAdd", 45 /* SyntaxKind.PlusPlusToken */, 39 /* SyntaxKind.PlusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterAddWhenFollowedByUnaryPlus", 39 /* SyntaxKind.PlusToken */, 39 /* SyntaxKind.PlusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterAddWhenFollowedByPreincrement", 39 /* SyntaxKind.PlusToken */, 45 /* SyntaxKind.PlusPlusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterPostdecrementWhenFollowedBySubtract", 46 /* SyntaxKind.MinusMinusToken */, 40 /* SyntaxKind.MinusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterSubtractWhenFollowedByUnaryMinus", 40 /* SyntaxKind.MinusToken */, 40 /* SyntaxKind.MinusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterSubtractWhenFollowedByPredecrement", 40 /* SyntaxKind.MinusToken */, 46 /* SyntaxKind.MinusMinusToken */, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterCloseBrace", 19 /* SyntaxKind.CloseBraceToken */, [27 /* SyntaxKind.CommaToken */, 26 /* SyntaxKind.SemicolonToken */], [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // For functions and control block place } on a new line [multi-line rule]
+                rule("NewLineBeforeCloseBraceInBlockContext", anyTokenIncludingMultilineComments, 19 /* SyntaxKind.CloseBraceToken */, [isMultilineBlockContext], 8 /* RuleAction.InsertNewLine */),
+                // Space/new line after }.
+                rule("SpaceAfterCloseBrace", 19 /* SyntaxKind.CloseBraceToken */, anyTokenExcept(21 /* SyntaxKind.CloseParenToken */), [isNonJsxSameLineTokenContext, isAfterCodeBlockContext], 4 /* RuleAction.InsertSpace */),
+                // Special case for (}, else) and (}, while) since else & while tokens are not part of the tree which makes SpaceAfterCloseBrace rule not applied
+                // Also should not apply to })
+                rule("SpaceBetweenCloseBraceAndElse", 19 /* SyntaxKind.CloseBraceToken */, 91 /* SyntaxKind.ElseKeyword */, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBetweenCloseBraceAndWhile", 19 /* SyntaxKind.CloseBraceToken */, 115 /* SyntaxKind.WhileKeyword */, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenEmptyBraceBrackets", 18 /* SyntaxKind.OpenBraceToken */, 19 /* SyntaxKind.CloseBraceToken */, [isNonJsxSameLineTokenContext, isObjectContext], 16 /* RuleAction.DeleteSpace */),
+                // Add a space after control dec context if the next character is an open bracket ex: 'if (false)[a, b] = [1, 2];' -> 'if (false) [a, b] = [1, 2];'
+                rule("SpaceAfterConditionalClosingParen", 21 /* SyntaxKind.CloseParenToken */, 22 /* SyntaxKind.OpenBracketToken */, [isControlDeclContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenFunctionKeywordAndStar", 98 /* SyntaxKind.FunctionKeyword */, 41 /* SyntaxKind.AsteriskToken */, [isFunctionDeclarationOrFunctionExpressionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceAfterStarInGeneratorDeclaration", 41 /* SyntaxKind.AsteriskToken */, 79 /* SyntaxKind.Identifier */, [isFunctionDeclarationOrFunctionExpressionContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterFunctionInFuncDecl", 98 /* SyntaxKind.FunctionKeyword */, anyToken, [isFunctionDeclContext], 4 /* RuleAction.InsertSpace */),
+                // Insert new line after { and before } in multi-line contexts.
+                rule("NewLineAfterOpenBraceInBlockContext", 18 /* SyntaxKind.OpenBraceToken */, anyToken, [isMultilineBlockContext], 8 /* RuleAction.InsertNewLine */),
+                // For get/set members, we check for (identifier,identifier) since get/set don't have tokens and they are represented as just an identifier token.
+                // Though, we do extra check on the context to make sure we are dealing with get/set node. Example:
+                //      get x() {}
+                //      set x(val) {}
+                rule("SpaceAfterGetSetInMember", [137 /* SyntaxKind.GetKeyword */, 151 /* SyntaxKind.SetKeyword */], 79 /* SyntaxKind.Identifier */, [isFunctionDeclContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenYieldKeywordAndStar", 125 /* SyntaxKind.YieldKeyword */, 41 /* SyntaxKind.AsteriskToken */, [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceBetweenYieldOrYieldStarAndOperand", [125 /* SyntaxKind.YieldKeyword */, 41 /* SyntaxKind.AsteriskToken */], anyToken, [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenReturnAndSemicolon", 105 /* SyntaxKind.ReturnKeyword */, 26 /* SyntaxKind.SemicolonToken */, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceAfterCertainKeywords", [113 /* SyntaxKind.VarKeyword */, 109 /* SyntaxKind.ThrowKeyword */, 103 /* SyntaxKind.NewKeyword */, 89 /* SyntaxKind.DeleteKeyword */, 105 /* SyntaxKind.ReturnKeyword */, 112 /* SyntaxKind.TypeOfKeyword */, 133 /* SyntaxKind.AwaitKeyword */], anyToken, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterLetConstInVariableDeclaration", [119 /* SyntaxKind.LetKeyword */, 85 /* SyntaxKind.ConstKeyword */], anyToken, [isNonJsxSameLineTokenContext, isStartOfVariableDeclarationList], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeOpenParenInFuncCall", anyToken, 20 /* SyntaxKind.OpenParenToken */, [isNonJsxSameLineTokenContext, isFunctionCallOrNewContext, isPreviousTokenNotComma], 16 /* RuleAction.DeleteSpace */),
+                // Special case for binary operators (that are keywords). For these we have to add a space and shouldn't follow any user options.
+                rule("SpaceBeforeBinaryKeywordOperator", anyToken, binaryKeywordOperators, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterBinaryKeywordOperator", binaryKeywordOperators, anyToken, [isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterVoidOperator", 114 /* SyntaxKind.VoidKeyword */, anyToken, [isNonJsxSameLineTokenContext, isVoidOpContext], 4 /* RuleAction.InsertSpace */),
+                // Async-await
+                rule("SpaceBetweenAsyncAndOpenParen", 132 /* SyntaxKind.AsyncKeyword */, 20 /* SyntaxKind.OpenParenToken */, [isArrowFunctionContext, isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBetweenAsyncAndFunctionKeyword", 132 /* SyntaxKind.AsyncKeyword */, [98 /* SyntaxKind.FunctionKeyword */, 79 /* SyntaxKind.Identifier */], [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                // Template string
+                rule("NoSpaceBetweenTagAndTemplateString", [79 /* SyntaxKind.Identifier */, 21 /* SyntaxKind.CloseParenToken */], [14 /* SyntaxKind.NoSubstitutionTemplateLiteral */, 15 /* SyntaxKind.TemplateHead */], [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // JSX opening elements
+                rule("SpaceBeforeJsxAttribute", anyToken, 79 /* SyntaxKind.Identifier */, [isNextTokenParentJsxAttribute, isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeSlashInJsxOpeningElement", anyToken, 43 /* SyntaxKind.SlashToken */, [isJsxSelfClosingElementContext, isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeGreaterThanTokenInJsxOpeningElement", 43 /* SyntaxKind.SlashToken */, 31 /* SyntaxKind.GreaterThanToken */, [isJsxSelfClosingElementContext, isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeEqualInJsxAttribute", anyToken, 63 /* SyntaxKind.EqualsToken */, [isJsxAttributeContext, isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterEqualInJsxAttribute", 63 /* SyntaxKind.EqualsToken */, anyToken, [isJsxAttributeContext, isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // TypeScript-specific rules
+                // Use of module as a function call. e.g.: import m2 = module("m2");
+                rule("NoSpaceAfterModuleImport", [142 /* SyntaxKind.ModuleKeyword */, 147 /* SyntaxKind.RequireKeyword */], 20 /* SyntaxKind.OpenParenToken */, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Add a space around certain TypeScript keywords
+                rule("SpaceAfterCertainTypeScriptKeywords", [
+                    126 /* SyntaxKind.AbstractKeyword */,
+                    127 /* SyntaxKind.AccessorKeyword */,
+                    84 /* SyntaxKind.ClassKeyword */,
+                    136 /* SyntaxKind.DeclareKeyword */,
+                    88 /* SyntaxKind.DefaultKeyword */,
+                    92 /* SyntaxKind.EnumKeyword */,
+                    93 /* SyntaxKind.ExportKeyword */,
+                    94 /* SyntaxKind.ExtendsKeyword */,
+                    137 /* SyntaxKind.GetKeyword */,
+                    117 /* SyntaxKind.ImplementsKeyword */,
+                    100 /* SyntaxKind.ImportKeyword */,
+                    118 /* SyntaxKind.InterfaceKeyword */,
+                    142 /* SyntaxKind.ModuleKeyword */,
+                    143 /* SyntaxKind.NamespaceKeyword */,
+                    121 /* SyntaxKind.PrivateKeyword */,
+                    123 /* SyntaxKind.PublicKeyword */,
+                    122 /* SyntaxKind.ProtectedKeyword */,
+                    146 /* SyntaxKind.ReadonlyKeyword */,
+                    151 /* SyntaxKind.SetKeyword */,
+                    124 /* SyntaxKind.StaticKeyword */,
+                    154 /* SyntaxKind.TypeKeyword */,
+                    158 /* SyntaxKind.FromKeyword */,
+                    141 /* SyntaxKind.KeyOfKeyword */,
+                    138 /* SyntaxKind.InferKeyword */,
+                ], anyToken, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeCertainTypeScriptKeywords", anyToken, [94 /* SyntaxKind.ExtendsKeyword */, 117 /* SyntaxKind.ImplementsKeyword */, 158 /* SyntaxKind.FromKeyword */], [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                // Treat string literals in module names as identifiers, and add a space between the literal and the opening Brace braces, e.g.: module "m2" {
+                rule("SpaceAfterModuleName", 10 /* SyntaxKind.StringLiteral */, 18 /* SyntaxKind.OpenBraceToken */, [isModuleDeclContext], 4 /* RuleAction.InsertSpace */),
+                // Lambda expressions
+                rule("SpaceBeforeArrow", anyToken, 38 /* SyntaxKind.EqualsGreaterThanToken */, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterArrow", 38 /* SyntaxKind.EqualsGreaterThanToken */, anyToken, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                // Optional parameters and let args
+                rule("NoSpaceAfterEllipsis", 25 /* SyntaxKind.DotDotDotToken */, 79 /* SyntaxKind.Identifier */, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterOptionalParameters", 57 /* SyntaxKind.QuestionToken */, [21 /* SyntaxKind.CloseParenToken */, 27 /* SyntaxKind.CommaToken */], [isNonJsxSameLineTokenContext, isNotBinaryOpContext], 16 /* RuleAction.DeleteSpace */),
+                // Remove spaces in empty interface literals. e.g.: x: {}
+                rule("NoSpaceBetweenEmptyInterfaceBraceBrackets", 18 /* SyntaxKind.OpenBraceToken */, 19 /* SyntaxKind.CloseBraceToken */, [isNonJsxSameLineTokenContext, isObjectTypeContext], 16 /* RuleAction.DeleteSpace */),
+                // generics and type assertions
+                rule("NoSpaceBeforeOpenAngularBracket", typeNames, 29 /* SyntaxKind.LessThanToken */, [isNonJsxSameLineTokenContext, isTypeArgumentOrParameterOrAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBetweenCloseParenAndAngularBracket", 21 /* SyntaxKind.CloseParenToken */, 29 /* SyntaxKind.LessThanToken */, [isNonJsxSameLineTokenContext, isTypeArgumentOrParameterOrAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterOpenAngularBracket", 29 /* SyntaxKind.LessThanToken */, anyToken, [isNonJsxSameLineTokenContext, isTypeArgumentOrParameterOrAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeCloseAngularBracket", anyToken, 31 /* SyntaxKind.GreaterThanToken */, [isNonJsxSameLineTokenContext, isTypeArgumentOrParameterOrAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterCloseAngularBracket", 31 /* SyntaxKind.GreaterThanToken */, [20 /* SyntaxKind.OpenParenToken */, 22 /* SyntaxKind.OpenBracketToken */, 31 /* SyntaxKind.GreaterThanToken */, 27 /* SyntaxKind.CommaToken */], [isNonJsxSameLineTokenContext, isTypeArgumentOrParameterOrAssertionContext, isNotFunctionDeclContext /*To prevent an interference with the SpaceBeforeOpenParenInFuncDecl rule*/], 16 /* RuleAction.DeleteSpace */),
+                // decorators
+                rule("SpaceBeforeAt", [21 /* SyntaxKind.CloseParenToken */, 79 /* SyntaxKind.Identifier */], 59 /* SyntaxKind.AtToken */, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterAt", 59 /* SyntaxKind.AtToken */, anyToken, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after @ in decorator
+                rule("SpaceAfterDecorator", anyToken, [
+                    126 /* SyntaxKind.AbstractKeyword */,
+                    79 /* SyntaxKind.Identifier */,
+                    93 /* SyntaxKind.ExportKeyword */,
+                    88 /* SyntaxKind.DefaultKeyword */,
+                    84 /* SyntaxKind.ClassKeyword */,
+                    124 /* SyntaxKind.StaticKeyword */,
+                    123 /* SyntaxKind.PublicKeyword */,
+                    121 /* SyntaxKind.PrivateKeyword */,
+                    122 /* SyntaxKind.ProtectedKeyword */,
+                    137 /* SyntaxKind.GetKeyword */,
+                    151 /* SyntaxKind.SetKeyword */,
+                    22 /* SyntaxKind.OpenBracketToken */,
+                    41 /* SyntaxKind.AsteriskToken */,
+                ], [isEndOfDecoratorContextOnSameLine], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeNonNullAssertionOperator", anyToken, 53 /* SyntaxKind.ExclamationToken */, [isNonJsxSameLineTokenContext, isNonNullAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterNewKeywordOnConstructorSignature", 103 /* SyntaxKind.NewKeyword */, 20 /* SyntaxKind.OpenParenToken */, [isNonJsxSameLineTokenContext, isConstructorSignatureContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceLessThanAndNonJSXTypeAnnotation", 29 /* SyntaxKind.LessThanToken */, 29 /* SyntaxKind.LessThanToken */, [isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+            ];
+            // These rules are applied after high priority
+            var userConfigurableRules = [
+                // Treat constructor as an identifier in a function declaration, and remove spaces between constructor and following left parentheses
+                rule("SpaceAfterConstructor", 135 /* SyntaxKind.ConstructorKeyword */, 20 /* SyntaxKind.OpenParenToken */, [isOptionEnabled("insertSpaceAfterConstructor"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterConstructor", 135 /* SyntaxKind.ConstructorKeyword */, 20 /* SyntaxKind.OpenParenToken */, [isOptionDisabledOrUndefined("insertSpaceAfterConstructor"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceAfterComma", 27 /* SyntaxKind.CommaToken */, anyToken, [isOptionEnabled("insertSpaceAfterCommaDelimiter"), isNonJsxSameLineTokenContext, isNonJsxElementOrFragmentContext, isNextTokenNotCloseBracket, isNextTokenNotCloseParen], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterComma", 27 /* SyntaxKind.CommaToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterCommaDelimiter"), isNonJsxSameLineTokenContext, isNonJsxElementOrFragmentContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after function keyword for anonymous functions
+                rule("SpaceAfterAnonymousFunctionKeyword", [98 /* SyntaxKind.FunctionKeyword */, 41 /* SyntaxKind.AsteriskToken */], 20 /* SyntaxKind.OpenParenToken */, [isOptionEnabled("insertSpaceAfterFunctionKeywordForAnonymousFunctions"), isFunctionDeclContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterAnonymousFunctionKeyword", [98 /* SyntaxKind.FunctionKeyword */, 41 /* SyntaxKind.AsteriskToken */], 20 /* SyntaxKind.OpenParenToken */, [isOptionDisabledOrUndefined("insertSpaceAfterFunctionKeywordForAnonymousFunctions"), isFunctionDeclContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after keywords in control flow statements
+                rule("SpaceAfterKeywordInControl", keywords, 20 /* SyntaxKind.OpenParenToken */, [isOptionEnabled("insertSpaceAfterKeywordsInControlFlowStatements"), isControlDeclContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterKeywordInControl", keywords, 20 /* SyntaxKind.OpenParenToken */, [isOptionDisabledOrUndefined("insertSpaceAfterKeywordsInControlFlowStatements"), isControlDeclContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after opening and before closing nonempty parenthesis
+                rule("SpaceAfterOpenParen", 20 /* SyntaxKind.OpenParenToken */, anyToken, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeCloseParen", anyToken, 21 /* SyntaxKind.CloseParenToken */, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBetweenOpenParens", 20 /* SyntaxKind.OpenParenToken */, 20 /* SyntaxKind.OpenParenToken */, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenParens", 20 /* SyntaxKind.OpenParenToken */, 21 /* SyntaxKind.CloseParenToken */, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterOpenParen", 20 /* SyntaxKind.OpenParenToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeCloseParen", anyToken, 21 /* SyntaxKind.CloseParenToken */, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after opening and before closing nonempty brackets
+                rule("SpaceAfterOpenBracket", 22 /* SyntaxKind.OpenBracketToken */, anyToken, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeCloseBracket", anyToken, 23 /* SyntaxKind.CloseBracketToken */, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenBrackets", 22 /* SyntaxKind.OpenBracketToken */, 23 /* SyntaxKind.CloseBracketToken */, [isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterOpenBracket", 22 /* SyntaxKind.OpenBracketToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeCloseBracket", anyToken, 23 /* SyntaxKind.CloseBracketToken */, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert a space after { and before } in single-line contexts, but remove space from empty object literals {}.
+                rule("SpaceAfterOpenBrace", 18 /* SyntaxKind.OpenBraceToken */, anyToken, [isOptionEnabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"), isBraceWrappedContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeCloseBrace", anyToken, 19 /* SyntaxKind.CloseBraceToken */, [isOptionEnabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"), isBraceWrappedContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenEmptyBraceBrackets", 18 /* SyntaxKind.OpenBraceToken */, 19 /* SyntaxKind.CloseBraceToken */, [isNonJsxSameLineTokenContext, isObjectContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterOpenBrace", 18 /* SyntaxKind.OpenBraceToken */, anyToken, [isOptionDisabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeCloseBrace", anyToken, 19 /* SyntaxKind.CloseBraceToken */, [isOptionDisabled("insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert a space after opening and before closing empty brace brackets
+                rule("SpaceBetweenEmptyBraceBrackets", 18 /* SyntaxKind.OpenBraceToken */, 19 /* SyntaxKind.CloseBraceToken */, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingEmptyBraces")], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBetweenEmptyBraceBrackets", 18 /* SyntaxKind.OpenBraceToken */, 19 /* SyntaxKind.CloseBraceToken */, [isOptionDisabled("insertSpaceAfterOpeningAndBeforeClosingEmptyBraces"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after opening and before closing template string braces
+                rule("SpaceAfterTemplateHeadAndMiddle", [15 /* SyntaxKind.TemplateHead */, 16 /* SyntaxKind.TemplateMiddle */], anyToken, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"), isNonJsxTextContext], 4 /* RuleAction.InsertSpace */, 1 /* RuleFlags.CanDeleteNewLines */),
+                rule("SpaceBeforeTemplateMiddleAndTail", anyToken, [16 /* SyntaxKind.TemplateMiddle */, 17 /* SyntaxKind.TemplateTail */], [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"), isNonJsxSameLineTokenContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterTemplateHeadAndMiddle", [15 /* SyntaxKind.TemplateHead */, 16 /* SyntaxKind.TemplateMiddle */], anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"), isNonJsxTextContext], 16 /* RuleAction.DeleteSpace */, 1 /* RuleFlags.CanDeleteNewLines */),
+                rule("NoSpaceBeforeTemplateMiddleAndTail", anyToken, [16 /* SyntaxKind.TemplateMiddle */, 17 /* SyntaxKind.TemplateTail */], [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"), isNonJsxSameLineTokenContext], 16 /* RuleAction.DeleteSpace */),
+                // No space after { and before } in JSX expression
+                rule("SpaceAfterOpenBraceInJsxExpression", 18 /* SyntaxKind.OpenBraceToken */, anyToken, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"), isNonJsxSameLineTokenContext, isJsxExpressionContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceBeforeCloseBraceInJsxExpression", anyToken, 19 /* SyntaxKind.CloseBraceToken */, [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"), isNonJsxSameLineTokenContext, isJsxExpressionContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterOpenBraceInJsxExpression", 18 /* SyntaxKind.OpenBraceToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"), isNonJsxSameLineTokenContext, isJsxExpressionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceBeforeCloseBraceInJsxExpression", anyToken, 19 /* SyntaxKind.CloseBraceToken */, [isOptionDisabledOrUndefined("insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"), isNonJsxSameLineTokenContext, isJsxExpressionContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space after semicolon in for statement
+                rule("SpaceAfterSemicolonInFor", 26 /* SyntaxKind.SemicolonToken */, anyToken, [isOptionEnabled("insertSpaceAfterSemicolonInForStatements"), isNonJsxSameLineTokenContext, isForContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterSemicolonInFor", 26 /* SyntaxKind.SemicolonToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterSemicolonInForStatements"), isNonJsxSameLineTokenContext, isForContext], 16 /* RuleAction.DeleteSpace */),
+                // Insert space before and after binary operators
+                rule("SpaceBeforeBinaryOperator", anyToken, binaryOperators, [isOptionEnabled("insertSpaceBeforeAndAfterBinaryOperators"), isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("SpaceAfterBinaryOperator", binaryOperators, anyToken, [isOptionEnabled("insertSpaceBeforeAndAfterBinaryOperators"), isNonJsxSameLineTokenContext, isBinaryOpContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeBinaryOperator", anyToken, binaryOperators, [isOptionDisabledOrUndefined("insertSpaceBeforeAndAfterBinaryOperators"), isNonJsxSameLineTokenContext, isBinaryOpContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoSpaceAfterBinaryOperator", binaryOperators, anyToken, [isOptionDisabledOrUndefined("insertSpaceBeforeAndAfterBinaryOperators"), isNonJsxSameLineTokenContext, isBinaryOpContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceBeforeOpenParenInFuncDecl", anyToken, 20 /* SyntaxKind.OpenParenToken */, [isOptionEnabled("insertSpaceBeforeFunctionParenthesis"), isNonJsxSameLineTokenContext, isFunctionDeclContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeOpenParenInFuncDecl", anyToken, 20 /* SyntaxKind.OpenParenToken */, [isOptionDisabledOrUndefined("insertSpaceBeforeFunctionParenthesis"), isNonJsxSameLineTokenContext, isFunctionDeclContext], 16 /* RuleAction.DeleteSpace */),
+                // Open Brace braces after control block
+                rule("NewLineBeforeOpenBraceInControl", controlOpenBraceLeftTokenRange, 18 /* SyntaxKind.OpenBraceToken */, [isOptionEnabled("placeOpenBraceOnNewLineForControlBlocks"), isControlDeclContext, isBeforeMultilineBlockContext], 8 /* RuleAction.InsertNewLine */, 1 /* RuleFlags.CanDeleteNewLines */),
+                // Open Brace braces after function
+                // TypeScript: Function can have return types, which can be made of tons of different token kinds
+                rule("NewLineBeforeOpenBraceInFunction", functionOpenBraceLeftTokenRange, 18 /* SyntaxKind.OpenBraceToken */, [isOptionEnabled("placeOpenBraceOnNewLineForFunctions"), isFunctionDeclContext, isBeforeMultilineBlockContext], 8 /* RuleAction.InsertNewLine */, 1 /* RuleFlags.CanDeleteNewLines */),
+                // Open Brace braces after TypeScript module/class/interface
+                rule("NewLineBeforeOpenBraceInTypeScriptDeclWithBlock", typeScriptOpenBraceLeftTokenRange, 18 /* SyntaxKind.OpenBraceToken */, [isOptionEnabled("placeOpenBraceOnNewLineForFunctions"), isTypeScriptDeclWithBlockContext, isBeforeMultilineBlockContext], 8 /* RuleAction.InsertNewLine */, 1 /* RuleFlags.CanDeleteNewLines */),
+                rule("SpaceAfterTypeAssertion", 31 /* SyntaxKind.GreaterThanToken */, anyToken, [isOptionEnabled("insertSpaceAfterTypeAssertion"), isNonJsxSameLineTokenContext, isTypeAssertionContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceAfterTypeAssertion", 31 /* SyntaxKind.GreaterThanToken */, anyToken, [isOptionDisabledOrUndefined("insertSpaceAfterTypeAssertion"), isNonJsxSameLineTokenContext, isTypeAssertionContext], 16 /* RuleAction.DeleteSpace */),
+                rule("SpaceBeforeTypeAnnotation", anyToken, [57 /* SyntaxKind.QuestionToken */, 58 /* SyntaxKind.ColonToken */], [isOptionEnabled("insertSpaceBeforeTypeAnnotation"), isNonJsxSameLineTokenContext, isTypeAnnotationContext], 4 /* RuleAction.InsertSpace */),
+                rule("NoSpaceBeforeTypeAnnotation", anyToken, [57 /* SyntaxKind.QuestionToken */, 58 /* SyntaxKind.ColonToken */], [isOptionDisabledOrUndefined("insertSpaceBeforeTypeAnnotation"), isNonJsxSameLineTokenContext, isTypeAnnotationContext], 16 /* RuleAction.DeleteSpace */),
+                rule("NoOptionalSemicolon", 26 /* SyntaxKind.SemicolonToken */, anyTokenIncludingEOF, [optionEquals("semicolons", ts.SemicolonPreference.Remove), isSemicolonDeletionContext], 32 /* RuleAction.DeleteToken */),
+                rule("OptionalSemicolon", anyToken, anyTokenIncludingEOF, [optionEquals("semicolons", ts.SemicolonPreference.Insert), isSemicolonInsertionContex

@@ -1,0 +1,2684 @@
+ext>
+				<![CDATA[O Problema não foi Resolvido? <a href="#"><Font color="#00AEE6">Clique Aqui</Font></a> para nos informar.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs2" Property="string">
+			<Text>
+				<![CDATA[Altere o vídeo de amostra e faça a reparação novamente. Se o problema ainda existir, <a href="#"><Font color="#00AEE6">Clique Aqui</Font></a> para nos informar.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs3" Property="string">
+			<Text>
+				<![CDATA[A criação da unidade falhou, verifique se o dispositivo está conectado corretamente, ou <a href="#"><Font color="#00AEE6">nos informe</Font></a> agora.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs4" Property="string">
+			<Text>
+				<![CDATA[A segunda verificação não resolveu o problema? <a href="#"><Font color="#00AEE6">Clique Aqui</Font></a> para nos informar.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs5" Property="string">
+			<Text>
+				<![CDATA[É necessária uma conexão com a Internet para ativar o software, verifique a sua rede ou entre em contato com o seu provedor de acesso ISP, <a href="#"><Font color="#00AEE6">você também pode nos informar</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs6" Property="string">
+			<Text>
+				<![CDATA[Qual parte do Recoverit você não gosta? <a href="#"><Font color="#00AEE6">Compartilhar</Font></a> pode nos ajudar a melhorar muito!]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs7" Property="string">
+			<Text>
+				<![CDATA[Sem conexão com a Internet]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs8" Property="string">
+			<Text>
+				<![CDATA[Ah não ... não conseguimos conectar à Internet, verifique a sua conexão e tente novamente.]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeepHint" Property="string">
+			<Text>
+				<![CDATA[O Modo de Verificação profunda consegue encontrar mais arquivos, contudo demora mais tempo.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 itens, %2]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameSelectFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 arquivos selecionados em %2]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeep" Property="string">
+			<Text>
+				<![CDATA[<font color=#26324B>Ainda não conseguiu encontrar os seus arquivos perdidos? Tente a </font> <b><a href="#"><font color=#00AEE6>Verificação Pronfunda</font></a></b>]]>
+			</Text>
+		</Item>
+		<Item Name="NoDataFrameDesc" Property="string">
+			<Text>
+				<![CDATA[<b>Nenhum arquivo foi encontrado</b><br><br>Selecione outros tipos de arquivos para verificar]]>
+			</Text>
+		</Item>
+		<Item Name="PauseBeforeRecover" Property="string">
+			<Text>
+				<![CDATA[Pause a verificação antes de iniciar a recuperação dos arquivos.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture1" Property="string">
+			<Text>
+				<![CDATA[Não é possível pré-visualizar. Isto pode estar acontecendo pelos seguintes motivos:]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture2"  Property="string">
+			<Text>
+				<![CDATA[1. Os dados foram sobrescritos.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture3"  Property="string">
+			<Text>
+				<![CDATA[2. Os dados estão incompletos. (Por favor aguarde até ao término do processo e tente novamente)]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantQuit1" Property="string">
+			<Text>
+				<![CDATA[Há um problema com a autorização da conta.]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantRetry"  Property="string">
+			<Text>
+				<![CDATA[Repetir]]>
+			</Text>
+		</Item>
+		<Item Name="m_BuyNowButton"  Property="string">
+			<Text>
+				<![CDATA[Comprar Agora]]>
+			</Text>
+		</Item>
+		<Item Name="bootretry"  Property="string">
+			<Text>
+				<![CDATA[Tentar novamente]]>
+			</Text>
+		</Item>
+		<Item Name="bootformatnow"  Property="string">
+			<Text>
+				<![CDATA[Formatar]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc3"  Property="string">
+			<Text>
+				<![CDATA[Alterar o Caminho]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Sim]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_NoButton"  Property="string">
+			<Text>
+				<![CDATA[Não]]>
+			</Text>
+		</Item>	 
+		<Item Name="Stop1_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Parar]]>
+			</Text>
+		</Item>
+		<Item Name="Stop1_m_cancelButton"  Property="string">
+			<Text>
+				<![CDATA[Cancelar]]>
+			</Text>
+		</Item>
+		<Item Name="Stop2_m_ExitButton" Property="string">
+			<Text>
+				<![CDATA[Sair]]>
+			</Text>
+		</Item>
+		<Item Name="Stop5_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Substituir]]>
+			</Text>
+		</Item>
+
+		<Item Name="Stop6_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Salvar]]>
+			</Text>
+		</Item>
+		<Item Name="PasswordDialogText"  Property="string">
+			<Text>
+				<![CDATA[O disco selecionado está bloqueado por senha. Digite a senha para verificar o disco completamente.]]>
+			</Text>
+		</Item>  
+		<Item Name="IsAdmin"  Property="string">
+			<Text>
+				<![CDATA[Você precisará fornecer a permissão de administrador para executar este programa.]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strError"  Property="string">
+			<Text>
+				<![CDATA[O Wondershare Recoverit está sendo executado!]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strWaring" Property="string">
+			<Text>
+				<![CDATA[Aviso]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyNetWorkDesc" Property="string">
+			<Text>
+				<![CDATA[Uma conexão com a Internet é necessária para ativar o software. Por favor verifique sua rede ou entre em contato com o seu Provedor de Serviços ISP.]]>
+			</Text>
+		</Item>
+		<Item Name="NewAntiPiracyDesc" Property="string">
+			<Text>
+				<![CDATA[O software não é original. Baixe e atualize ele para a versão original, caso queira recuperar os dados.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc1" Property="string">
+			<Text>
+				<![CDATA[Você corre o risco de estar usando um software pirateado!]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc2" Property="string">
+			<Text>
+				<![CDATA[Aviso:]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc3" Property="string">
+			<Text>
+				<![CDATA[Seu computador pode ser infetado por vírus e até sofrer a perda dos seus dados, devido ao uso de software pirateado.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc4" Property="string">
+			<Text>
+				<![CDATA[Preparamos esta oferta por tempo limitado para você]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc5" Property="string">
+			<Text>
+				<![CDATA[Ganhe 60% de Desconto ao comprar uma Licença Original.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc6" Property="string">
+			<Text>
+				<![CDATA[Nota: Sugerimos que você recupere os seus arquivos verificados o mais rápido possível, Caso contrário os dados podem ser substituídos causando uma falha na recuperação.]]>
+			</Text>
+		</Item>	
+		<Item Name="PiracyDesc7" Property="string">
+			<Text>
+				<![CDATA[O seu software parece estar danificado ou corrompido, faça novamente o download e o reinstale.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc8" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00AEE6>Website Oficial</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="ScanFramePauseTooltip" Property="string">
+			<Text>
+				<![CDATA[Pausar]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameStopTooltip" Property="string">
+			<Text>
+				<![CDATA[Parar]]>
+			</Text>
+		</Item>
+		<Item Name="MulItemSelected" Property="string">
+			<Text>
+				<![CDATA[%1 selecionado]]>
+			</Text>
+		</Item>	
+		<Item Name="m_strArchive" Property="string">
+			<Text>
+				<![CDATA[Arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="m_strAudio" Property="string">
+			<Text>
+				<![CDATA[Arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDataBase" Property="string">
+			<Text>
+				<![CDATA[Base de Dados]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDocument" Property="string">
+			<Text>
+				<![CDATA[Documento Office]]>
+			</Text>
+		</Item>
+		<Item Name="m_strEmail" Property="string">
+			<Text>
+				<![CDATA[Email]]>
+			</Text>
+		</Item>
+		<Item Name="m_strGraphic" Property="string">
+			<Text>
+				<![CDATA[Gráfico]]>
+			</Text>
+		</Item>
+		<Item Name="m_strInternetWeb" Property="string">
+			<Text>
+				<![CDATA[Internet & Web]]>
+			</Text>
+		</Item>
+		<Item Name="m_strMiscellaneous" Property="string">
+			<Text>
+				<![CDATA[Diverso]]>
+			</Text>
+		</Item>
+		<Item Name="m_strVideo" Property="string">
+			<Text>
+				<![CDATA[Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="m_strNoExtension" Property="string">
+			<Text>
+				<![CDATA[Sem Extensão]]>
+			</Text>
+		</Item>
+		<Item Name="m_strFileNamePath" Property="string">
+			<Text>
+				<![CDATA[Pesquisar pelo nome ou local do arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip1" Property="string">
+			<Text>
+				<![CDATA[Filtro]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip2" Property="string">
+			<Text>
+				<![CDATA[%1 dos arquivos corresponde às condições do filtro.]]>
+			</Text>
+		</Item>		
+		<Item Name="UpdateAuthorDesc0" Property="string">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+		<Item Name="loginDesc" Property="string">
+			<Text>
+				<![CDATA[Fazer login]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleRemoveDesc" Property="string">
+			<Text>
+				<![CDATA[%1 foi removido, conecte novamente ao computador e tente de novo.]]>
+			</Text>
+		</Item>
+		<Item Name="LostPartitionDesc" Property="string">
+			<Text>
+				<![CDATA[Partição Perdida]]>
+			</Text>
+		</Item>
+		<Item Name="LocalDiskDesc" Property="string">
+			<Text>
+				<![CDATA[Disco Local]]>
+			</Text>
+		</Item>
+		<Item Name="RawFilesDesc" Property="string">
+			<Text>
+				<![CDATA[Arquivos RAW]]>
+			</Text>
+		</Item>
+		<Item Name="FolderDesc" Property="string">
+			<Text>
+				<![CDATA[Pasta]]>
+			</Text>
+		</Item>
+		<Item Name="lostlocationDesc" Property="string">
+			<Text>
+				<![CDATA[Arquivo sem caminho]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleBinDesc" Property="string">
+			<Text>
+				<![CDATA[Lixeira]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerDesc" Property="string">
+			<Text>
+				<![CDATA[O disco selecionado foi bloqueado pelo <b> BitLocker do Windows</b> , desbloqueie e tente novamente.]]>
+			</Text>
+		</Item>
+		<Item Name="LostBitLockerDesc" Property="string">
+			<Text>
+				<![CDATA[%1 está protegido pelo BitLocker, desbloqueie ele para continuar com a verificação.]]>
+			</Text>
+		</Item>		
+		<Item Name="DiskRefreshDesc" Property="string">
+			<Text>
+				<![CDATA[Carregando informações sobre disco, por favor aguarde...]]>
+			</Text>
+		</Item>
+		<Item Name="ScanWaitFrameDesc3" Property="string">
+			<Text>
+				<![CDATA[Varredura parada, preparando para retornar, por favor aguarde pacientemente…]]>
+			</Text>
+		</Item>
+		<Item Name="DesktopDesc" Property="string">
+			<Text>
+				<![CDATA[Área de Trabalho]]>
+			</Text>
+		</Item>
+		<Item Name="SelectFolderkDesc" Property="string">
+			<Text>
+				<![CDATA[Pastas]]>
+			</Text>
+		</Item>		
+		<Item Name="Unknown" Property="string">
+			<Text>
+				<![CDATA[Desconhecido]]>
+			</Text>
+		</Item>
+		<Item Name="findHardDriver1" Property="string">
+			<Text>
+				<![CDATA[Ainda não oferecemos suporte para o modelo da sua câmera.<br><br><br>Você deve retirar o cartão SD e inseri-lo em um leitor de cartão para verificá-lo.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2" Property="string">
+			<Text>
+				<![CDATA[O seu disco está danificado. Recupere os seus arquivos o mais rápido possível.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2_1" Property="string">
+			<Text>
+				<![CDATA[Detectamos que o seu disco tem alguns problemas.]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="CalendarFrame">	
+		<Item Name="Week1" Property="string">
+			<Text>
+				<![CDATA[Seg]]>
+			</Text>
+		</Item>
+		<Item Name="Week2" Property="string">
+			<Text>
+				<![CDATA[Ter]]>
+			</Text>
+		</Item>
+		<Item Name="Week3" Property="string">
+			<Text>
+				<![CDATA[Qua]]>
+			</Text>
+		</Item>
+		<Item Name="Week4" Property="string">
+			<Text>
+				<![CDATA[Qui]]>
+			</Text>
+		</Item>
+		<Item Name="Week5" Property="string">
+			<Text>
+				<![CDATA[Sex]]>
+			</Text>
+		</Item>
+		<Item Name="Week6" Property="string">
+			<Text>
+				<![CDATA[Sáb]]>
+			</Text>
+		</Item>
+		<Item Name="Week7" Property="string">
+			<Text>
+				<![CDATA[Dom]]>
+			</Text>
+		</Item>	  
+		<Item Name="Mon1" Property="string">
+			<Text>
+				<![CDATA[Janeiro]]>
+			</Text>
+		</Item>
+		<Item Name="Mon2" Property="string">
+			<Text>
+				<![CDATA[Fevereiro]]>
+			</Text>
+		</Item>
+		<Item Name="Mon3" Property="string">
+			<Text>
+				<![CDATA[Março]]>
+			</Text>
+		</Item>
+		<Item Name="Mon4" Property="string">
+			<Text>
+				<![CDATA[Abril]]>
+			</Text>
+		</Item>
+		<Item Name="Mon5" Property="string">
+			<Text>
+				<![CDATA[Maio]]>
+			</Text>
+		</Item>
+		<Item Name="Mon6" Property="string">
+			<Text>
+				<![CDATA[Junho]]>
+			</Text>
+		</Item>
+		<Item Name="Mon7" Property="string">
+			<Text>
+				<![CDATA[Julho]]>
+			</Text>
+		</Item>
+		<Item Name="Mon8" Property="string">
+			<Text>
+				<![CDATA[Agosto]]>
+			</Text>
+		</Item>
+		<Item Name="Mon9" Property="string">
+			<Text>
+				<![CDATA[Setembro]]>
+			</Text>
+		</Item>
+		<Item Name="Mon10" Property="string">
+			<Text>
+				<![CDATA[Outubro]]>
+			</Text>
+		</Item>
+		<Item Name="Mon11" Property="string">
+			<Text>
+				<![CDATA[Novembro]]>
+			</Text>
+		</Item>
+		<Item Name="Mon12" Property="string">
+			<Text>
+				<![CDATA[Dezembro]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RowHeaderFrame">	
+		<Item Name="Head0" Property="string">
+			<Text>
+				<![CDATA[     Nome]]>
+			</Text>
+		</Item>
+		<Item Name="Head1"  Property="string">
+			<Text>
+				<![CDATA[Tamanho]]>
+			</Text>
+		</Item>
+		<Item Name="Head2"  Property="string">
+			<Text>
+				<![CDATA[Destino]]>
+			</Text>
+		</Item>
+		<Item Name="Head3" Property="string">
+			<Text>
+				<![CDATA[Data de Criação]]>
+			</Text>
+		</Item>
+		<Item Name="Head4"  Property="string">
+			<Text>
+				<![CDATA[Data de Modificação]]>
+			</Text>
+		</Item>
+		<Item Name="Head5"  Property="string">
+			<Text>
+				<![CDATA[Formato]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MainMenu">		
+		<Item Name="m_StrStatus" Property="string">
+			<Text>
+				<![CDATA[Feedback]]>
+			</Text>
+		</Item>	  
+		<Item Name="m_optionsAction" Property="string">
+			<Text>
+				<![CDATA[Idioma]]>
+			</Text>
+		</Item>
+		<Item Name="m_helpAction" Property="string">
+			<Text>
+				<![CDATA[Ajuda]]>
+			</Text>
+		</Item>
+		<Item Name="m_purchaseAction" Property="string">
+			<Text>
+				<![CDATA[Comprar]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction" Property="string">
+			<Text>
+				<![CDATA[Registrar]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction1" Property="string">
+			<Text>
+				<![CDATA[Conta]]>
+			</Text>
+		</Item>
+		<Item Name="m_suppotAction" Property="string">
+			<Text>
+				<![CDATA[Central de Suporte]]>
+			</Text>
+		</Item>
+		<Item Name="m_diskToolAction" Property="string">
+			<Text>
+				<![CDATA[Ferramentas de Disco]]>
+			</Text>
+		</Item>
+		<Item Name="m_logfilesAction" Property="string">
+			<Text>
+				<![CDATA[Arquivos de Log]]>
+			</Text>
+		</Item>
+		<Item Name="m_updateAction" Property="string">
+			<Text>
+				<![CDATA[Verificar Atualizações]]>
+			</Text>
+		</Item>
+		<Item Name="m_userGuideAction" Property="string">
+			<Text>
+				<![CDATA[Guia do Usuário]]>
+			</Text>
+		</Item>
+		<Item Name="m_aboutAction" Property="string">
+			<Text>
+				<![CDATA[Sobre]]>
+			</Text>
+		</Item>
+		<Item Name="m_contactusAction" Property="string">
+			<Text>
+				<![CDATA[Perguntas Frequentes]]>
+			</Text>
+		</Item>	  
+	</Form>
+	<Form Name="cmenuOption">
+		<Item Name="Language" Property="string">
+			<Text>
+				<![CDATA[Idioma]]>
+			</Text>
+		</Item>
+		<Item Name="languageCombox" Property="string">
+			<Text>
+				<![CDATA[English(English),Japanese(日本語),French(Français),German(Deutsch),Chinese Traditional(中国香港),Chinese Traditional(中国台湾),Portuguese(Português),Italiano(Italiano),Spanish(Español),Netherland(Nederlands),Arab( العربية ),Korean(한국어),Sweden(Swédia),Indonesia(Indonesia),Russian(русский)]]>
+			</Text>
+		</Item>
+		<Item Name="okButton" Property="string">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+		<Item Name="cancelButton" Property="string">
+			<Text>
+				<![CDATA[Cancelar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BitLockerPasswordDialog">
+		<Item Name="lblTextValue" Property="string">
+			<Text>
+				<![CDATA[O disco selecionado está criptografado com o BitLocker. Digite sua senha para desbloquear.]]>
+			</Text>
+		</Item>
+		<Item Name="lineEditPlaceholderText" Property="string">
+			<Text>
+				<![CDATA[senha/chave de recuperação]]>
+			</Text>
+		</Item>
+		<Item Name="lblHowTo" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Esqueceu a senha?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc1" Property="string">
+			<Text>
+				<![CDATA[Tente pesquisar a chave de recuperação neste computador]]>
+			</Text>
+		</Item>
+		<Item Name="labelError" Property="label">
+			<Text>
+				<![CDATA[senha incorreta]]>
+			</Text>
+		</Item>		
+		<Item Name="BtnSearch" Property="button">
+			<Text>
+				<![CDATA[pesquisando]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc2" Property="string">
+			<Text>
+				<![CDATA[pesquisando...]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc3" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>Não encontrado</font>. <a href="#"><font color=#00B0F5>Como encontrar outra chave de recuperação？</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc4" Property="string">
+			<Text>
+				<![CDATA[Desbloqueado com êxito. ]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc5" Property="string">
+			<Text>
+				<![CDATA[Encontramos! Desbloqueado com êxito. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanNoDataFrame">
+		<Item Name="LastScanProgressSynced" Property="string">
+			<Text>
+				<![CDATA[Sincronização do progresso da última verificação]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc1" Property="label">
+			<Text>
+				<![CDATA[fazendo varredura]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc2" Property="label">
+			<Text>
+				<![CDATA[Não saia do processo atual até que a verificação esteja concluída.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="RepairFileDataFrame">
+		<Item Name="textDesc1" Property="string">
+			<Text>
+				<![CDATA[Não é possível visualizar o arquivo danificado, estamos iniciando o componente "Repairit" para tentar repará-lo…]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc2" Property="string">
+			<Text>
+				<![CDATA[Ainda deseja recuperar o arquivo danificado?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc3" Property="string">
+			<Text>
+				<![CDATA[O reparo não foi concluído, o arquivo ainda está danificado após a recuperação]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc4" Property="string">
+			<Text>
+				<![CDATA[continuar recuperação]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc5" Property="string">
+			<Text>
+				<![CDATA[cancelar]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc6" Property="string">
+			<Text>
+				<![CDATA[Seu arquivo foi reparado com êxito!]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc7" Property="string">
+			<Text>
+				<![CDATA[Falha no reparo, o arquivo está muito danificado e não pode ser visualizado.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc8" Property="string">
+			<Text>
+				<![CDATA[Ainda deseja recuperar o arquivo danificado?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc9" Property="string">
+			<Text>
+				<![CDATA[O arquivo pode estar danificado. Confirme assim que possível após a recuperação e tente corrigir]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="CrashContinueDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Deseja continuar a verificação não concluída?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Ocorreu um problema no software e o progresso da verificação que você acabou de fazer não foi concluído. Deseja continuar?]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOK" Property="button">
+			<Text>
+				<![CDATA[Continuar]]>
+			</Text>
+		</Item>
+		<Item Name="BtnCancel" Property="button">
+			<Text>
+				<![CDATA[Cancelar]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="LockDriverDialog">
+		<Item Name="LockDriverDialog1" Property="string">
+			<Text>
+				<![CDATA[Pular]]>
+			</Text>
+		</Item>
+		<Item Name="LockDriverDialog2" Property="string">
+			<Text>
+				<![CDATA[Desbloquear]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerLink" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00AEE6>Como Desbloquear?</font></a>]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="FilterFrame">
+		<Item Name="FilterDesc" Property="string">
+			<Text>
+				<![CDATA[Filtro]]>
+			</Text>
+		</Item>
+		<Item Name="ResetDesc" Property="string">
+			<Text>
+				<![CDATA[Redefinir]]>
+			</Text>
+		</Item>
+		<Item Name="FileTypeDesc" Property="string">
+			<Text>
+				<![CDATA[Tipo de Arquivo]]>
+			</Text>
+		</Item>		
+		<Item Name="TimeDesc" Property="string">
+			<Text>
+				<![CDATA[Tempo]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[Tamanho do Arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDescText" Property="string">
+			<Text>
+				<![CDATA[Tamanho do Arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText1" Property="string">
+			<Text>
+				<![CDATA[Tempo todo]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText2" Property="string">
+			<Text>
+				<![CDATA[O Dia Anterior]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText3" Property="string">
+			<Text>
+				<![CDATA[A Semana Anterior]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText4" Property="string">
+			<Text>
+				<![CDATA[O Mês Anterior]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText5" Property="string">
+			<Text>
+				<![CDATA[O Ano Anterior]]>
+			</Text>
+		</Item>		
+		<Item Name="FilterDateTimeText6" Property="string">
+			<Text>
+				<![CDATA[Personalizar...]]>
+			</Text>
+		</Item>
+		<Item Name="Lessthan1MB" Property="string">
+			<Text>
+				<![CDATA[Menos de 1 MB]]>
+			</Text>
+		</Item>
+		<Item Name="1GBabove" Property="string">
+			<Text>
+				<![CDATA[Mais de 1 GB]]>
+			</Text>
+		</Item>
+		<Item Name="AllFiles" Property="string">
+			<Text>
+				<![CDATA[Todos os Arquivos]]>
+			</Text>
+		</Item>	
+		<Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[Arquivos Excluídos]]>
+			</Text>
+		</Item>
+		<Item Name="FilteringDesc" Property="string">
+			<Text>
+				<![CDATA[Filtrando]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchingDesc" Property="string">
+			<Text>
+				<![CDATA[Procurando]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchresultsFilesEx" Property="string">
+			<Text>
+				<![CDATA[Resultado da pesquisa: %1 itens; %2 arquivos]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFiles" Property="string">
+			<Text>
+				<![CDATA[Resultados da busca: %1 arquivos]]>
+			</Text>
+		</Item>
+		<Item Name="Searchresults" Property="string">
+			<Text>
+				<![CDATA[Resultado da busca para %1]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFile" Property="string">
+			<Text>
+				<![CDATA[Resultados da busca: 0 arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="Less100MB" Property="string">
+			<Text>
+				<![CDATA[1MB~100MB]]>
+			</Text>
+		</Item>
+		<Item Name="Less1GB" Property="string">
+			<Text>
+				<![CDATA[100MB~1GB]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ShowBannerFrame">
+		<Item Name="ShowBannerFrameCrashSystem1_1" Property="string">
+			<Text>
+				<![CDATA[Computador não inicializável]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem1_2" Property="string">
+			<Text>
+				<![CDATA[Acesse os dados do seu computador travado criando uma unidade USB inicializável.]]>
+			</Text>
+		</Item>		
+		<Item Name="ShowBannerFrameCrashSystem2_1" Property="string">
+			<Text>
+				<![CDATA[Tela azul da morte]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem2_2" Property="string">
+			<Text>
+				<![CDATA[Defina as opções de inicialização no PC travado para iniciar os dados de resgate.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_1" Property="string">
+			<Text>
+				<![CDATA[Tela negra da morte]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_2" Property="string">
+			<Text>
+				<![CDATA[Copie ou restaure de forma fácil e simples os dados apagados de um PC avariado]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_1" Property="string">
+			<Text>
+				<![CDATA[#1 para Recuperar Vídeos Excluídos ou Profundamente Ocultos]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_2" Property="string">
+			<Text>
+				<![CDATA[Quando você descobrir que algo inesperado aconteceu durante a gravação ou edição de um vídeo.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_1" Property="string">
+			<Text>
+				<![CDATA[Recuperação de Vídeos em Ultra HD, 4K e 8K]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_2" Property="string">
+			<Text>
+				<![CDATA[Suportamos a recuperação de vídeos em Ultra HD, 4K e até 8K, que é mais eficaz do que nunca.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_1" Property="string">
+			<Text>
+				<![CDATA[Recuperação de Vídeos de todos os dispositivos]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_2" Property="string">
+			<Text>
+				<![CDATA[Recuperar de DSLR, Câmeras digitais, Drones, Câmeras de painel, cartões SD, etc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_1" Property="string">
+			<Text>
+				<![CDATA[Danos Causados por Operações Acidentais]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_2" Property="string">
+			<Text>
+				<![CDATA[Gravar depois de deixar cair, danos causados pela água, sacudidas, quedas, bateria descarregada, desligamento inesperado durante a gravação de vídeo, etc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_1" Property="string">
+			<Text>
+				<![CDATA[Vídeo foi recuperado mas não conseguiu ser reproduzido]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_2" Property="string">
+			<Text>
+				<![CDATA[Vídeo perdido foi recuperado, mas não conseguiu ser reproduzido por algumas razões desconhecidas.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_1" Property="string">
+			<Text>
+				<![CDATA[Reparo de vídeo de marcas de câmera amplamente utilizadas]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_2" Property="string">
+			<Text>
+				<![CDATA[Câmeras suportadas: Cannon, Nikon, Sony, Panasonic, GoPro, DJI etc.]]>
+			</Text>
+		</Item>			
+	</Form>	
+	<Form Name="FindHardDriverDialog">
+		<Item Name="FindHardDriverDialogOtherState1" Property="string">
+			<Text>
+				<![CDATA[Causa]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState2" Property="string">
+			<Text>
+				<![CDATA[Se o status de seu disco é:<br>Offline/Ausente/Ilegível/Falha/Desconhecido/Externo]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState3" Property="string">
+			<Text>
+				<![CDATA[Solução]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState4" Property="string">
+			<Text>
+				<![CDATA[Por favor, consulte as dicas da Microsoft para resolver o problema:  <a href="#"><font color=#00B0F5>Solução de problemas da Microsoft</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNotInitialized1" Property="string">
+			<Text>
+				<![CDATA[Causa]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized2" Property="string">
+			<Text>
+				<![CDATA[O disco não tem uma assinatura válida de disco.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNotInitialized3" Property="string">
+			<Text>
+				<![CDATA[Solução]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized4" Property="string">
+			<Text>
+				<![CDATA[Clique com o botão direito do mouse em Gerenciamento de Disco para inicializar a unidade. Depois, use o Recoverit para digitalizar e recuperar os dados.]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNoMedia1" Property="string">
+			<Text>
+				<![CDATA[Causa]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia2" Property="string">
+			<Text>
+				<![CDATA[Se o status de seu disco for "Sem Mídia", ele pode ter sérios danos de hardware.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNoMedia3" Property="string">
+			<Text>
+				<![CDATA[Solução]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia4" Property="string">
+			<Text>
+				<![CDATA[Por favor, envie o disco para oficina de reparo para inspeção.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="mainframe">
+		<Item Name="MainBannerFrameDataRecovery" Property="string">
+			<Text>
+				<![CDATA[Discos Rígidos e Localizações]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameCrashSystem" Property="string">
+			<Text>
+				<![CDATA[Computador com Sistema Danificado]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameAdvanceVideo" Property="string">
+			<Text>
+				<![CDATA[Recuperação Avançada de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameVideoRepair" Property="string">
+			<Text>
+				<![CDATA[Reparo de Vídeo Corrompido]]>
+			</Text>
+		</Item>
+		<Item Name="labelDataRecover" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Arquivos]]>
+			</Text>
+		</Item>	
+		<Item Name="labelDataRepair" Property="label">
+			<Text>
+				<![CDATA[Reparo de Arquivos]]>
+			</Text>
+		</Item>
+		<Item Name="mainformlblDesc" Property="label">
+			<Text>
+				<![CDATA[Estamos analisando seu vídeo, por favor, aguarde pacientemente.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="fulldiskframe">
+		<Item Name="labelAdvanceText" Property="label">
+			<Text>
+				<![CDATA[Recupere seus vídeos perdidos de todos os dispositivos]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="label">
+			<Text>
+				<![CDATA[Selecione um local para iniciar a recuperação]]>
+			</Text>
+		</Item>	
+		<Item Name="lblHardTitle" Property="label">
+			<Text>
+				<![CDATA[Discos Rígidos]]>
+			</Text>
+		</Item>
+		<Item Name="lblExternTitle" Property="label">
+			<Text>
+				<![CDATA[Discos Externos]]>
+			</Text>
+		</Item>
+		<Item Name="lblSpecificTitle" Property="label">
+			<Text>
+				<![CDATA[Acesso Rápido]]>
+			</Text>
+		</Item>	
+		<Item Name="lblFeedback" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Não consegue detectar seu disco rígido?</font></a>]]>
+			</Text>
+		</Item>	
+		<Item Name="refreshbtn" Property="tooltip">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+		<Item Name="advanceVideoDesc" Property="string">
+			<Text>
+				<![CDATA[Selecione um disco rígido para iniciar a Recuperação Avançada de Vídeo:]]>
+			</Text>
+		</Item>
+	</Form>
+
+	<Form Name="CrashSystemShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recupere Seus Dados do Computador Danificado]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Crie um pendrive bootável para inicializar o computador danificado e recuperar dados a partir dele:]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Iniciar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Tecnologia Patenteada para Recuperar Vídeos Profundamente Ocultos]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Inovação exclusiva de tecnologia patenteada do Recoverit - extraia videoclipes e integre]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Iniciar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="VideoRepairShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Reparo Rápido & Avançado de Vídeo, Evite a Corrupção de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[3 passos para reparar vídeos danificados, um kit de ferramentas completo para cenários de de danos diversos]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Adicionar vídeo]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CommonWaitFrame">
+		<Item Name="lblDiskDesc1" Property="label">
+			<Text>
+				<![CDATA[Carregando disco...]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Travado no carregamento por um longo tempo?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="RemoveExternalDisk">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Remova todos os dispositivos externos e tente novamente]]>
+			</Text>
+		</Item>
+		<Item Name="labelTex1" Property="label">
+			<Text>
+				<![CDATA[ Remova todos os discos externos conectados ao computador e aguarde que o carregamento seja concluído.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelTex2" Property="label">
+			<Text>
+				<![CDATA[Reconecte o disco que você deseja recuperar e inicie a varredura.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Entendi]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[O problema ainda ocorre?  <a href="#"><font color=#00B0F5>Clique aqu</font></a> para nos informar.  ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FindHardDriverDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Disco Rígido não encontrado]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Abra o <a href="#"><font color=#00B0F5>Gerenciamento de Disco</font></a>, verifique o Estado de seu disco:]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNotInit" Property="button">
+			<Text>
+				<![CDATA[Não Inicializado]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNoMedia" Property="button">
+			<Text>
+				<![CDATA[Sem Mídia]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOther" Property="button">
+			<Text>
+				<![CDATA[Outro Status]]>			    
+			</Text>
+		</Item>		
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Entendi]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Contate-nos</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MobileDialog">
+		<Item Name="MobileDialogDownload" Property="string">
+			<Text>
+				<![CDATA[Ir para baixar]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recoverit]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1_1" Property="label">
+			<Text>
+				<![CDATA[Recupere arquivos de PCs, discos rígidos e dispositivos de armazenamento externo. ]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[dr.fone - Recuperação de dados]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2_1" Property="label">
+			<Text>
+				<![CDATA[Recupere dados de dispositivos iOS/Android.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BadSectorDialog">
+		<Item Name="BadSectorFrameDriver" Property="string">
+			<Text>
+				<![CDATA[Foram detectados setores ruins no (%1:).  ]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameViewDetails" Property="string">
+			<Text>
+				<![CDATA[Ver detalhes]]>
+			</Text>
+		</Item>
+
+		<Item Name="BadSectorFrameSkipSector" Property="string">
+			<Text>
+				<![CDATA[Tentando pular setores ruins, por favor espere...]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameLearnMore" Property="string">
+			<Text>
+				<![CDATA[Saiba mais]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDialogDesc" Property="string">
+			<Text>
+				<![CDATA[Existem %2 setores ruins no disco]]>
+			</Text>
+		</Item>		
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Recupere seus arquivos o mais rápido possível, e faça backup imediatamente para evitar a perda de dados ]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Fazer backup imediatamente]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblGoodText" Property="label">
+			<Text>
+				<![CDATA[Bom]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblPoorText" Property="label">
+			<Text>
+				<![CDATA[Ruim]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblSevereText" Property="label">
+			<Text>
+				<![CDATA[Severo]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblDamagedText" Property="label">
+			<Text>
+				<![CDATA[Danificado]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblUnkownText" Property="label">
+			<Text>
+				<![CDATA[Incerto]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchHintFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Desculpe, nenhum arquivo encontrado!]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[1.  Alguns arquivos estão faltando o nome do arquivo original, verifique então em <a href="#"><font color=#00B0F5>Arquivos sem fonte</font></a>]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[2. Por favor, espere que a varredura seja concluída e pesquise novamente.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[3. Tente usar o Filtro para procurar seus arquivos.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Como procurar arquivos em Arquivos sem Fonte]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Arquivos sem fonte não possuem seus nomes de origem, não se pode buscar pelos nomes originais. Aqui estão algumas dicas para procurar arquivos em Arquivos sem Fonte:]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[1. Clique em [Arquivos sem fonte]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[2. Selecione o tipo de arquivo a ser recuperado.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[3. Pré-visualize para confirmar se os arquivos são o que você precisa.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Entendi]]>			    
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="PreviewSimilarErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Ops, a visualização do arquivo falhou pelo seguinte motivo:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[O arquivo pode ter sido substituído. Recomenda-se restaurar no computador.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>O que significa o arquivo sendo sobrescrito?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Ops, a visualização do arquivo falhou pelo seguinte motivo:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[O arquivo pode ter sido substituído. Recomenda-se restaurar no computador.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>O que significa o arquivo sendo sobrescrito?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="ScanPreviewErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Ops, a visualização do arquivo falhou pelo seguinte motivo:]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[O arquivo ainda está incompleto, por favor, pré-visualize depois de a varredura estar concluída.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Verifique os formatos que suportam a pré-visualização</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="PreviewUnkownFileFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Oops, o formato do arquivo não suporta pré-visualização]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Não se preocupe, você pode ver esses arquivos depois que eles forem recuperados em seu computador.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Verifique os formatos que suportam a pré-visualização</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewAdanceVideoErrorFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Oops, a visualização do vídeo falhou. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Tente a <b>Recuperação aprimorada</b> para digitalizar os fragmentos ocultos do vídeo.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[Observação: Salve os arquivos digitalizados antes de iniciar a Recuperação aprimorada]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewVideoErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Oops, a visualização do vídeo falhou. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[Recupere para o computador e tente o Reparo de Vídeo para consertar os vídeos corrompidos.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DocumentViewOrderFrame">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[A pré-visualização do vídeo é limitada a 30 segundos. Se você quiser reproduzir o vídeo completo, você pode o restaurar em seu computador.]]>
+			</Text>
+		</Item>
+		<Item Name="labelOfficeText" Property="label">
+			<Text>
+				<![CDATA[Apenas a primeira página do arquivo pode ser pré-visualizada.<br>Se você precisar ver mais conteúdo, restaure o arquivo em seu computador.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFrameTree">
+		<Item Name="TipDiskRawDesc" Property="string">
+			<Text>
+				<![CDATA[Estes arquivos não possuem mais seus nomes originais, tamanhos de arquivos e registros de data e hora. Mas eles podem ser exatamente o que você precisa.]]>
+			</Text>
+		</Item>
+		<Item Name="TipLostLocationDesc" Property="string">
+			<Text>
+				<![CDATA[Estes arquivos não têm informações sobre o caminho de armazenamento original, você pode verificar se é o que você <br>precisa.]]>
+			</Text>
+		</Item>
+		<Item Name="btnpath" Property="button">
+			<Text>
+				<![CDATA[Local de Arquivo]]>
+			</Text>
+		</Item>
+		<Item Name="btntype" Property="button">
+			<Text>
+				<![CDATA[Tipo de Arquivo]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ReconnectDialog">
+		<Item Name="ReconnectDiskDesc" Property="string">
+			<Text>
+				<![CDATA[Disco (%1:) desconectado, reconecte e volte a digitalizar.]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Digitalizar novamente]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDRlibDialog">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Software error, back to home and re-scan.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[Back]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFinishDialog">
+		<Item Name="ScanCompleteedAdvanceDesc" Property="string">
+			<Text>
+				<![CDATA[Varredura Concluída! Desculpe, não encontramos seus arquivos, <a href="#"><Font color="#00B0F5">deixe um feedback</Font></a> para que possamos verificar mais.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanCompleteedDesc" Property="string">
+			<Text>
+				<![CDATA[Varredura concluída! %1 arquivos foram encontrados!]]>
+			</Text>
+		</Item>
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Observação: Por favor recupere o quanto antes para evitar que os arquivos sejam sobregravados. ]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideo">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Não consegue encontrar o vídeo que você precisa?]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Recomendamos que você utilize o recurso de Recuperação Avançada de Vídeo.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Saiba mais]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideoDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Recuperação Avançada de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Salve os arquivos atualmente digitalizados que você precisa]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Volte para a página inicial, clique em [Recuperação Avançada de Vídeo].]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Selecione formatos de vídeo e inicie a Recuperação Avançada de Vídeo.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Entendi]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurntoDeepRecycleFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Se você não conseguir encontrar os arquivos excluídos, tente uma varredura profunda.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Uma varredura profunda levará mais tempo para varrer todos os setores do disco para encontrar mais arquivos.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Varredura profunda]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectPathDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[Selecione um lugar para recuperar os arquivos]]>
+			</Text>
+		</Item>
+		<Item Name="label" Property="label">
+			<Text>
+				<![CDATA[Localização:]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblHint" Property="label">
+			<Text>
+				<![CDATA[Caminho do arquivo inválido！]]>			    
+			</Text>
+		</Item>			
+		<Item Name="m_sDocumentItem" Property="string">
+			<Text>
+				<![CDATA[Meus Documentos]]>
+			</Text>
+		</Item>
+		<Item Name="m_sDeskTopItem" Property="string">
+			<Text>
+				<![CDATA[Área de Trabalho]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Meu Computador]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[OK]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProtectedDialog">
+		<Item Name="ProtectedDialogTitle1" Property="string">
+			<Text>
+				<![CDATA[Permissões insuficientes!]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle2" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF0000><b>Permissão insuficiente<b></font><font color=#26324B> para salvar o arquivo no disco selecionado. Por favor selecione outro disco e tente novamente.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle4" Property="string">
+			<Text>
+				<![CDATA[Memória Insuficiente!]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">//ProtectedDialogTitle3
+			<Text>
+				<![CDATA[Selecione Novamente]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoveryDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[Selecione o caminho para salvar arquivos:]]>
+			</Text>
+		</Item>	
+		<Item Name="OverrideDesc" Property="string">
+			<Text>
+				<![CDATA[Não salve o arquivo no Disco (%1:) aonde você os perdeu, isso fará com que o arquivo seja sobregravado.]]>
+			</Text>
+		</Item>
+		<Item Name="NewFolderDesc" Property="string">
+			<Text>
+				<![CDATA[Nova Pasta]]>
+			</Text>
+		</Item>
+		<Item Name="t_strNewName" Property="string">
+			<Text>
+				<![CDATA[NovaPasta]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle5" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>%1</font> <font color=#26324B>em %2 arquivos selecionados e não há espaço suficiente no disco selecionado, Por favor selecione outro disco.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="strWaring" Property="string">
+			<Text>
+				<![CDATA[Salvar os dados na partição principal irá reduzir as hipóteses de recuperar com sucesso. Deseja salvar mesmo assim?]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Meu Computador]]>
+			</Text>
+		</Item>
+		<Item Name="strRecycleSave" Property="string">
+			<Text>
+				<![CDATA[É recomendável salvar os arquivos recuperados no disco externo para evitar a substituição dos arquivos, pois a recuperação pode falhar.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc1" Property="string">
+			<Text>
+				<![CDATA[Sugerimos que você salve os arquivos em uma unidade externa,<br><br>pois salvar os arquivos na mesma unidade em que você os perdeu, reduzirá a chance da recuperação ser bem-sucedida.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc2" Property="string">
+			<Text>
+				<![CDATA[Sugerimos que você salve os arquivos em outra unidade,<br><br>pois salvar os arquivos na mesma unidade em que você os perdeu, reduzirá a chance da recuperação ser bem-sucedida.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnRecovery" Property="button">
+			<Text>
+				<![CDATA[Recuperar]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoverSuccessDialog">
+		<Item Name="OpenFile" Property="string">
+			<Text>
+				<![CDATA[Abrir Pasta]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText" Property="label">
+			<Text>
+				<![CDATA[Parabéns! Compartilhe sua experiência de recuperação agora!]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText1" Property="label">
+			<Text>
+				<![CDATA[Fácil de usar]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText2" Property="label">
+			<Text>
+				<![CDATA[Recuperação bem-sucedida]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectAdvanceVideoDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Selecione os Formatos de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="labelCheckBoxDesc" Property="label">
+			<Text>
+				<![CDATA[Selecionar Todos <font color=#8C9295>(Observação: Quanto mais formatos forem selecionados, mais tempo de varredura)</font>]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Iniciar ]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">//SelectAdvanceVideoDialogHint1
+			<Text>
+				<![CDATA[* Selecione o formato para verificar!]]>
+			</Text>
+		</Item>
+		<Item Name="labelMoreText" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Mais formatos necessários?</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MessagePushDialog">		
+		<Item Name="labelNoMessage" Property="string">
+			<Text>
+				<![CDATA[Nenhuma mensagem]]>
+			</Text>
+		</Item>
+		<Item Name="strSimilarLoading" Property="string">
+			<Text>
+				<![CDATA[Carregando]]>
+			</Text>
+		</Item>	
+		<Item Name="MessageCenter" Property="string">
+			<Text>
+				<![CDATA[Centro de Mensagens]]>
+			</Text>
+		</Item>
+		<Item Name="labelText" Property="string">
+			<Text>
+				<![CDATA[Recoverit Chatbot]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="HintDialog">		
+		<Item Name="lblMid3" Property="label">
+			<Text>
+				<![CDATA[Comprar o Recoverit para recuperar arquivos O MAIS RÁPIDO POSSÍVEL]]>
+			</Text>
+		</Item>
+		<Item Name="labelTrail" Property="label">
+			<Text>
+				<![CDATA[Essencial]]>
+			</Text>
+		</Item>	
+		<Item Name="labelTraiIText1" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Dados]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnBuy1" Property="button">
+			<Text>
+				<![CDATA[Comprar]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasic" Property="label">
+			<Text>
+				<![CDATA[Padrão]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText1" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Dados]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText2" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Computadores com Sistemas Danificado]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy2" Property="button">
+			<Text>
+				<![CDATA[Comprar]]>
+			</Text>
+		</Item>	
+
+		<Item Name="labelPro" Property="label">
+			<Text>
+				<![CDATA[Premium]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText1" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Dados]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText2" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Computadores com Sistemas Danificados]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText3" Property="label">
+			<Text>
+				<![CDATA[Reparo de Vídeo Corrompido]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText4" Property="label">
+			<Text>
+				<![CDATA[Recuperação Avançada de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy3" Property="button">
+			<Text>
+				<![CDATA[Comprar]]>
+			</Text>
+		</Item>		
+		<Item Name="labelHint" Property="label">
+			<Text>
+				<![CDATA[Já comprou?]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="UpdateAuthorDialog">		
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Atualize para o Plano Premium para Usar este Recurso]]>
+			</Text>
+		</Item>
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Recoverit Avançado]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recuperação de Dados]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Recuperar Arquivos do Computador Danificado]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Reparar Vídeos Corrompidos]]>
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[Recuperação Avançada de Vídeo]]>
+			</Text>
+		</Item>
+		<Item Name="UpgradeNowDesc" Property="string">
+			<Text>
+				<![CDATA[Atualizar Agora]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProgressDialog">		
+		<Item Name="labelUBackitDesc1" Property="label">
+			<Text>
+				<![CDATA[Faça backup de seus dados e recordações preciosas, nunca mais as perca de novo.]]>
+			</Text>
+		</Item>
+		<Item Name="labelUBackitDesc2" Property="label">
+			<Text>
+				<![CDATA[Automático, simples, inteligente]]>
+			</Text>
+		</Item>	
+		<Item Name="labelUBackitDesc3" Property="label">
+			<Text>
+				<![CDATA[Backup incremental]]>
+			</Text>
+		</Item>
+		<Item Name="buttonUBackit" Property="button">
+			<Text>
+				<![CDATA[Iniciar um Período de Experiência de 1 Mês]]>
+			</Text>
+		</Item>
+		<Item Name="BackupDataDesc" Property="string">
+			<Text>
+				<![CDATA[Fazer backup]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CorruptVideoFrame">	
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Você pode recuperar para o computador e reparar os vídeos corrompidos.]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recuperar vídeo corrompido para o computador.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Clique em [Reparo de Vídeo Corrompido].]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Adicione vídeo corrompido para iniciar o reparo.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDREDialog">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Erro de software.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Selecione os arquivos e recupere-os e volte à página inicial para tentar novamente.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="OnlineWidget">
+		<Item Name="labelNetWorkText1" Property="label">
+			<Text>
+				<![CDATA[Oops, erro na internet.]]>
+			</Text>
+		</Item>
+		<Item Name="labelNetWorkText2" Property="label">
+			<Text>
+				<![CDATA[Verifique sua internet e tente novamente.]]>
+			</Text>
+		</Item>
+		<Item Name="buttonRefresh" Property="button">
+			<Text>
+				<![CDATA[Atualizar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoSuffixDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Se você deseja recuperar outros formatos de vídeo, pode enviar feedbacks para nós.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Enviar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FilterTipsFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Dicas para filtro:]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Use o filtro para localizar rapidamente os arquivos desejados]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue1" Property="label">
+			<Text>
+				<![CDATA[Foto, vídeo, áudio…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue2" Property="label">
+			<Text>
+				<![CDATA[Dia, semana, mês, ano…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue3" Property="label">
+			<Text>
+				<![CDATA[1 MB, 1 a 100 MB, 100 MB a 1 GB…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue4" Property="label">
+			<Text>
+				<![CDATA[Arquivos existentes, arquivos excluídos]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="NewFilterModel">
+		<Item Name="FileStatusDesc" Property="string">
+			<Text>
+				<![CDATA[Status do arquivo]]>
+			</Text>
+		</Item>
+		 <Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[Excluído]]>
+			</Text>
+		</Item>
+	    <Item Name="ExistsFiles" Property="string">
+			<Text>
+				<![CDATA[Existente]]>
+			</Text>
+		</Item>
+		<Item Name="WhatTypeText" Property="string">
+			<Text>
+				<![CDATA[Tipo]]>
+			</Text>
+		</Item>
+		<Item Name="AlltypesText" Property="string">
+			<Text>
+				<![CDATA[Todos os tipos]]>
+			</Text>
+		</Item>		
+		<Item Name="tagText" Property="string">
+			<Text>
+				<![CDATA[Etiquetas]]>
+			</Text>
+		</Item>
+		<Item Name="alltagText" Property="string">
+			<Text>
+				<![CDATA[Todas as etiquetas]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Tem certeza de que deseja sair do software?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Dicas: se você sair agora, não será possível recuperar dados importantes. É recomendável permanecer aqui para concluir a recuperação primeiro. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseFeedbackDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Lamentamos não atender às suas necessidades ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Você pode compartilhar conosco o motivo de cancelar o Recoverit?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemText1" Property="string">
+			<Text>
+				<![CDATA[Ele não inclui o recurso de que preciso]]>
+			</Text>
+		</Item>
+		<Item Name="itemText2" Property="string">
+			<Text>
+				<![CDATA[Não encontrei a unidade onde os dados foram perdidos]]>
+			</Text>
+		</Item>
+		<Item Name="itemText3" Property="string">
+			<Text>
+				<![CDATA[Não gosto do design da interface do software]]>
+			</Text>
+		</Item>
+		<Item Name="itemText4" Property="string">
+			<Text>
+				<![CDATA[Eu não soube usar este software]]>
+			</Text>
+		</Item>
+		<Item Name="itemText5" Property="string">
+			<Text>
+				<![CDATA[Outros (você pode compartilhar conosco)]]>
+			</Text>
+		</Item>
+		<Item Name="lblText3" Property="label">
+			<Text>
+				<![CDATA[Agradecemos seu feedback.]]>
+			</Text>
+		</Item>
+		<Item Name="btnSubmit" Property="button">
+			<Text>
+				<![CDATA[Enviar]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1064">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[Restauração de vídeo/foto]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Recuperação aprimorada]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[Recupere vídeos/fotos perdidos de qualquer dispositivo]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[Canon, Sony, DJI, GoPro, Seagate, cartão SD etc. Todos.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[Selecione uma unidade para recuperar seus vídeos e fotos perdidos:]]>
+			</Text>
+		</Item>	
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[O que é a Recuperação aprimorada?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[1. Recupere vídeos perdidos ou muito ocultos.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[2. Dois modos de recuperação para obter vídeos e fotos: modo rápido e modo aprofundado.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[Selecione formatos de vídeo para fazer uma varredura aprofundada]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[Somente 11 formatos específicos podem ser recuperados pelo Deep Mode. Você pode selecionar os formatos necessários.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Duração da recuperação: Quanto maior o número de diferentes formatos selecionados, mais tempo será preciso.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[Selecione pelo menos um formato para fazer uma varredura aprofundada.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Fazer a varredura de um vídeo é demorado. Seja paciente.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Modo de recuperação:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[Você pode visualizar os arquivos de vídeo e foto exibidos]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Quick]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Deep]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[Tempo dispendido:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[O Quick Scan foi concluído.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[A maioria dos vídeos e fotos pode ser digitalizada. <b>Você pode visualizá-los e recuperá-los</b>.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[Dicas：O Deep Scan está tentando encontrar mais arquivos para você. Vai levar algum tempo, por favor, seja paciente.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[O que é o Deep Scan?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Se o Quick Scan não encontrar os arquivos, o Deep Scan encontrará mais arquivos para você. ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Experimente a Recuperação aprimorada]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[Se você precisar recuperar arquivos do cartão SD da câmera, recomendamos usar a Recuperação aprimorada para recuperar vídeos e fotos.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[Continuar a varredura]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Experimentar]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[Recomendamos que você use o recurso Recuperação avançada.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[Para voltar para a página inicial, clique em [Recuperação aprimorada].]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[Selecione o disco de destino e inicie a [Recuperação aprimorada].]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1066">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[NAS e Linux ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Recupere facilmente dados dos sistemas NAS/Linux]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[Três etapas para recuperar seus arquivos]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[Escolha o servidor NAS/sistema Linux ---- Conecte-se ao servidor ---- selecione Recuperar]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[Não é necessário interromper o servidor]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[Recuperação em tempo real sem interromper o serviço NAS]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[Compatível com o <font color=#00B0F5>servidor NAS</font> e com a recuperação do <font color=#00B0F5>sistema Linux</font>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[Selecione o servidor ou sistema, insira o endereço IP e outras informações e recupere os dados com facilidade ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[Recuperação do NAS]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Recuperação do Linux]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[Procurando um servidor NAS na rede local]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Se após um longo período o dispositivo NAS não for encontrado, clique em "Conectar manualmente", insira o endereço IP e outras informações e conecte-se ao dispositivo que deseja restaurar para recuperar os arquivos.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Cancelar pesquisa]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[Conectar manualmente]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Falha ao procurar por um servidor NAS]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Nenhum servidor NAS encontrado na rede local. Tente <font color=#00B0F5>Conectar manualmente</font> para conectar o servidor.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[Selecione um servidor NAS para iniciar a recuperação]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[Servidores NAS ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[Fabricante:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Não consegue se conectar ao servidor NAS?</font></a>]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[Soluções para falhas de conexão NAS]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Se houver falhas de conexão, talvez o SSH não esteja ativado ou não tenha uma conta com permissões de superusuário (root).]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Como habilitar o SSH?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[1) Selecione "Painel de controle" e, em seguida, clique em "Terminal e SNMP"]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[2) Pesquise a frase "Como habilitar o SSH?" no Google ou entre em contato diretamente com o fabricante do dispositivo NAS.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Se o problema persistir, <a href="#"><font color=#00B0F5>clique aqui</font></a> para entrar em contato conosco.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Saiba mais</font></a>]]>
+			</Text>
+		</Item>				
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[Computador do administrador]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[Servidor de destino:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue30" Property="string">
+			<Text>
+				<![CDATA[Preencha as informações para se conectar remotamente ao servidor NAS e iniciar a recuperação]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue31" Property="string">
+			<Text>
+				<![CDATA[Endereço IP/nome do domínio do servidor de destino]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue32" Property="string">
+			<Text>
+				<![CDATA[Insira o endereço IP]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue33" Property="string">
+			<Text>
+				<![CDATA[Porta:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue34" Property="string">
+			<Text>
+				<![CDATA[Porta do servidor de destino]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue35" Property="string">
+			<Text>
+				<![CDATA[Insira o número da porta]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue36" Property="string">
+			<Text>
+				<![CDATA[A porta padrão é 22, mas você pode verificar "Terminal e SNMP" para confirmar.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue37" Property="string">
+			<Text>
+				<![CDATA[Conta de usuário:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue38" Property="string">
+			<Text>
+				<![CDATA[Conta do servidor de destino]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue39" Property="string">
+			<Text>
+				<![CDATA[Insira a conta de usuário]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue40" Property="string">
+			<Text>
+				<![CDATA[Senha:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue41" Property="string">
+			<Text>
+				<![CDATA[Senha do servidor de destino]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue42" Property="string">
+			<Text>
+				<![CDATA[Insira a senha]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue43" Property="string">
+			<Text>
+				<![CDATA[Conectar]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue44" Property="string">
+			<Text>
+				<![CDATA[Esta conta tem restrições de acesso. Tente outra conta com permissões de root.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue45" Property="string">
+			<Text>
+				<![CDATA[Aviso: as informações estão incorretas. Verifique e preencha o IP, a porta, o usuário e a senha corretos.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue46" Property="string">
+			<Text>
+				<![CDATA[1. Verifique o serviço SSH]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue47" Property="string">
+			<Text>
+				<![CDATA[Selecione "Painel de controle", clique em "Terminal e SNMP" e verifique o serviço SSH e a porta. Geralmente, a porta é 22.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue48" Property="string">
+			<Text>
+				<![CDATA[2. Verifique se as informações estão corretas]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue49" Property="string">
+			<Text>
+				<![CDATA[1) Insira o endereço IP correto ou use o nome de domínio para se conectar.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue50" Property="string">
+			<Text>
+				<![CDATA[2) Certifique-se de que sua conta de usuário tenha permissões de root.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue51" Property="string">
+			<Text>
+				<![CDATA[3) Recomendamos que você selecione a exibição de texto simples ao inserir a senha.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue52" Property="string">
+			<Text>
+				<![CDATA[4) Verifique novamente o serviço SSH e a porta.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue53" Property="string">
+			<Text>
+				<![CDATA[Preencha as informações para se conectar remotamente ao sistema Linux e iniciar a recuperação]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue54" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Não consegue se conectar ao sistema Linux?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue55" Property="string">
+			<Text>
+				<![CDATA[Soluções para falhas de conexão com o Linux]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue56" Property="string">
+			<Text>
+				<![CDATA[Recuperação de NAS e Linux]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue57" Property="string">
+			<Text>
+				<![CDATA[Agradecemos sua classificação. Poderia compartilhar a experiência de recuperação em nosso site de classificação? Sua satisfação é o que motiva nossos esforços.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue58" Property="string">
+			<Text>
+				<![CDATA[Avançar]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue59" Property="string">
+			<Text>
+				<![CDATA[Conectando ao servidor de destino, por favor aguarde.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue60" Property="string">
+			<Text>
+				<![CDATA[Servidor (%1) desconectado. Verifique o ambiente de rede e reconecte.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[Tente novamente]]>
+			</Text>
+		</Item>
+		<Item Name="itemValueHome" Property="string">
+			<Text>
+				<![CDATA[Início]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="DetentionHintDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Os dados perdidos devem ser recuperados o mais rápido possível. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Aviso: quanto maior o tempo decorrido, menor a probabilidade dos arquivos serem recuperados. É recomendável recuperar os dados encontrados imediatamente.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Entendi!]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="MessageDisplayWidget">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Faça back-up das informações e memórias que ama e nunca mais as perca]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Automático, simples, inteligente]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Back-up adicional]]>
+			</Text>
+		</Item>
+		<Item Name="buttonMore" Property="button">
+			<Text>
+				<![CDATA[Inicie a avaliação de um mês]]>
+			</Text>
+		</Item>		
+	</Form>
+</Language>
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

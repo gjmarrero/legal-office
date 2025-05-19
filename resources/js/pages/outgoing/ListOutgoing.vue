@@ -26,7 +26,11 @@ const searchQuery = ref(null);
 
 const searchbyQuery = ref('all');
 
-const document_path = ref('/storage/uploads/outgoing/');
+// const document_path = ref('http://192.168.6.221:8000/storage/uploads/outgoing/');
+// const document_path = ref(`${import.meta.env.VITE_APP_URL}/storage/uploads/outgoing/`)
+
+const main_document_path = '/storage/uploads/outgoing/';
+const additional_path = '/storage/uploads/outgoing_documents/';
 
 const document_source = ref(null);
 
@@ -36,8 +40,9 @@ const handleValue = (value) => {
     show.value = value;
 };
 
-const getFile = (document_attachment) => {
-    document_source.value = document_path.value + document_attachment;
+const getFile = (document_path,document_attachment) => {
+    
+    document_source.value = document_path+document_attachment;
     show.value = true;
 }
 
@@ -51,6 +56,35 @@ const getDocuments = (page = 1) => {
         .then((response) => {
             documents.value = response.data;
         });
+}
+
+
+const file_form = reactive({
+    file: null,
+});
+
+const docIdAttach = ref(null)
+
+const attachFile = (document_id) => {
+    docIdAttach.value = document_id;
+    $('#attachFileModal').modal('show');
+}
+
+const getFileAttachment = (event) => {
+    console.log('file attached')
+    file_form.file = event.target.files[0];
+}
+
+const createAttachFile = () => {
+    const formData = new FormData();
+    formData.append('document_id', docIdAttach.value);
+    formData.append('document_file', file_form.file);
+
+    axios.post(`/api/outgoing/attach_file`, formData)
+        .then((response) => {
+            $('#attachFileModal').modal('hide');
+            getDocuments()
+        })    
 }
 
 // const deleteDocument = (id) => {
@@ -180,6 +214,7 @@ onMounted(() => {
                                         <th scope="col">#</th>
                                         <th scope="col">Date Dispatched</th>
                                         <th scope="col">Recipient</th>
+                                        <th scope="col">Recipient Office</th>
                                         <th scope="col">Subject</th>
                                         <th scope="col">Content</th>
                                         <th class="col-lg-3" scope="col">Attachment</th>
@@ -191,11 +226,16 @@ onMounted(() => {
                                         <td>{{ index + 1 }}</td>
                                         <td>{{ document.date_dispatched }}</td>
                                         <td>{{ document.recipient }}</td>
+                                        <td>{{ document.recipient_office }}</td>
                                         <td>{{ document.subject }}</td>
                                         <td>{{ document.content }}</td>
                                         <td class="col-lg-3">
-                                            <a href="#" @click.prevent="getFile(document.attachment)">
-                                                {{ document.attachment }}
+                                            <a href="#" @click.prevent="getFile(main_document_path,document.attachment)">
+                                                <p>{{ document.attachment }}</p>
+                                            </a>
+
+                                            <a v-for="(attachment, index) in document.additional_attachments" href="#" @click.prevent="getFile(additional_path,attachment.document_file)">
+                                                <p>{{ attachment.document_file }}</p>
                                             </a>
                                         </td>
                                         <td>
@@ -205,6 +245,11 @@ onMounted(() => {
                                             <router-link :to="`/admin/outgoing/${document.id}/edit`">
                                                 <i class="fa fa-edit mr-2"></i>
                                             </router-link>
+
+                                            <a v-if="(route.name != 'admin.documents')" href="#"
+                                                @click.prevent="attachFile(document.id)">
+                                                <font-awesome-icon icon="fa-solid fa-paperclip" class="mr-2" />
+                                            </a>
                                         </td>
                                         <!-- <td>
                                             <router-link :to="`/admin/documents/transactions/${document.id}`">
@@ -264,5 +309,34 @@ onMounted(() => {
         </div>
       </div>
     </div> -->
+
+    <div class="modal fade" id="attachFileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <span>Attach File</span>
+
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <Form @submit="createAttachFile()">
+                            <div class="form-group">
+                                <input type="file" class="form-control-file" id="document_file" name="document_file"
+                                    @change="getFileAttachment" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </Form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 </template>

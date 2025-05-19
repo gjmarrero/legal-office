@@ -33,7 +33,7 @@ class Transaction extends Model
     }
 
     public function document(): BelongsTo{
-        return $this->belongsTo(Document::class);
+        return $this->belongsTo(related: Document::class);
     }
 
     public function formattedDateAssigned(): Attribute{

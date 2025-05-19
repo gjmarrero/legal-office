@@ -1,0 +1,3071 @@
+<Language language="English(English)">
+	<Default>
+		<Font From="Lohit Telugu " To="Arial" FailTo="Tahoma" />
+	</Default>  
+	<Strings>
+		<!--有更新的项-->		
+		<Item Name="noNameDisplayText">
+			<Text>
+				<![CDATA[పేరు లేదు]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDescs">
+			<Text>
+				<![CDATA[క్రింది విధంగా 3 ఫైల్‌ల పునరుద్ధరణ విఫలమైంది.]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDesc">
+			<Text>
+				<![CDATA[క్రింది విధంగా 1 ఫైల్‌ పునరుద్ధరణ విఫలమైంది.]]>
+			</Text>
+		</Item>			
+		<Item Name="SaveFailFileName">
+			<Text>
+				<![CDATA[ఫైల్ పేరు]]>
+			</Text>
+		</Item>		
+		<Item Name="LoadingfilesDesc">
+			<Text>
+				<![CDATA[ఫైల్‌లు లోడ్ అవుతున్నాయి... దయచేసి ఓపికతో వేచి ఉండండి.]]>
+			</Text>
+		</Item>		
+		<Item Name="FilesFoundDesc">
+			<Text>
+				<![CDATA[కనుగొనబడిన ఫైల్‌లు:]]>
+			</Text>
+		</Item>
+		<Item Name="ReadingSectorsDesc">
+			<Text>
+				<![CDATA[రీడింగ్ సెక్టార్‌లు:]]>
+			</Text>
+		</Item>	
+		<Item Name="StopScanningDesc">
+			<Text>
+				<![CDATA[మీరు స్కానింగ్ ప్రక్రియ పూర్తి కాకముందే దాన్ని ఆపివేయాలనుకుంటున్నారా?<br><br><br>హెచ్చరిక: స్కాన్‌కు అంతరాయం కలిగిస్తే, పునరుద్ధరణ విషయంలో అసంపూర్ణ ఫలితాలు అందించబడతాయి.]]>
+			</Text>
+		</Item>
+		<Item Name="HomeStopScanningDesc">
+			<Text>
+				<![CDATA[మీరు ప్రస్తుత స్కాన్ ఫలితాలను వదిలివేసి, హోమ్‌పేజీకి వెనక్కి వెళ్లాలనుకుంటున్నారా?<br><br><br>హెచ్చరిక: మీరు ఇప్పుడు నిష్క్రమించినట్లయితే, ప్రస్తుత స్కాన్ ఫలితాలను కోల్పోవడం జరగవచ్చు. తక్షణమే ఫైల్‌లను పునరుద్ధరించమని సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningDesc">
+			<Text>
+				<![CDATA[మీరు ప్రస్తుత స్కాన్ ఫలితాలను వదిలివేసి, ప్రోగ్రామ్‌ను మూసివేయాలనుకుంటున్నారా?<br><br><br>హెచ్చరిక: మీరు ఇప్పుడు నిష్క్రమించినట్లయితే, ప్రస్తుత స్కాన్ ఫలితాలను కోల్పోవడం జరగవచ్చు. తక్షణమే ఫైల్‌లను పునరుద్ధరించమని సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningNoRecoverDesc">
+			<Text>
+				<![CDATA[మీరు ప్రస్తుత స్కాన్ ఫలితాలను వదిలివేసి, ప్రోగ్రామ్‌ను మూసివేయాలనుకుంటున్నారా?<br><br><br>హెచ్చరిక: మీరు ఇప్పుడు నిష్క్రమించినట్లయితే, ప్రస్తుత స్కాన్ ఫలితాలను కోల్పోవడం జరగవచ్చు. తక్షణమే ఫైల్‌లను పునరుద్ధరించమని సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="ListViewDesc">
+			<Text>
+				<![CDATA[జాబితా వీక్షణ]]>
+			</Text>
+		</Item>
+		<Item Name="DetailViewDesc">
+			<Text>
+				<![CDATA[వివరం వీక్షణ]]>
+			</Text>
+		</Item>
+		<Item Name="IconViewDesc">
+			<Text>
+				<![CDATA[చిహ్నం వీక్షణ]]>
+			</Text>
+		</Item>		
+		<Item Name="ButtonBack">
+			<Text>
+				<![CDATA[వెనక్కి]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonOk">
+			<Text>
+				<![CDATA[సరే]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonCancel">
+			<Text>
+				<![CDATA[రద్దు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonRecover">
+			<Text>
+				<![CDATA[పునరుద్ధరించు]]>
+			</Text>
+		</Item>
+		<Item Name="ScanDesc">
+			<Text>
+				<![CDATA[స్కాన్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonAdvanceRecover">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="AllVideosDesc">
+			<Text>
+				<![CDATA[అన్ని వీడియోలు]]>
+			</Text>
+		</Item>
+		<Item Name="OtherVideosDesc">
+			<Text>
+				<![CDATA[ఇతర వీడియోలు]]>
+			</Text>
+		</Item>
+		<Item Name ="OtherPhotosDesc">
+			<Text>
+				<![CDATA[ఇతర ఫోటోలు]]>
+			</Text>
+		</Item>
+		<Item Name="CorruptedVideoDesc">
+			<Text>
+				<![CDATA[పాడైన వీడియో]]>
+			</Text>
+		</Item>		
+		<Item Name="VideoFormatDesc">
+			<Text>
+				<![CDATA[వీడియో ఫార్మాట్]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryFailDesc">
+			<Text>
+				<![CDATA[<a href="#"><font color=#FF644D>%1 ఫైల్‌లను పునరుద్ధరించడం విఫలమైంది</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryCancelDesc">
+			<Text>
+				<![CDATA[మరియు ఫైల్(ల) %1 పునరుద్ధరణను రద్దు చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="SelectAllDesc">
+			<Text>
+				<![CDATA[అన్నింటినీ ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="OnlineSupportDesc">
+			<Text>
+				<![CDATA[ఆన్‌లైన్ మద్దతు]]>
+			</Text>
+		</Item>
+		<Item Name="MoreDesc">
+			<Text>
+				<![CDATA[మరిన్ని]]>
+			</Text>
+		</Item>
+		<Item Name="checkboxScanningDesc">
+			<Text>
+				<![CDATA[ఫైల్‌లు స్కాన్ అవుతున్న సమయంలో తనిఖీ చేయబడవు. ఫైల్‌లను పునరుద్ధరించడానికి దయచేసి స్కాన్ చేయడాన్ని పాజ్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="lostPartitionTooltipDesc">
+			<Text>
+				<![CDATA[విభజనలో డ్రైవ్ లెటర్ లేదు మరియు అది Windows Explorerలో యాక్సెస్ చేయబడదు.]]>
+			</Text>
+		</Item>
+		<Item Name ="NoReminderAgain">
+			<Text>
+				<![CDATA[మళ్లీ గుర్తు చేయబడదు]]>
+			</Text>
+		</Item>
+		<Item Name ="lockedDesc">
+			<Text>
+				<![CDATA[లాక్ చేయబడింది]]>
+			</Text>
+		</Item>
+		<Item Name ="lostFileNameDesc">
+			<Text>
+				<![CDATA[పోగొట్టుకున్న ఫైల్ పేరు]]>
+			</Text>
+		</Item>
+	</Strings>
+	<Form Name="OldFrame">
+		<Item Name="OutofMemoryDesc">
+			<Text>
+				<![CDATA[కంప్యూటర్‌లో మెమరీ లేదు, స్కాన్ ప్రాసెస్ పాజ్ చేయబడుతుంది మరియు మీరు స్కాన్ అవుట్ ఫైల్‌లను పునరుద్ధరించవచ్చు.<br><br><br>RAM సమాచారం: %1, Recoveritను ఉపయోగిస్తున్న సమయంలో దయచేసి ఇతర అధిక మెమరీ వినియోగ ప్రోగ్రామ్‌ను ఆపివేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="string">
+			<Text>
+				<![CDATA[పునరుద్ధరించడాన్ని ప్రారంభించడానికి లొకేషన్‌ని ఎంచుకోండి]]>
+			</Text>
+		</Item>	
+		<Item Name="FullDiskDesc_1" Property="string">
+			<Text>
+				<![CDATA[%1 ఫైల్‌లను ఉచితంగా పునరుద్ధరణ చేయండి, <Font color="#FF641D">%2 ఇప్పుడు అందుబాటులో ఉంది.</Font>]]>
+			</Text>
+		</Item>
+		<Item Name="m_free" Property="string">
+			<Text>
+				<![CDATA[ఉచితం]]>
+			</Text>
+		</Item>
+		<Item Name="m_stillrecover" Property="string">
+			<Text>
+				<![CDATA[మీరు ఇప్పటికీ ఉచిత వెర్షన్ కోసం %1 ఫైల్‌లను పునరుద్ధరించవచ్చు, ]]>
+			</Text>
+		</Item>
+		<Item Name="m_recoverSelected" Property="string">
+			<Text>
+				<![CDATA[%1 ఫైల్‌లు ఎంచుకోబడ్డాయి.]]>
+			</Text>
+		</Item>
+		<Item Name="lblFreeDesc" Property="string">
+			<Text>
+				<![CDATA[అధునాతన వెర్షన్ ప్రయోజనాలను ఆనందించడానికి లైసెన్స్‌ని కొనుగోలు చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="lblFreeWarning" Property="string">
+			<Text>
+				<![CDATA[ఎంచుకోబడిన ఫైల్ పరిమాణం అందుబాటులో ఉన్న పరిమాణం కంటే పెద్దదిగా ఉంది. ]]>
+			</Text>
+		</Item>
+
+		<Item Name="availableDesc" Property="string">
+			<Text>
+				<![CDATA[అందుబాటులో ఉంది]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewUnkownFileDesc1" Property="string">
+			<Text>
+				<![CDATA[మీరు ఫైల్‌ను కంప్యూటర్‌కు పునరుద్ధరించిన తర్వాత దాన్ని చూడవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewFileMaxDesc" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>1GB కంటే ఎక్కువ పరిమాణం</Font> ఉన్న ఫైల్‌లు ప్రివ్యూ కోసం అందుబాటులో ఉండవు.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanningPause" Property="string">
+			<Text>
+				<![CDATA[స్కాన్ చేయడం పాజ్ చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="AdvancedVideoScanHint" Property="string">
+			<Text>
+				<![CDATA[మేము వీడియో ఫైల్‌ల డీప్ స్కాన్‌ను చేయాల్సి ఉంది మరియు దానికి కొంత సమయం పడుతుంది. మీ వీడియోలను తిరిగి పొందడానికి దయచేసి కొంతసేపు వేచి ఉండండి.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc1" Property="string">
+			<Text>
+				<![CDATA[ఈ డిస్క్‌లో స్కాన్ చేయడం కొనసాగించలేని చాలా బ్యాడ్ సెక్టార్‌లు ఉన్నాయి. మీరు వీలైనంత త్వరగా <b>ప్రస్తుతం స్కాన్ చేయబడిన ఫైల్‌లను పునరుద్ధరించమని</b> సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="m_RenameText" Property="string">
+			<Text>
+				<![CDATA[కొత్త పేరు ఇప్పటికే ఉనికిలో ఉంది లేదా కొత్త పేరు తెరిచి ఉన్న ఫైల్‌ను సూచిస్తోంది.]]>
+			</Text>
+		</Item>
+		<Item Name="strStopTitle" Property="string">
+			<Text>
+				<![CDATA[మీరు ఖచ్చితంగా ఫైల్‌లను పునరుద్ధరించడాన్ని ఆపివేయాలనుకుంటున్నారా?]]>
+			</Text>
+		</Item>
+		<Item Name="noDriver" Property="string">
+			<Text>
+				<![CDATA[పరికరం తీసివేయబడింది, దయచేసి తిరిగి కనెక్ట్ చేసి, ఆపై మళ్లీ ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverRemoveHint" Property="string">
+			<Text>
+				<![CDATA[%1 ఫైల్(ల) పునరుద్ధరణ విఫలమైంది, ఎందుకంటే %2 తీసివేయబడింది.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverFat32" Property="string">
+			<Text>
+				<![CDATA[FAT32 ఫైల్ సిస్టమ్ పరిమితుల కారణంగా 4GB కంటే పెద్దదైన ఒకే ఫైల్ పునరుద్ధరించబడదు, మీరు దాన్ని విభజనలోని ఇతర రకాలకు పునరుద్ధరించవచ్చు.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverSuccessDesc" Property="string">
+			<Text>
+				<![CDATA[<Font color="#00B0F5">%1</Font> ఫైల్‌లను పునరుద్ధరించడం పూర్తయింది!]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverFailDesc1" Property="string">
+			<Text>
+				<![CDATA[<b>%1 ఫైల్(లు)</b> విజయవంతంగా పునరుద్ధరించబడ్డాయి! క్రింది కారణం వల్ల కొన్ని ఫైల్‌లు పునరుద్ధరించబడలేదు:]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSaveDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[అందుబాటులో లేని సేవింగ్ పరికరం కారణంగా పునరుద్ధరణ విఫలమైంది. దయచేసి బాహ్య స్టోరేజీ మీడియాను తిరిగి ఇన్‌సర్ట్ చేసి, మీ డేటాను మళ్లీ పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSourceDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[అందుబాటులో లేని మూలాధార పరికరం కారణంగా పునరుద్ధరణ విఫలమైంది, దయచేసి బాహ్య స్టోరేజీ మీడియాను తిరిగి ఇన్‌సర్ట్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameRecoverHint" Property="string">
+			<Text>
+				<![CDATA[దయచేసి పునరుద్ధరించడానికి ఫైల్(లు) ఎంచుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="SourceDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[మూలాధార డిస్క్ డిస్‌కనెక్ట్ చేయబడింది! దయచేసి తిరిగి కనెక్ట్ చేసి, పునరుద్ధరించడం కొనసాగించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="DestDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[టార్గెట్ డిస్క్ డిస్‌కనెక్ట్ చేయబడింది!! దయచేసి తిరిగి కనెక్ట్ చేసి, పునరుద్ధరించడం కొనసాగించండి.]]>
+			</Text>
+		</Item>	
+		<Item Name="strRecoverFilesNum" Property="string">
+			<Text>
+				<![CDATA[ఫైల్‌లను పునరుద్ధరించడం: ]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblname" Property="string">
+			<Text>
+				<![CDATA[పేరు:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lalsize" Property="string">
+			<Text>
+				<![CDATA[పరిమాణం:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblpath" Property="string">
+			<Text>
+				<![CDATA[పాత్:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblecrete" Property="string">
+			<Text>
+				<![CDATA[సృష్టించిన తేదీ:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblmodefy" Property="string">
+			<Text>
+				<![CDATA[సవరించిన తేదీ:]]>
+			</Text>
+		</Item>
+		<Item Name="m_btperview" Property="string">
+			<Text>
+				<![CDATA[ప్రివ్యూ]]>
+			</Text>
+		</Item>
+		<Item Name="UnNormalSector" Property="string">
+			<Text>
+				<![CDATA[మేము ప్రస్తుతం మీ పరికరానికి మద్దతు అందించము. <b>కనెక్ట్ చేయబడిన పరికరం కెమెరా అయినట్లయితే, మీరు SD కార్డ్‌ను బయటికి తీసి, దాన్ని కార్డ్ రీడర్‌లోకి ఇన్‌సర్ట్ చేయడం ద్వారా దాన్ని స్కాన్ చేయవచ్చు</b>.]]>
+			</Text>
+		</Item>
+		<Item Name="AllRoundScanCompleteed" ControlType="11">
+			<Text>
+				<![CDATA[కోల్పోయిన ఫైల్‌లను కనుగొనడం సాధ్యం కాలేదా? డీప్ స్కాన్‌ను ప్రయత్నించండి ]]>
+			</Text>
+		</Item>
+
+		<Item Name="RawScanCompleteed" Property="string">
+			<Text>
+				<![CDATA[కోల్పోయిన మీ ఫైల్‌లను కనుగొనడం సాధ్యం కాలేదా? దయచేసి డీప్ స్కాన్ మోడ్‌ను ఎంచుకుని, మళ్లీ ప్రయత్నించండి. ]]>
+			</Text>
+		</Item>
+
+		<Item Name="UnVerifyTrustDesc1" Property="string">
+			<Text>
+				<![CDATA[మీరు పైరేట్ చేయబడిన సాఫ్ట్‌వేర్‌ను ఉపయోగించే ప్రమాదంలో ఉన్నారు, దయచేసి ఉపయోగించడం కొనసాగించడానికి చట్టబద్దమైన కాపీని కొనుగోలు చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc2" Property="string">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc3" Property="string">
+			<Text>
+				<![CDATA[డౌన్‌లోడ్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewLoadDesc" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ లోడ్ అవుతోంది...దయచేసి ఓపికతో వేచి ఉండండి.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc4" ControlType="11">
+			<Text>
+				<![CDATA[దయచేసి కొనుగోలు చేసిన తర్వాత Recoverit అధికారిక వెబ్‌సైట్ నుండి ప్రామాణికమైన సాఫ్ట్‌వేర్‌ను డౌన్‌లోడ్ చేసి, ఇన్‌స్టాల్ చేయండి. http://recoverit.wondershare.com]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs1" Property="string">
+			<Text>
+				<![CDATA[సమస్య ఇప్పటికీ అలాగే ఉందా? మాకు నివేదించడానికి <a href="#"><Font color="#00B0F5">ఇక్కడ క్లిక్ చేయండి</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs2" Property="string">
+			<Text>
+				<![CDATA[నమూనా వీడియోను మార్చడానికి ప్రయత్నించి, ఆపై దాన్ని మళ్లీ రిపేర్ చేయండి. సమస్య అలాగే ఉన్నట్లయితే, మాకు నివేదించడానికి <a href="#"><Font color="#00B0F5">ఇక్కడ క్లిక్ చేయండి</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs3" Property="string">
+			<Text>
+				<![CDATA[సృష్టించడం విఫలమైంది, మీ పరికరం సరిగ్గా కనెక్ట్ చేయబడిందని తనిఖీ చేయండి లేదా ఇప్పుడే మాకు <a href="#"><Font color="#00B0F5">నివేదించండి</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs4" Property="string">
+			<Text>
+				<![CDATA[మళ్లీ స్కాన్ చేయడం వలన సమస్య పరిష్కారం కాలేదా? మాకు నివేదించడానికి <a href="#"><Font color="#00B0F5">ఇక్కడ క్లిక్ చేయండి</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs5" Property="string">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్‌ను యాక్టివేట్ చేయడం కోసం ఇంటర్‌నెట్ కనెక్షన్ అవసరం. దయచేసి మీ నెట్‌వర్క్‌ను తనిఖీ చేయండి లేదా మీ IT అడ్మినిస్ట్రేటర్‌ను సంప్రదించండి, అంతే కాకుండా మీరు మాకు <a href="#"><Font color="#00B0F5">నివేదించవచ్చు.</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs6" Property="string">
+			<Text>
+				<![CDATA[మీకు Recoveritలో ఏ భాగం నచ్చలేదు? మాతో <a href="#"><Font color="#00B0F5">దాన్ని షేర్ చేయడం</Font></a> వలన మాకు సమయం బాగా ఆదా అవుతుంది!]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs7" Property="string">
+			<Text>
+				<![CDATA[ఇంటర్‌నెట్ కనెక్షన్ లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs8" Property="string">
+			<Text>
+				<![CDATA[అయ్యో... మేము ఇంటర్‌నెట్‌కు కనెక్ట్ చేయలేకున్నాము. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేసి, ఆపై తిరిగి ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeepHint" Property="string">
+			<Text>
+				<![CDATA[డీప్ స్కాన్ మోడ్ మరిన్ని ఫైల్‌లను కనుగొనగలదు. అయినప్పటికీ, దానికి ఎక్కువ సమయం పడుతుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 ఐటెమ్‌లు, %2]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameSelectFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%2లో %1 ఫైల్(లు) ఎంచుకోబడ్డాయి]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeep" Property="string">
+			<Text>
+				<![CDATA[కోల్పోయిన ఫైల్‌లను కనుగొనడం సాధ్యం కాలేదా? <a href="#"><font color=#00B0F5>డీప్ స్కాన్</font></a>ను ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="NoDataFrameDesc" Property="string">
+			<Text>
+				<![CDATA[<b>ఫైల్ ఏదీ కనుగొనబడలేదు</b><br><br>దయచేసి తనిఖీ చేయడానికి ఇతర ఫైల్‌ను ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="PauseBeforeRecover" Property="string">
+			<Text>
+				<![CDATA[ఫైల్‌లను పునరుద్ధరించడానికి ముందు దయచేసి స్కాన్‌ను పాజ్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture1" Property="string">
+			<Text>
+				<![CDATA[ప్రివ్యూ చేయడం సాధ్యం కాలేదు. క్రింది కారణం వల్ల ఫైల్ పాడై ఉండవచ్చు: ]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture2" Property="string">
+			<Text>
+				<![CDATA[1. డేటా ఓవర్‌రైట్ చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture3" Property="string">
+			<Text>
+				<![CDATA[2. డేటా అసంపూర్తిగా ఉంది. (దయచేసి స్కాన్ చేయడం పూర్తయ్యే వరకు వేచి ఉండి, మళ్లీ ప్రివ్యూ చేయండి.)]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantQuit1" Property="string">
+			<Text>
+				<![CDATA[ఖాతా ఆథరైజేషన్‌ కారణంగా సమస్య ఉంది.]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantRetry" Property="string">
+			<Text>
+				<![CDATA[మళ్లీ ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="m_BuyNowButton" Property="string">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="bootretry" Property="string">
+			<Text>
+				<![CDATA[తిరిగి ప్రయత్నించు]]>
+			</Text>
+		</Item>
+		<Item Name="bootformatnow" Property="string">
+			<Text>
+				<![CDATA[ఫార్మాట్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc3" Property="string">
+			<Text>
+				<![CDATA[పాత్ మార్చు]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_sureButton" Property="string">
+			<Text>
+				<![CDATA[అవును]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_NoButton" Property="string">
+			<Text>
+				<![CDATA[కాదు]]>
+			</Text>
+		</Item>	 
+		<Item Name="Stop1_m_sureButton" Property="string">
+			<Text>
+				<![CDATA[ఆపివేయి]]>
+			</Text>
+		</Item>
+		<Item Name="Stop1_m_cancelButton" Property="string">
+			<Text>
+				<![CDATA[రద్దు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="Stop2_m_ExitButton" Property="string">
+			<Text>
+				<![CDATA[నిష్క్రమించు]]>
+			</Text>
+		</Item>
+		<Item Name="Stop5_m_sureButton" Property="string">
+			<Text>
+				<![CDATA[ఓవర్‌రైట్ చేయి]]>
+			</Text>
+		</Item>
+
+		<Item Name="Stop6_m_sureButton" Property="string">
+			<Text>
+				<![CDATA[సేవ్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="PasswordDialogText" Property="string">
+			<Text>
+				<![CDATA[ఎంచుకోబడిన డిస్క్ పాస్‌వర్డ్ ద్వారా లాక్ చేయబడింది. పూర్తిగా స్కాన్ చేయడానికి దయచేసి పాస్‌వర్డ్‌ను నమోదు చేయండి.]]>
+			</Text>
+		</Item>  
+		<Item Name="IsAdmin" Property="string">
+			<Text>
+				<![CDATA[మీరు ఈ ప్రోగ్రామ్‌ను అమలు చేయడానికి అడ్మినిస్ట్రేటర్ అనుమతిని అందించాలి.]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strError" Property="string">
+			<Text>
+				<![CDATA[Wondershare Recoverit ఇప్పటికీ అమలు అవుతోంది!]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strWaring" Property="string">
+			<Text>
+				<![CDATA[యుద్ధం]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyNetWorkDesc" Property="string">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్‌ను యాక్టివేట్ చేయడం కోసం ఇంటర్‌నెట్ కనెక్షన్ అవసరం. దయచేసి మీ నెట్‌వర్క్‌ను తనిఖీ చేయండి లేదా మీ IT అడ్మినిస్ట్రేటర్‌ను సంప్రదించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="NewAntiPiracyDesc" Property="string">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్ ప్రామాణికమైనది కాదు. డేటాను పునరుద్ధరించడానికి ప్రామాణికమైన వెర్షన్‌ను డౌన్‌లోడ్ చేసి, దానికి అప్‌గ్రేడ్ చేసుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc1" Property="string">
+			<Text>
+				<![CDATA[మీరు పైరేట్ అయిన సాఫ్ట్‌వేర్‌ను ఉపయోగించే ప్రమాదం ఉంది!]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc2" Property="string">
+			<Text>
+				<![CDATA[హెచ్చరిక:]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc3" Property="string">
+			<Text>
+				<![CDATA[పైరేట్ చేయబడిన సాఫ్ట్‌వేర్‌ను ఉపయోగించడం ద్వారా మీ కంప్యూటర్‌కు వైరస్‌లు సోకవచ్చు, మీ డేటా మళ్లీ కోల్పోయేలా కూడా చేయవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc4" Property="string">
+			<Text>
+				<![CDATA[మీ కోసం పరిమిత కాలపు ఆఫర్ ఇక్కడ ఉంది]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc5" Property="string">
+			<Text>
+				<![CDATA[ప్రామాణికమైన లైసెన్స్‌ను కొనుగోలు చేయడానికి 60% తగ్గింపు.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc6" Property="string">
+			<Text>
+				<![CDATA[గమనిక: వీలైనంత త్వరగా స్కాన్ చేయబడిన ఫైల్‌లను పునరుద్ధరించమని మేము సూచిస్తున్నాము. లేకపోతే, డేటా ఓవర్‌రైట్ చేయబడవచ్చు మరియు పునరుద్ధరణ విఫలమవుతుంది.]]>
+			</Text>
+		</Item>	
+		<Item Name="PiracyDesc7" Property="string">
+			<Text>
+				<![CDATA[మీ అప్లికేషన్ పాడైనట్లు లేదా అసంపూర్తిగా ఉన్నట్లు కనిపిస్తోంది, దయచేసి అధికారిక వెర్షన్‌ను డౌన్‌లోడ్ చేసి, ఆపై తిరిగి ఇన్‌స్టాల్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc8" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>అధికారిక వెబ్‌సైట్</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="ScanFramePauseTooltip" Property="string">
+			<Text>
+				<![CDATA[పాజ్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameStopTooltip" Property="string">
+			<Text>
+				<![CDATA[ఆపివేయి]]>
+			</Text>
+		</Item>
+		<Item Name="MulItemSelected" Property="string">
+			<Text>
+				<![CDATA[%1 ఎంచుకోబడింది]]>
+			</Text>
+		</Item>	
+		<Item Name="m_strArchive" Property="string">
+			<Text>
+				<![CDATA[ఆర్కైవ్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="m_strAudio" Property="string">
+			<Text>
+				<![CDATA[ఆడియో]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDataBase" Property="string">
+			<Text>
+				<![CDATA[డేటాబేస్]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDocument" Property="string">
+			<Text>
+				<![CDATA[పత్రం]]>
+			</Text>
+		</Item>
+		<Item Name="m_strEmail" Property="string">
+			<Text>
+				<![CDATA[ఇమెయిల్]]>
+			</Text>
+		</Item>
+		<Item Name="m_strGraphic" Property="string">
+			<Text>
+				<![CDATA[ఫోటో]]>
+			</Text>
+		</Item>
+		<Item Name="m_strInternetWeb" Property="string">
+			<Text>
+				<![CDATA[వెబ్‌ఫైల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="m_strMiscellaneous" Property="string">
+			<Text>
+				<![CDATA[ఇతరములు]]>
+			</Text>
+		</Item>
+		<Item Name="m_strVideo" Property="string">
+			<Text>
+				<![CDATA[వీడియో]]>
+			</Text>
+		</Item>
+		<Item Name="m_strNoExtension" Property="string">
+			<Text>
+				<![CDATA[పొడిగింపు లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="m_strFileNamePath" Property="string">
+			<Text>
+				<![CDATA[ఫైల్‌ను శోధించు]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip1" Property="string">
+			<Text>
+				<![CDATA[ఫిల్టర్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip2" Property="string">
+			<Text>
+				<![CDATA[%1 ఫైల్‌(లు) ఫిల్టర్ షరతులకు సరిపోలాయి.]]>
+			</Text>
+		</Item>		
+		<Item Name="UpdateAuthorDesc0" Property="string">
+			<Text>
+				<![CDATA[అప్‌గ్రేడ్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="loginDesc" Property="string">
+			<Text>
+				<![CDATA[లాగిన్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleRemoveDesc" Property="string">
+			<Text>
+				<![CDATA[%1 తీసివేయబడింది, దయచేసి దాన్ని కంప్యూటర్‌కు ప్లగిన్ చేసి, ఆపై మళ్లీ ప్రయత్నించండి. ]]>
+			</Text>
+		</Item>
+		<Item Name="LostPartitionDesc" Property="string">
+			<Text>
+				<![CDATA[కోల్పోయిన విభజన]]>
+			</Text>
+		</Item>
+		<Item Name="LocalDiskDesc" Property="string">
+			<Text>
+				<![CDATA[స్థానిక డిస్క్]]>
+			</Text>
+		</Item>
+		<Item Name="RawFilesDesc" Property="string">
+			<Text>
+				<![CDATA[మూలాధారం లేని ఫైల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="FolderDesc" Property="string">
+			<Text>
+				<![CDATA[ఫోల్డర్]]>
+			</Text>
+		</Item>
+		<Item Name="lostlocationDesc" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ స్థానాన్ని కోల్పోయింది]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleBinDesc" Property="string">
+			<Text>
+				<![CDATA[రీసైకిల్ బిన్]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerDesc" Property="string">
+			<Text>
+				<![CDATA[%1 BitLocker ద్వారా రక్షించబడింది, దయచేసి స్కాన్ చేయడానికి దాన్ని అన్‌లాక్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="LostBitLockerDesc" Property="string">
+			<Text>
+				<![CDATA[%1 BitLocker ద్వారా రక్షించబడింది, దయచేసి స్కాన్ చేయడానికి దాన్ని అన్‌లాక్ చేయండి.]]>
+			</Text>
+		</Item>		
+		<Item Name="DiskRefreshDesc" Property="string">
+			<Text>
+				<![CDATA[డిస్క్ సమాచారం రీఫ్రెష్ చేయబడుతోంది]]>
+			</Text>
+		</Item>
+		<Item Name="ScanWaitFrameDesc3" Property="string">
+			<Text>
+				<![CDATA[స్కాన్ ఆపివేయబడి, వెనక్కి వెళ్లడానికి సిద్ధమవుతోంది, దయచేసి ఓపికతో వేచి ఉండండి...]]>
+			</Text>
+		</Item>
+		<Item Name="DesktopDesc" Property="string">
+			<Text>
+				<![CDATA[డెస్క్‌టాప్]]>
+			</Text>
+		</Item>
+		<Item Name="SelectFolderkDesc" Property="string">
+			<Text>
+				<![CDATA[ఫోల్డర్‌ను ఎంచుకోండి]]>
+			</Text>
+		</Item>		
+		<Item Name="Unknown" Property="string">
+			<Text>
+				<![CDATA[తెలియదు]]>
+			</Text>
+		</Item>
+		<Item Name="findHardDriver1" Property="string">
+			<Text>
+				<![CDATA[మేము ఇంకా మీ కెమెరా మోడల్‌కు మద్దతు అందించడం లేదు. <br><br><br>మీరు SD కార్డ్‌ను బయటికి తీసి, దాన్ని కార్డ్ రీడర్‌లోకి ఇన్‌సర్ట్ చేయడం ద్వారా దాన్ని స్కాన్ చేయవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2" Property="string">
+			<Text>
+				<![CDATA[మీ డిస్క్ పరిస్థితి బాగాలేదు. మీ ఫైల్‌లను వీలైనంత త్వరగా పునరుద్ధరించమని సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2_1" Property="string">
+			<Text>
+				<![CDATA[మీ డిస్క్‌లో సమస్యలు ఉన్నాయని గుర్తిస్తుంది.]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="CalendarFrame">	
+		<Item Name="Week1" Property="string">
+			<Text>
+				<![CDATA[సోమ]]>
+			</Text>
+		</Item>
+		<Item Name="Week2" Property="string">
+			<Text>
+				<![CDATA[మంగళ]]>
+			</Text>
+		</Item>
+		<Item Name="Week3" Property="string">
+			<Text>
+				<![CDATA[బుధ]]>
+			</Text>
+		</Item>
+		<Item Name="Week4" Property="string">
+			<Text>
+				<![CDATA[గురు]]>
+			</Text>
+		</Item>
+		<Item Name="Week5" Property="string">
+			<Text>
+				<![CDATA[శుక్ర]]>
+			</Text>
+		</Item>
+		<Item Name="Week6" Property="string">
+			<Text>
+				<![CDATA[శని]]>
+			</Text>
+		</Item>
+		<Item Name="Week7" Property="string">
+			<Text>
+				<![CDATA[ఆది]]>
+			</Text>
+		</Item>	  
+		<Item Name="Mon1" Property="string">
+			<Text>
+				<![CDATA[జనవరి]]>
+			</Text>
+		</Item>
+		<Item Name="Mon2" Property="string">
+			<Text>
+				<![CDATA[ఫిబ్రవరి]]>
+			</Text>
+		</Item>
+		<Item Name="Mon3" Property="string">
+			<Text>
+				<![CDATA[మార్చి]]>
+			</Text>
+		</Item>
+		<Item Name="Mon4" Property="string">
+			<Text>
+				<![CDATA[ఏప్రిల్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon5" Property="string">
+			<Text>
+				<![CDATA[మే]]>
+			</Text>
+		</Item>
+		<Item Name="Mon6" Property="string">
+			<Text>
+				<![CDATA[జూన్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon7" Property="string">
+			<Text>
+				<![CDATA[జులై]]>
+			</Text>
+		</Item>
+		<Item Name="Mon8" Property="string">
+			<Text>
+				<![CDATA[ఆగస్ట్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon9" Property="string">
+			<Text>
+				<![CDATA[సెప్టెంబర్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon10" Property="string">
+			<Text>
+				<![CDATA[అక్టోబర్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon11" Property="string">
+			<Text>
+				<![CDATA[నవంబర్]]>
+			</Text>
+		</Item>
+		<Item Name="Mon12" Property="string">
+			<Text>
+				<![CDATA[డిసెంబర్]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RowHeaderFrame">	
+		<Item Name="Head0" Property="string">
+			<Text>
+				<![CDATA[       పేరు]]>
+			</Text>
+		</Item>
+		<Item Name="Head1" Property="string">
+			<Text>
+				<![CDATA[పరిమాణం]]>
+			</Text>
+		</Item>
+		<Item Name="Head2" Property="string">
+			<Text>
+				<![CDATA[పాత్]]>
+			</Text>
+		</Item>
+		<Item Name="Head3" Property="string">
+			<Text>
+				<![CDATA[సృష్టించిన తేదీ]]>
+			</Text>
+		</Item>
+		<Item Name="Head4" Property="string">
+			<Text>
+				<![CDATA[సవరించిన తేదీ]]>
+			</Text>
+		</Item>
+		<Item Name="Head5" Property="string">
+			<Text>
+				<![CDATA[రకం]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MainMenu">		
+		<Item Name="m_StrStatus" Property="string">
+			<Text>
+				<![CDATA[అభిప్రాయం]]>
+			</Text>
+		</Item>	  
+		<Item Name="m_optionsAction" Property="string">
+			<Text>
+				<![CDATA[భాష]]>
+			</Text>
+		</Item>
+		<Item Name="m_helpAction" Property="string">
+			<Text>
+				<![CDATA[సహాయం]]>
+			</Text>
+		</Item>
+		<Item Name="m_purchaseAction" Property="string">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction" Property="string">
+			<Text>
+				<![CDATA[యాక్టివ్]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction1" Property="string">
+			<Text>
+				<![CDATA[ఖాతా]]>
+			</Text>
+		</Item>
+		<Item Name="m_suppotAction" Property="string">
+			<Text>
+				<![CDATA[వినియోగదారు గైడ్]]>
+			</Text>
+		</Item>
+		<Item Name="m_diskToolAction" Property="string">
+			<Text>
+				<![CDATA[డిస్క్ టూల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="m_logfilesAction" Property="string">
+			<Text>
+				<![CDATA[లాగ్ ఫైల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="m_updateAction" Property="string">
+			<Text>
+				<![CDATA[అప్‌డేట్‌ల కోసం తనిఖీ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="m_userGuideAction" Property="string">
+			<Text>
+				<![CDATA[వినియోగదారు గైడ్]]>
+			</Text>
+		</Item>
+		<Item Name="m_aboutAction" Property="string">
+			<Text>
+				<![CDATA[పరిచయం]]>
+			</Text>
+		</Item>
+		<Item Name="m_contactusAction" Property="string">
+			<Text>
+				<![CDATA[FAQ]]>
+			</Text>
+		</Item>	  
+	</Form>
+	<Form Name="cmenuOption">
+		<Item Name="Language" Property="string">
+			<Text>
+				<![CDATA[భాష]]>
+			</Text>
+		</Item>
+		<Item Name="languageCombox" Property="string">
+			<Text>
+				<![CDATA[English(English),Japanese(日本語),French(Français),German(Deutsch),Chinese Traditional(中国香港),Chinese Traditional(中国台湾),Portuguese(Portuguese),Italiano(Italiano),Spanish(Español),Netherland(Nederlands),Arab( العربية ),Korean(한국어),Sweden(Swédia),Indonesia(Indonesia),Russian(русский),Hindi(हिन्दी)]]>
+			</Text>
+		</Item>
+		<Item Name="okButton" Property="string">
+			<Text>
+				<![CDATA[సరే]]>
+			</Text>
+		</Item>
+		<Item Name="cancelButton" Property="string">
+			<Text>
+				<![CDATA[రద్దు చేయి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BitLockerPasswordDialog">
+		<Item Name="lblTextValue" Property="string">
+			<Text>
+				<![CDATA[మీరు ఎంచుకున్న డిస్క్ బిట్‌లాకర్‌తో ఎన్‌క్రిప్ట్ చేయబడింది, దయచేసి అన్‌లాక్ చేయడానికి మీ పాస్‌వర్డ్‌ని నమోదు చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="lineEditPlaceholderText" Property="string">
+			<Text>
+				<![CDATA[పాస్‌వర్డ్/పునరుద్ధరణ కీ]]>
+			</Text>
+		</Item>
+		<Item Name="lblHowTo" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>పాస్‌వర్డ్‌ను మర్చిపోయారా?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc1" Property="string">
+			<Text>
+				<![CDATA[ఈ PCలో పునరుద్ధరణ కీని శోధించడం ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelError" Property="label">
+			<Text>
+				<![CDATA[పాస్‌వర్డ్ సరైనది కాదు]]>
+			</Text>
+		</Item>		
+		<Item Name="BtnSearch" Property="button">
+			<Text>
+				<![CDATA[శోధించడం]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc2" Property="string">
+			<Text>
+				<![CDATA[శోధించడం...]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc3" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>కనుగొనబడలేదు</font>. <a href="#"><font color=#00B0F5>వేరే రికవరీ కీని కనుగొనడం ఎలా?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc4" Property="string">
+			<Text>
+				<![CDATA[విజయవంతంగా అన్‌లాక్ చేయబడింది. ]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc5" Property="string">
+			<Text>
+				<![CDATA[మేము దాన్ని కనుగొన్నాము, విజయవంతంగా అన్‌లాక్ చేయబడింది. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanNoDataFrame">
+		<Item Name="LastScanProgressSynced" Property="string">
+			<Text>
+				<![CDATA[చివరి స్కాన్ ప్రోగ్రెస్ సింక్ చేయబడింది]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc1" Property="label">
+			<Text>
+				<![CDATA[స్కాన్ చేయడం]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc2" Property="label">
+			<Text>
+				<![CDATA[దయచేసి స్కాన్ పూర్తయ్యే వరకు ప్రస్తుత ప్రాసెస్ నుండి నిష్క్రమించవద్దు.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="RepairFileDataFrame">
+		<Item Name="textDesc1" Property="string">
+			<Text>
+				<![CDATA[దెబ్బతిన్న ఫైల్‌ను ప్రివ్యూ చేయడం సాధ్యం కాదు, దాన్ని మరమ్మతు చేయడం ప్రయత్నించడానికి మేము “Repairit” భాగాన్ని ప్రారంభిస్తున్నాము ...]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc2" Property="string">
+			<Text>
+				<![CDATA[ఇప్పటికీ దెబ్బతిన్న ఫైల్‌ను రికవరీ చేయాలా?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc3" Property="string">
+			<Text>
+				<![CDATA[రిపేర్ పూర్తి కాలేదు, పునరుద్ధరణ తర్వాత ఫైల్ ఇప్పటికీ పాడైంది]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc4" Property="string">
+			<Text>
+				<![CDATA[ఇప్పటికీ పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc5" Property="string">
+			<Text>
+				<![CDATA[రద్దు చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc6" Property="string">
+			<Text>
+				<![CDATA[అద్భుతం, మేము మీ ఫైల్‌ను విజయవంతంగా రిపేర్ చేసాము！]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc7" Property="string">
+			<Text>
+				<![CDATA[మరమ్మతు చేయడం విఫలమైంది, ఫైల్ బాగా దెబ్బతింది మరియు ప్రివ్యూ చేయబడదు.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc8" Property="string">
+			<Text>
+				<![CDATA[ఇప్పటికీ దెబ్బతిన్న ఫైల్‌ను రికవరీ చేయాలా?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc9" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ పాడై ఉండవచ్చు, దయచేసి పునరుద్ధరణ తర్వాత వీలైనంత త్వరగా నిర్ధారించి, దాన్ని పరిష్కరించడానికి ప్రయత్నించండి]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="CrashContinueDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[పూర్తి చేయని స్కాన్‌ని కొనసాగించాలా?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్ సమస్య ఏర్పడింది మరియు మీరు ఇప్పుడు చేసిన స్కాన్ ప్రోగ్రెస్ ముగియలేదు. మీరు కొనసాగించాలనుకుంటున్నారా?]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOK" Property="button">
+			<Text>
+				<![CDATA[కొనసాగించు]]>
+			</Text>
+		</Item>
+		<Item Name="BtnCancel" Property="button">
+			<Text>
+				<![CDATA[రద్దు చేయి]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="LockDriverDialog">
+		<Item Name="LockDriverDialog1" Property="string">
+			<Text>
+				<![CDATA[దాటవేయి]]>
+			</Text>
+		</Item>
+		<Item Name="LockDriverDialog2" Property="string">
+			<Text>
+				<![CDATA[అన్‌లాక్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerLink" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>ఎలా అన్‌లాక్ చేయాలి?</font></a>]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="FilterFrame">
+		<Item Name="FilterDesc" Property="string">
+			<Text>
+				<![CDATA[ఫిల్టర్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="ResetDesc" Property="string">
+			<Text>
+				<![CDATA[రీసెట్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="FileTypeDesc" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ రకం]]>
+			</Text>
+		</Item>		
+		<Item Name="TimeDesc" Property="string">
+			<Text>
+				<![CDATA[సమయం]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ పరిమాణం]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDescText" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ పరిమాణం]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText1" Property="string">
+			<Text>
+				<![CDATA[అన్ని సమయాలు]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText2" Property="string">
+			<Text>
+				<![CDATA[గత రోజు]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText3" Property="string">
+			<Text>
+				<![CDATA[గత వారం]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText4" Property="string">
+			<Text>
+				<![CDATA[గత నెల]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText5" Property="string">
+			<Text>
+				<![CDATA[గత సంవత్సరం]]>
+			</Text>
+		</Item>		
+		<Item Name="FilterDateTimeText6" Property="string">
+			<Text>
+				<![CDATA[అనుకూలీకరించు...]]>
+			</Text>
+		</Item>
+		<Item Name="Lessthan1MB" Property="string">
+			<Text>
+				<![CDATA[1 MB కంటే తక్కువ]]>
+			</Text>
+		</Item>
+		<Item Name="1GBabove" Property="string">
+			<Text>
+				<![CDATA[1GB కంటే ఎక్కువ]]>
+			</Text>
+		</Item>
+		<Item Name="AllFiles" Property="string">
+			<Text>
+				<![CDATA[అన్ని ఫైల్‌లు]]>
+			</Text>
+		</Item>	
+		<Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[తొలగించబడిన ఫైల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="FilteringDesc" Property="string">
+			<Text>
+				<![CDATA[ఫిల్టర్ చేస్తోంది]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchingDesc" Property="string">
+			<Text>
+				<![CDATA[శోధిస్తోంది]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchresultsFilesEx" Property="string">
+			<Text>
+				<![CDATA[శోధన ఫలితం: %1 ఐటెమ్‌లు; %2 ఫైల్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFiles" Property="string">
+			<Text>
+				<![CDATA[శోధన ఫలితం: %1 ఐటెమ్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="Searchresults" Property="string">
+			<Text>
+				<![CDATA[%1 కోసం శోధన ఫలితం]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFile" Property="string">
+			<Text>
+				<![CDATA[శోధన ఫలితాలు: 0 ఫైల్]]>
+			</Text>
+		</Item>	
+		<Item Name="Less100MB" Property="string">
+			<Text>
+				<![CDATA[1MB~100MB]]>
+			</Text>
+		</Item>	
+		<Item Name="Less1GB" Property="string">
+			<Text>
+				<![CDATA[100MB~1GB]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="ShowBannerFrame">
+		<Item Name="ShowBannerFrameCrashSystem1_1" Property="string">
+			<Text>
+				<![CDATA[కంప్యూటర్ బూట్ చేయదగినది కాదు]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem1_2" Property="string">
+			<Text>
+				<![CDATA[బూట్ చేయదగిన USB డ్రైవ్‌ను సృష్టించడం ద్వారా క్రాష్ అయిన మీ కంప్యూటర్ డేటాను యాక్సెస్ చేయండి.]]>
+			</Text>
+		</Item>		
+		<Item Name="ShowBannerFrameCrashSystem2_1" Property="string">
+			<Text>
+				<![CDATA[బ్లూ స్క్రీన్ ఆఫ్ డెత్]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem2_2" Property="string">
+			<Text>
+				<![CDATA[డేటాను రక్షించడం ప్రారంభించడానికి క్రాష్ అయిన PCలో బూట్ ఎంపికలను సెట్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_1" Property="string">
+			<Text>
+				<![CDATA[బ్లాక్ స్క్రీన్ ఆఫ్ డెత్]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_2" Property="string">
+			<Text>
+				<![CDATA[క్రాష్ అయిన PC నుండి తొలగించబడిన డేటాను సులభంగా మరియు సరళంగా కాపీ చేయండి లేదా పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_1" Property="string">
+			<Text>
+				<![CDATA[తొలగించబడిన లేదా లోతుగా దాచబడిన వీడియోలను పునరుద్ధరించడానికి #1]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_2" Property="string">
+			<Text>
+				<![CDATA[మీరు వీడియోను రికార్డ్ లేదా ఎడిట్ చేస్తున్న సమయంలో ఏదైనా ఊహించనిది కనుగొన్నప్పుడు జరిగినట్లు కనుగొన్నప్పుడు.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_1" Property="string">
+			<Text>
+				<![CDATA[అల్ట్రా HD, 4K మరియు 8K వీడియోలను పునరుద్ధరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_2" Property="string">
+			<Text>
+				<![CDATA[మేము HD, 4K మరియు 8K వీడియోలను కూడా పునరుద్ధరించడానికి మద్దతు అందిస్తాము, ఇది గతంలో కంటే మరింత శక్తివంతమైనది.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_1" Property="string">
+			<Text>
+				<![CDATA[అన్ని పరికరాల నుండి వీడియోను పునరుద్ధరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_2" Property="string">
+			<Text>
+				<![CDATA[DSLR, డిజిటల్ కెమెరాలు, డ్రోన్‌లు, డ్యాష్‌క్యామ్‌లు, SD కార్డ్‌లు మొదలైనవాటి నుండి పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_1" Property="string">
+			<Text>
+				<![CDATA[ప్రమాదవశాత్తూ జరిగిన ఆపరేషన్ వల్ల నష్టం ఏర్పడింది]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_2" Property="string">
+			<Text>
+				<![CDATA[క్రాష్, నీటి వల్ల కలిగే నష్టం, షేకింగ్, పడిపోవడం, బ్యాటరీ డెడ్, వీడియో రికార్డింగ్ సమయంలో ఊహించని షట్‌డౌన్, మొదలైనవాటి తర్వాత రికార్డ్ చేయడం.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_1" Property="string">
+			<Text>
+				<![CDATA[వీడియో పునరుద్ధరించబడింది, కానీ ప్లే చేయడంలో విఫలమైంది]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_2" Property="string">
+			<Text>
+				<![CDATA[కోల్పోయిన వీడియో పునరుద్ధరించబడింది, కానీ కొన్ని తెలియని కారణాల వల్ల ప్లే చేయడంలో విఫలమైంది.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_1" Property="string">
+			<Text>
+				<![CDATA[విస్తృతంగా ఉపయోగించే కెమెరా బ్రాండ్‌ల నుండి వీడియోను రిపేర్ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_2" Property="string">
+			<Text>
+				<![CDATA[కెనాన్, నికాన్, సోనీ, పానసోనిక్, గోప్రో, DJI, మొదలైనవాటికి మద్దతు ఉంది.]]>
+			</Text>
+		</Item>			
+	</Form>	
+	<Form Name="FindHardDriverDialog">
+		<Item Name="FindHardDriverDialogOtherState1" Property="string">
+			<Text>
+				<![CDATA[కారణం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState2" Property="string">
+			<Text>
+				<![CDATA[మీ డిస్క్ స్థితి అనేది క్రింది స్థితిలో ఉన్నట్లయితే:<br>Offline/Missing/Unreadable/Failed/Unknown/Foreign]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState3" Property="string">
+			<Text>
+				<![CDATA[పరిష్కారం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState4" Property="string">
+			<Text>
+				<![CDATA[దయచేసి దాన్ని పరిష్కరించడానికి Microsoft చిట్కాలను రెఫర్ చేయండి: <a href="#"><font color=#00B0F5>Microsoft ట్రబుల్ షూటింగ్</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNotInitialized1" Property="string">
+			<Text>
+				<![CDATA[కారణం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized2" Property="string">
+			<Text>
+				<![CDATA[డిస్క్‌లో చెల్లుబాటు అయ్యే డిస్క్ సంతకం లేదు.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNotInitialized3" Property="string">
+			<Text>
+				<![CDATA[పరిష్కారం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized4" Property="string">
+			<Text>
+				<![CDATA[డ్రైవ్‌ను ప్రారంభించడానికి డిస్క్ మేనేజ్‌మెంట్‌పై కుడి-క్లిక్ చేయండి. ఆపై, దాని నుండి డేటాను స్కాన్ చేసి, పునరుద్ధరించడానికి Recoveritను ఉపయోగించండి.]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNoMedia1" Property="string">
+			<Text>
+				<![CDATA[కారణం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia2" Property="string">
+			<Text>
+				<![CDATA[మీ డిస్క్ స్థితి "మీడియా లేదు” అయినట్లయితే, దానికి తీవ్రమైన హార్డ్‌వేర్ నష్టం ఉండవచ్చు.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNoMedia3" Property="string">
+			<Text>
+				<![CDATA[పరిష్కారం]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia4" Property="string">
+			<Text>
+				<![CDATA[దయచేసి డిస్క్‌ను తనిఖీ చేయడానికి రిపేర్ షాప్‌కు పంపండి.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="mainframe">
+		<Item Name="MainBannerFrameDataRecovery" Property="string">
+			<Text>
+				<![CDATA[హార్డ్ డ్రైవ్‌లు మరియు లొకేషన్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameCrashSystem" Property="string">
+			<Text>
+				<![CDATA[సిస్టమ్ క్రాష్ అయిన కంప్యూటర్]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameAdvanceVideo" Property="string">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameVideoRepair" Property="string">
+			<Text>
+				<![CDATA[పాడైన వీడియో రిపేర్]]>
+			</Text>
+		</Item>
+		<Item Name="labelDataRecover" Property="label">
+			<Text>
+				<![CDATA[ఫైల్ పునరుద్ధరణ]]>
+			</Text>
+		</Item>	
+		<Item Name="labelDataRepair" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌ను రిపేర్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="mainformlblDesc" Property="label">
+			<Text>
+				<![CDATA[వీడియోను విశ్లేషిస్తోంది, దయచేసి కాసేపు వేచి ఉండండి...]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="fulldiskframe">
+		<Item Name="labelAdvanceText" Property="label">
+			<Text>
+				<![CDATA[అన్ని పరికరాల నుండి కోల్పోయిన మీ వీడియోలను పునరుద్ధరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="label">
+			<Text>
+				<![CDATA[పునరుద్ధరించడాన్ని ప్రారంభించడానికి లొకేషన్‌ని ఎంచుకోండి]]>
+			</Text>
+		</Item>	
+		<Item Name="lblHardTitle" Property="label">
+			<Text>
+				<![CDATA[హార్డ్ డిస్క్ డ్రైవ్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="lblExternTitle" Property="label">
+			<Text>
+				<![CDATA[బాహ్య డ్రైవ్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="lblSpecificTitle" Property="label">
+			<Text>
+				<![CDATA[క్విక్ యాక్సెస్]]>
+			</Text>
+		</Item>	
+		<Item Name="lblFeedback" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మీ హార్డ్ డ్రైవ్‌ను గుర్తించడం సాధ్యం కాలేదా?</font></a>]]>
+			</Text>
+		</Item>	
+		<Item Name="refreshbtn" Property="tooltip">
+			<Text>
+				<![CDATA[రీఫ్రెష్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[రీఫ్రెష్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[రీఫ్రెష్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[రీఫ్రెష్ చేయి]]>
+			</Text>
+		</Item>
+		<Item Name="advanceVideoDesc" Property="string">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణని ప్రారంభించడానికి హార్డ్ డ్రైవ్‌ను ఎంచుకోండి:]]>
+			</Text>
+		</Item>
+	</Form>
+
+	<Form Name="CrashSystemShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[క్రాష్ అయిన కంప్యూటర్ నుండి మీ డేటాను రక్షించండి]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[క్రాష్ అయిన కంప్యూటర్‌ను ప్రారంభించడానికి మరియు దాని నుండి డేటాను తిరిగి పొందడానికి బూట్ చేయదగిన USBను సృష్టించండి:]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[ప్రారంభించు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[లోతుగా దాచబడిన వీడియోలను పునరుద్ధరించడానికి పేటెంట్ పొందిన సాంకేతికత]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[ప్రత్యేకంగా పేటెంట్ పొందిన ఆవిష్కరణ సాంకేతికత Recoverit నుండి లభిస్తుంది - వీడియో క్లిప్‌లను సంగ్రహించి, ఏకీకృతం చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[ప్రారంభించు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="VideoRepairShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[త్వరిత & అధునాతన వీడియో రిపేర్, వీడియో పాడవ్వకుండా చూసుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[దెబ్బతిన్న వీడియోలను రిపేర్ చేయడానికి 3 దశలు, ఎక్కువగా దెబ్బతిన్న దృష్టాంతాల కోసం ఆల్-ఇన్-వన్ టూల్‌కిట్]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[వీడియోను జోడించు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CommonWaitFrame">
+		<Item Name="lblDiskDesc1" Property="label">
+			<Text>
+				<![CDATA[డిస్క్ లోడ్ అవుతోంది...]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>చాలా సమయం నుండి లోడ్ అవ్వడంలో ఆగిపోయిందా?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="RemoveExternalDisk">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[అన్ని బాహ్య పరికరాలను తీసివేసి, మళ్లీ ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelTex1" Property="label">
+			<Text>
+				<![CDATA[కంప్యూటర్‌కు కనెక్ట్ చేసిన అన్ని బాహ్య డిస్క్‌లను తీసివేసి, లోడ్ చేయడం పూర్తయ్యే వరకు వేచి ఉండండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelTex2" Property="label">
+			<Text>
+				<![CDATA[మీరు పునరుద్ధరించాలనుకుంటున్న డిస్క్‌ను తిరిగి కనెక్ట్ చేసి, స్కాన్ చేయడం ప్రారంభించండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[అర్థమైంది]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[సమస్య ఇప్పటికీ అలాగే ఉందా? మాకు నివేదించడానికి <a href="#"><font color=#00B0F5>ఇక్కడ క్లిక్ చేయండి</font></a>. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FindHardDriverDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[హార్డ్ డ్రైవ్ కనుగొనబడలేదు]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>డిస్క్ మేనేజ్‌మెంట్</font></a>ను తెరిచి, మీ డిస్క్ స్థితిని తనిఖీ చేయండి, మీ డిస్క్ స్థితి క్రింది స్థితిలో ఉన్నట్లయితే:]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNotInit" Property="button">
+			<Text>
+				<![CDATA[ప్రారంభించబడలేదు]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNoMedia" Property="button">
+			<Text>
+				<![CDATA[మీడియా లేదు]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOther" Property="button">
+			<Text>
+				<![CDATA[ఇతర స్థితి]]>			    
+			</Text>
+		</Item>		
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[అర్థమైంది]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మమ్మల్ని సంప్రదించండి</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MobileDialog">
+		<Item Name="MobileDialogDownload" Property="string">
+			<Text>
+				<![CDATA[డౌన్‌లోడ్ ఎంపికకు వెళ్లు]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recoverit]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1_1" Property="label">
+			<Text>
+				<![CDATA[PCలు, హార్డ్ డ్రైవ్‌లు మరియు బాహ్య స్టోరేజీ పరికరాల నుండి ఫైల్‌లను పునరుద్ధరణ చేయండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[డా.ఫోన్ - డేటా పునరుద్ధరణ]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2_1" Property="label">
+			<Text>
+				<![CDATA[iOS/Android పరికరాల నుండి డేటాను పునరుద్ధరించండి.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BadSectorDialog">
+		<Item Name="BadSectorFrameDriver" Property="string">
+			<Text>
+				<![CDATA[ఇందులో బ్యాడ్ సెక్టార్‌లు గుర్తించబడ్డాయి (%1:). ]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameViewDetails" Property="string">
+			<Text>
+				<![CDATA[వివరాలను చూడండి]]>
+			</Text>
+		</Item>
+
+		<Item Name="BadSectorFrameSkipSector" Property="string">
+			<Text>
+				<![CDATA[బ్యాడ్ సెక్టార్‌లను దాటవేయడానికి ప్రయత్నించండి, దయచేసి వేచి ఉండండి...]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameLearnMore" Property="string">
+			<Text>
+				<![CDATA[మరింత తెలుసుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDialogDesc" Property="string">
+			<Text>
+				<![CDATA[డిస్క్‌లో %1 బ్యాడ్ సెక్టార్‌లు ఉన్నాయి]]>
+			</Text>
+		</Item>		
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[మీ ఫైల్‌లను వీలైనంత త్వరగా పునరుద్ధరించి, మళ్లీ డేటా కోల్పోకుండా నివారించడానికి తక్షణమే బ్యాకప్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[తక్షణమే బ్యాకప్ చేయి]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblGoodText" Property="label">
+			<Text>
+				<![CDATA[బాగుంది]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblPoorText" Property="label">
+			<Text>
+				<![CDATA[పేలవంగా ఉంది]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblSevereText" Property="label">
+			<Text>
+				<![CDATA[తీవ్రంగా ఉంది]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblDamagedText" Property="label">
+			<Text>
+				<![CDATA[దెబ్బతింది]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblUnkownText" Property="label">
+			<Text>
+				<![CDATA[తెలియదు]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchHintFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[క్షమించండి, ఫైల్ ఏదీ కనుగొనబడలేదు!]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[1. కొన్ని ఫైల్‌లలో అసలు ఫైల్ పేరు లేదు, <a href="#"><font color=#00B0F5>మూలాధారం లేని ఫైల్‌లు</font></a>లో దయచేసి వాటిని తనిఖీ చేయండి]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[2. దయచేసి స్కాన్‌ను పూర్తి చేయడం కోసం వేచి ఉండి, మళ్లీ శోధించండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[3. మీ ఫైల్‌లను కనుగొనేందుకు ఫిల్టర్‌ను ఉపయోగించడానికి ప్రయత్నించండి.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[మూలాధారం లేని ఫైల్‌లను కనుగొనడం ఎలా]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[మూలాధారం లేని ఫైల్‌లు వాటి ఫైల్ పేర్లను కోల్పోతాయి, మీరు అసలు పేర్ల ద్వారా శోధించలేరు. మూలాధారం లేని ఫైల్‌లలో ఫైల్‌లను కనుగొనడానికి ఇక్కడ కొన్ని చిట్కాలు ఉన్నాయి:]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[[మూలాధారం లేని ఫైల్‌లు]పై క్లిక్ చేయండి]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[పునరుద్ధరించబడాల్సిన ఫైల్ రకాన్ని ఎంచుకోండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌లు మీకు కావాల్సినవని నిర్ధారించడానికి వాటిని ప్రివ్యూ చేయండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[అర్థమైంది]]>			    
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="PreviewSimilarErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[అయ్యో, ప్రివ్యూ చేయడం క్రింది కారణం వల్ల విఫలమైంది:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[ఫైల్ ఓవర్‌రైట్ చేయబడి ఉండవచ్చు. కంప్యూటర్‌ను రీస్టోర్ చేయవలసిందిగా సిఫార్సు చేయబడింది.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>ఏ ఫైల్ ఓవర్‌రైట్ చేయబడుతోంది?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[అయ్యో, ప్రివ్యూ చేయడం క్రింది కారణం వల్ల విఫలమైంది:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ ఓవర్‌రైట్ చేయబడి ఉండవచ్చు. కంప్యూటర్‌ను రీస్టోర్ చేయవలసిందిగా సిఫార్సు చేయబడింది.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>ఏ ఫైల్ ఓవర్‌రైట్ చేయబడుతోంది?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="ScanPreviewErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[అయ్యో, ప్రివ్యూ చేయడం క్రింది కారణం వల్ల విఫలమైంది:]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ ఇప్పటికీ అసంపూర్తిగా ఉంది, స్కాన్ చేయడం పూర్తయిన తర్వాత దయచేసి దాన్ని ప్రివ్యూ చేయండి.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="PreviewUnkownFileFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[అయ్యో, ఫైల్ ఫార్మాట్‌కు మద్దతు లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[చింతించకండి, మీరు అలాంటి ఫైల్‌లను మీ కంప్యూటర్‌కు పునరుద్ధరించబడిన తర్వాత మీరు వాటిని చూడవచ్చు.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>ప్రివ్యూ మద్దతు ఉన్న ఫార్మాట్‌లను తనిఖీ చేయండి</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewAdanceVideoErrorFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[అయ్యో, వీడియోను ప్రివ్యూ చేయడం విఫలమైంది.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[దాచిన వీడియో శకలాలు కోసం స్కాన్ చేయడానికి మెరుగైన రికవరీని ప్రయత్నించండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[గమనిక: మెరుగైన రికవరీని ప్రారంభించే ముందు స్కాన్ చేసిన ఫైల్‌లను సేవ్ చేయండి]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewVideoErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[అయ్యో, వీడియోను ప్రివ్యూ చేయడం విఫలమైంది.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[కంప్యూటర్‌కు పునరుద్ధరించి, పాడైన వీడియోలను పరిష్కరించడానికి వీడియో రిపేర్‌ను ప్రయత్నించండి.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DocumentViewOrderFrame">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[వీడియోను ప్రివ్యూ చేయడం 30 సెకన్లకు పరిమితం చేయబడింది. మీరు పూర్తి వీడియోను ప్లే చేయాలనుకున్నట్లయితే, మీరు దాన్ని మీ కంప్యూటర్‌కు పునరుద్ధరించవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="labelOfficeText" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌లోని మొదటి పేజీని మాత్రమే ప్రివ్యూ చేయవచ్చు.<br>మీరు మరింత కంటెంట్‌ను చూడాలనుకున్నట్లయితే, మీ కంప్యూటర్‌కు ఫైల్‌ను పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFrameTree">
+		<Item Name="TipDiskRawDesc" Property="string">
+			<Text>
+				<![CDATA[ఈ ఫైల్‌లకు ఇకపై వాటి అసలు ఫైల్ పేర్లు, ఫైల్ పరిమాణాలు మరియు టైమ్ స్టాంప్‌లు ఉండవు,  కానీ అవి మీకు కావాల్సినట్లుగా ఖచ్చితంగా ఉండవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="TipLostLocationDesc" Property="string">
+			<Text>
+				<![CDATA[ఈ ఫైల్‌లలో వాటి అసలు స్టోరేజీ పాత్‌కు సంబంధించిన సమాచారం లేదు, మీకు కావాల్సినది ఇదేనేమో మీరు తనిఖీ చేయవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="btnpath" Property="button">
+			<Text>
+				<![CDATA[ఫైల్ లొకేషన్]]>
+			</Text>
+		</Item>
+		<Item Name="btntype" Property="button">
+			<Text>
+				<![CDATA[ఫైల్ రకం]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ReconnectDialog">
+		<Item Name="ReconnectDiskDesc" Property="string">
+			<Text>
+				<![CDATA[డిస్క్ (%1:) డిస్‌కనెక్ట్ చేయబడింది, తిరిగి కనెక్ట్ చేసి, మళ్లీ స్కాన్ చేయండి.]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[తిరిగి స్కాన్ చేయి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDRlibDialog">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్ ఎర్రర్, హోమ్‌కు వెనక్కి వెళ్లి, తిరిగి స్కాన్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[వెనక్కి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFinishDialog">
+		<Item Name="ScanCompleteedAdvanceDesc" Property="string">
+			<Text>
+				<![CDATA[స్కాన్ చేయడం పూర్తయింది! క్షమించండి, మేము మీ ఫైల్‌లను కనుగొనలేదు, తదుపరి తనిఖీ కోసం <a href="#"><Font color="#00B0F5">మాకు అభిప్రాయాన్ని పంపండి</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanCompleteedDesc" Property="string">
+			<Text>
+				<![CDATA[స్కాన్ చేయడం పూర్తయింది! %1 ఫైల్‌లు కనుగొనబడ్డాయి!]]>
+			</Text>
+		</Item>
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[గమనిక:ఫైల్‌లు ఓవర్‌రైట్ చేయబడకుండా నివారించడానికి దయచేసి వీలైనంత త్వరగా పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[సరే]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideo">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[మీకు కావాల్సిన వీడియోను కనుగొనడం సాధ్యం కాలేదా?]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[మీరు అధునాతన వీడియో పునరుద్ధరణ ఫీచర్‌ను ఉపయోగించమని మేము సిఫార్సు చేస్తున్నాము.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[మరింత తెలుసుకోండి]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideoDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[మీకు కావాల్సిన ప్రస్తుతం స్కాన్ చేయబడిన ఫైల్‌లను సేవ్ చేయండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[తిరిగి హోమ్‌పేజీకి వెళ్లి, [అధునాతన వీడియో పునరుద్ధరణ]పై క్లిక్ చేయండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[వీడియో ఫార్మాట్‌లను ఎంచుకుని, అధునాతన వీడియో పునరుద్ధరణని ప్రారంభించండి.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[అర్థమైంది]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurntoDeepRecycleFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[తొలగించబడిన ఫైల్‌లను కనుగొనడం సాధ్యం కాకపోతే, డీప్ స్కాన్‌ను ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[మరిన్ని ఫైల్‌లను కనుగొనడం కోసం మీ డిస్క్ సెక్టార్‌లు అన్నింటినీ స్కాన్ చేయడానికి డీప్ స్కాన్ మరింత సమయాన్ని వెచ్చిస్తుంది.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[డీప్ స్కాన్]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectPathDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌ను పునరుద్ధరించడం ప్రారంభించడానికి లొకేషన్‌ను ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="label" Property="label">
+			<Text>
+				<![CDATA[ఇన్‌పుట్ పాత్:]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblHint" Property="label">
+			<Text>
+				<![CDATA[చెల్లుబాటు కాని ఫైల్ పాత్！]]>			    
+			</Text>
+		</Item>			
+		<Item Name="m_sDocumentItem" Property="string">
+			<Text>
+				<![CDATA[నా పత్రాలు]]>
+			</Text>
+		</Item>
+		<Item Name="m_sDeskTopItem" Property="string">
+			<Text>
+				<![CDATA[డెస్క్‌టాప్]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[నా కంప్యూటర్]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[సరే]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProtectedDialog">
+		<Item Name="ProtectedDialogTitle1" Property="string">
+			<Text>
+				<![CDATA[అనుమతి సరిపోదు!]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle2" Property="string">
+			<Text>
+				<![CDATA[<font color=#26324B> ఎంచుకోబడిన డిస్క్‌కు ఫైల్‌ను సేవ్ చేయడానికి<font color=#FF0000><b>అనుమతి సరిపోదు</b></font>. దయచేసి మరొక డిస్క్‌ను తిరిగి ఎంచుకోండి.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle4" Property="string">
+			<Text>
+				<![CDATA[తగినంత స్థలం లేదు!]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">//ProtectedDialogTitle3
+			<Text>
+				<![CDATA[మళ్లీ ఎంచుకోండి]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoveryDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌లను సేవ్ చేయడానికి పాత్‌ను ఎంచుకోండి:]]>
+			</Text>
+		</Item>	
+		<Item Name="OverrideDesc" Property="string">
+			<Text>
+				<![CDATA[మీరు వాటిని కోల్పోయిన డిస్క్(%1:)కు ఫైల్‌ను సేవ్ చేయవద్దు, అది ఫైల్ ఓవర్‌రైట్‌కు దారి తీస్తుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="NewFolderDesc" Property="string">
+			<Text>
+				<![CDATA[కొత్త ఫోల్డర్]]>
+			</Text>
+		</Item>
+		<Item Name="t_strNewName" Property="string">
+			<Text>
+				<![CDATA[కొత్త ఫోల్డర్]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle5" Property="string">
+			<Text>
+				<![CDATA[%2 ఫైల్(లు)లో %1ని ఎంచుకోవడం జరిగింది మరియు ఎంచుకోబడిన మీ డిస్క్‌లో తగినంత స్థలం లేదు. దయచేసి మరొక డిస్క్‌ను తిరిగి ఎంచుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="strWaring" Property="string">
+			<Text>
+				<![CDATA[మూలాధార విభజనలో డేటాను సేవ్ చేయడం వలన పునరుద్ధరణ విజయవంతమయ్యే అవకాశం తగ్గుతుంది. ఇప్పటికీ దానిలో డేటాను సేవ్ చేయాలా?]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[నా కంప్యూటర్]]>
+			</Text>
+		</Item>
+		<Item Name="strRecycleSave" Property="string">
+			<Text>
+				<![CDATA[ఫైల్‌లు ఓవర్‌రైట్ చేయబడకుండా నివారించడం కోసం బాహ్య డిస్క్‌కు పునరుద్ధరించబడిన ఫైల్‌లను సేవ్ చేయమని మీకు సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc1" Property="string">
+			<Text>
+				<![CDATA[మేము <font color=#00B0F5>బాహ్య డ్రైవ్</font>కు ఫైల్‌లను సేవ్ చేయమని మీకు సూచిస్తున్నాము.<br><br><br>ఎందుకంటే, మీరు ఫైల్‌లను కోల్పోయిన అదే డ్రైవ్‌కు సేవ్ చేయడం వలన పునరుద్ధరణ విజయవంతమయ్యే అవకాశం తగ్గుతుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc2" Property="string">
+			<Text>
+				<![CDATA[మేము <font color=#00B0F5>మరొక డ్రైవ్</font>కు ఫైల్‌లను సేవ్ చేయమని మీకు సూచిస్తున్నాము.<br><br><br>ఎందుకంటే, మీరు ఫైల్‌లను కోల్పోయిన అదే డ్రైవ్‌కు సేవ్ చేయడం వలన పునరుద్ధరణ విజయవంతమయ్యే అవకాశం తగ్గుతుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnRecovery" Property="button">
+			<Text>
+				<![CDATA[పునరుద్ధరించు]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoverSuccessDialog">
+		<Item Name="OpenFile" Property="string">
+			<Text>
+				<![CDATA[ఫోల్డర్‌ను తెరువు]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText" Property="label">
+			<Text>
+				<![CDATA[అభినందనలు! ఇప్పుడు మీ పునరుద్ధరణ అనుభవాన్ని షేర్ చేయండి!]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText1" Property="label">
+			<Text>
+				<![CDATA[ఉపయోగించడం సులభం]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText2" Property="label">
+			<Text>
+				<![CDATA[విజయవంతమైన పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectAdvanceVideoDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[వీడియో ఫార్మాట్‌లను ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelCheckBoxDesc" Property="label">
+			<Text>
+				<![CDATA[అన్నీ ఎంచుకోండి <font color=#8C9295>(గమనిక: మీరు ఎన్ని ఎక్కువ ఫార్మాట్‌లను ఎంచుకుంటే, అంత ఎక్కువ స్కాన్ సమయం వెచ్చించబడుతుంది)</font>]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[ప్రారంభించు ]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[* దయచేసి స్కాన్ చేయడానికి ఫార్మాట్‌లను ఎంచుకోండి!]]>
+			</Text>
+		</Item>
+		<Item Name="labelMoreText" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మరిన్ని ఫార్మాట్‌లు కావాలా？</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MessagePushDialog">		
+		<Item Name="labelNoMessage" Property="string">
+			<Text>
+				<![CDATA[సందేశం లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="strSimilarLoading" Property="string">
+			<Text>
+				<![CDATA[లోడ్ అవుతోంది]]>
+			</Text>
+		</Item>	
+		<Item Name="MessageCenter" Property="string">
+			<Text>
+				<![CDATA[సందేశ కేంద్రం]]>
+			</Text>
+		</Item>
+		<Item Name="labelText" Property="string">
+			<Text>
+				<![CDATA[Recoverit చాట్‌బాట్]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="HintDialog">		
+		<Item Name="lblMid3" Property="label">
+			<Text>
+				<![CDATA[వీలైనంత త్వరగా ఫైల్‌లను పునరుద్ధరించడానికి Recoveritను కొనుగోలు చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelTrail" Property="label">
+			<Text>
+				<![CDATA[ఆవశ్యకం]]>
+			</Text>
+		</Item>	
+		<Item Name="labelTraiIText1" Property="label">
+			<Text>
+				<![CDATA[డేటా పునరుద్ధరణ]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnBuy1" Property="button">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasic" Property="label">
+			<Text>
+				<![CDATA[ప్రామాణికం]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText1" Property="label">
+			<Text>
+				<![CDATA[డేటా పునరుద్ధరణ]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText2" Property="label">
+			<Text>
+				<![CDATA[సిస్టమ్ క్రాష్ అయిన కంప్యూటర్ పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy2" Property="button">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>	
+
+		<Item Name="labelPro" Property="label">
+			<Text>
+				<![CDATA[ప్రీమియమ్]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText1" Property="label">
+			<Text>
+				<![CDATA[డేటా పునరుద్ధరణ]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText2" Property="label">
+			<Text>
+				<![CDATA[సిస్టమ్ క్రాష్ అయిన కంప్యూటర్ పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText3" Property="label">
+			<Text>
+				<![CDATA[పాడైన వీడియో రిపేర్]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText4" Property="label">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy3" Property="button">
+			<Text>
+				<![CDATA[కొనుగోలు చేయి]]>
+			</Text>
+		</Item>		
+		<Item Name="labelHint" Property="label">
+			<Text>
+				<![CDATA[ఇప్పటికే కొనుగోలు చేసారా?]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="UpdateAuthorDialog">		
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[ఈ ఫీచర్‌ను ఉపయోగించడానికి ప్రీమియమ్ ప్లాన్‌కు అప్‌గ్రేడ్ చేసుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Recoverit ప్రీమియమ్]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[డేటా పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[క్రాష్ అయిన కంప్యూటర్ నుండి ఫైల్‌లను పునరుద్ధరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[పాడైన వీడియోలను రిపేర్ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[అధునాతన వీడియో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="UpgradeNowDesc" Property="string">
+			<Text>
+				<![CDATA[ఇప్పుడే అప్‌గ్రేడ్ చేసుకోండి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProgressDialog">		
+		<Item Name="labelUBackitDesc1" Property="label">
+			<Text>
+				<![CDATA[మీ ప్రతిష్టాత్మకమైన డేటా మరియు జ్ఞాపకాలను బ్యాకప్ చేసుకోండి, వాటిని మళ్లీ ఎప్పటికీ కోల్పోవద్దు.]]>
+			</Text>
+		</Item>
+		<Item Name="labelUBackitDesc2" Property="label">
+			<Text>
+				<![CDATA[ఆటోమేటిక్, సింపుల్, స్మార్ట్]]>
+			</Text>
+		</Item>	
+		<Item Name="labelUBackitDesc3" Property="label">
+			<Text>
+				<![CDATA[ఇంక్రిమెంటల్ బ్యాకప్]]>
+			</Text>
+		</Item>
+		<Item Name="buttonUBackit" Property="button">
+			<Text>
+				<![CDATA[1-నెల ట్రయల్‌ను ప్రారంభించండి]]>
+			</Text>
+		</Item>
+		<Item Name="BackupDataDesc" Property="string">
+			<Text>
+				<![CDATA[డేటాను బ్యాకప్ చేయండి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CorruptVideoFrame">	
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[మీరు కంప్యూటర్‌కు పునరుద్ధరించి, పాడైన వీడియోలను రిపేర్ చేయవచ్చు.]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[కంప్యూటర్‌కు పాడైన వీడియోలను పునరుద్ధరించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[[పాడైన వీడియో రిపేర్]పై ట్యాబ్.]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[రిపేర్ చేయడం ప్రారంభించడానికి పాడైన వీడియోను జోడించండి.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDREDialog">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[సాఫ్ట్‌వేర్ ఎర్రర్.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[ఫైల్‌లను ఎంచుకుని, పునరుద్ధరించండి, ఆపై మళ్లీ ప్రయత్నించడం కోసం తిరిగి హోమ్‌పేజీకి వెళ్లండి.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[సరే]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="OnlineWidget">
+		<Item Name="labelNetWorkText1" Property="label">
+			<Text>
+				<![CDATA[అయ్యో, నెట్‌వర్క్ ఎర్రర్.]]>
+			</Text>
+		</Item>
+		<Item Name="labelNetWorkText2" Property="label">
+			<Text>
+				<![CDATA[మీ నెట్‌వర్క్‌ను తనిఖీ చేసి, మళ్లీ ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="buttonRefresh" Property="button">
+			<Text>
+				<![CDATA[రీఫ్రెష్ చేయి]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoSuffixDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[మీరు ఇతర వీడియో ఫార్మాట్‌లను పునరుద్ధరించాలనుకున్నట్లయితే, మీరు మాకు అభిప్రాయాన్ని పంపవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[సమర్పించు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FilterTipsFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[ఫిల్టర్ కోసం చిట్కాలు:]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[కావాల్సిన ఫైల్‌లను వేగంగా గుర్తించడం కోసం ఫిల్టర్‌ను ఉపయోగించండి]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue1" Property="label">
+			<Text>
+				<![CDATA[ఫోటో, వీడియో, ఆడియో...]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue2" Property="label">
+			<Text>
+				<![CDATA[రోజు, వారం, నెల, సంవత్సరం...]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue3" Property="label">
+			<Text>
+				<![CDATA[1MB, 1-100MB, 100MB-1GB…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue4" Property="label">
+			<Text>
+				<![CDATA[ప్రస్తుతం ఉన్న ఫైల్‌లు, తొలగించిన ఫైల్‌లు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="NewFilterModel">
+		<Item Name="FileStatusDesc" Property="string">
+			<Text>
+				<![CDATA[ఫైల్ స్థితి]]>
+			</Text>
+		</Item>
+		 <Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[తొలగించబడింది]]>
+			</Text>
+		</Item>
+	    <Item Name="ExistsFiles" Property="string">
+			<Text>
+				<![CDATA[ప్రస్తుతం ఉన్న]]>
+			</Text>
+		</Item>
+		<Item Name="WhatTypeText" Property="string">
+			<Text>
+				<![CDATA[ఏ రకం]]>
+			</Text>
+		</Item>
+		<Item Name="AlltypesText" Property="string">
+			<Text>
+				<![CDATA[మొత్తం రకాలు]]>
+			</Text>
+		</Item>		
+		<Item Name="tagText" Property="string">
+			<Text>
+				<![CDATA[ట్యాగ్‌లు]]>
+			</Text>
+		</Item>
+		<Item Name="alltagText" Property="string">
+			<Text>
+				<![CDATA[మొత్తం ట్యాగ్‌లు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[మీరు ఖచ్చితంగా సాఫ్ట్‌వేర్ నుండి నిష్క్రమించాలనుకుంటున్నారా? ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[చిట్కాలు: ఇప్పుడు మీరు నిష్క్రమించినట్లయితే, ముఖ్యమైన డేటా రికవరీ చేయబడదు. ముందుగా రికవరీని పూర్తి చేయడం కోసం ఇక్కడ ఉండమని సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseFeedbackDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[మమ్మల్ని క్షమించండి, మేము మీ అవసరాలను తీర్చలేదు ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[మీరు Recoverit నుండి నిష్క్రమించడానికి గల కారణాన్ని మాతో పంచుకోగలరా?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemText1" Property="string">
+			<Text>
+				<![CDATA[ఇందులో నాకు కావాల్సిన ఫీచర్ లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="itemText2" Property="string">
+			<Text>
+				<![CDATA[నేను డేటాను కోల్పోయిన డ్రైవ్‌ను కనుగొనలేదు]]>
+			</Text>
+		</Item>
+		<Item Name="itemText3" Property="string">
+			<Text>
+				<![CDATA[నాకు సాఫ్ట్‌వేర్ ఇంటర్‌ఫేజ్ డిజైన్ నచ్చలేదు]]>
+			</Text>
+		</Item>
+		<Item Name="itemText4" Property="string">
+			<Text>
+				<![CDATA[నాకు ఈ సాఫ్ట్‌వేర్‌ను ఎలా ఉపయోగించాలో తెలియలేదు]]>
+			</Text>
+		</Item>
+		<Item Name="itemText5" Property="string">
+			<Text>
+				<![CDATA[ఇతరాలు (మీరు మాతో పంచుకోగలరు)]]>
+			</Text>
+		</Item>
+		<Item Name="lblText3" Property="label">
+			<Text>
+				<![CDATA[మీ అభిప్రాయాన్ని తెలియజేసినందుకు ధన్యవాదాలు.]]>
+			</Text>
+		</Item>
+		<Item Name="btnSubmit" Property="button">
+			<Text>
+				<![CDATA[సమర్పించు]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1064">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[వీడియో/ఫోటో పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[మెరుగుపరిచిన రికవరీ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[అన్ని పరికరాల నుండి కోల్పోయిన మీ వీడియోలు/ఫోటోలను రికవరీ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[కెనాన్, నికాన్, DJI, గోప్రో, సీగేట్, SD కార్డ్ వంటి మొదలైన ప్రతీది.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[కోల్పోయిన మీ వీడియోలు మరియు ఫోటోలను రికవరీ చేయడానికి డ్రైవ్‌ను ఎంచుకోండి:]]>
+			</Text>
+		</Item>	
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[మెరుగుపరిచిన రికవరీ అంటే ఏమిటి?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[1. కోల్పోయిన లేదా లోతుగా దాచిన వీడియోలను రికవరీ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[2. క్విక్ మరియు డీప్ మోడ్, వీడియోలు అలాగే ఫోటోలను తిరిగి పొందడం కోసం రెండు రికవరీ మోడ్‌లు.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[డీప్ స్కాన్ చేయడం కోసం వీడియో ఫార్మాట్‌లను ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[డీప్ మోడ్ ద్వారా నిర్దిష్ట 11 ఫార్మాట్‌లను మాత్రమే రికవరీ చేయవచ్చు, మీకు అవసరమైన ఫార్మాట్‌లను మీరు ఎంచుకోగలరు.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[రికవరీ వ్యవధి: ఎంత ఎక్కువ మొత్తంలో ఫైల్ రకాలను ఎంచుకుంటే, ఇది అంత ఎక్కువ సమయం తీసుకుంటుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[డీప్ స్కాన్ చేయడం కోసం కనీసం ఒక ఫార్మాట్‌ను దయచేసి ఎంచుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[వీడియోను స్కాన్ చేయడానికి కొంత సమయం పడుతుంది, దయచేసి ఓపికతో వేచి ఉండండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[రికవరీ మోడ్:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[ప్రదర్శించిన వీడియో మరియు ఫోటో ఫైల్‌లను మీరు ప్రివ్యూ చేయగలరు.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[క్విక్]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[డీప్]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[గడిపిన సమయం:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[క్విక్ స్కాన్ పూర్తయింది.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[వీడియోలు మరియు ఫోటోలలో చాలా వరకు స్కాన్ చేయబడవచ్చు, మీరు <b>వాటిని ప్రివ్యూ చేసి, రికవరీ</b> చేయగలరు.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[చిట్కాలు：డీప్ స్కాన్ మీకోసం మరిన్ని ఫైల్‌లను గుర్తించడానికి ప్రయత్నిస్తోంది. దీనికి కొంత సమయం పడుతుంది, దయచేసి ఓపిక పట్టండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[డీప్ స్కాన్ అంటే ఏమిటి?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[క్విక్ స్కాన్ మీ ఫైల్‌లను గుర్తించనట్లయితే, డీప్ స్కాన్ మీకోసం మరిన్ని ఫైల్‌లను గుర్తిస్తుంది. ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[మెరుగుపరిచిన రికవరీని ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[మీరు కెమెరా SD కార్డ్ నుండి ఫైల్‌లను రికవరీ చేయాల్సినట్లయితే, మీ వీడియోలు మరియు ఫోటోలను రికవరీ చేయడం కోసం మెరుగుపరిచిన రికవరీని ఉపయోగించడాన్ని మేము అధికంగా సిఫార్సు చేస్తున్నాము.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[స్కాన్ చేయడం కొనసాగించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[మెరుగుపరిచిన రికవరీ ఫీచర్‌ను ఉపయోగించమని మేము మీకు సిఫార్సు చేస్తున్నాము.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[తిరిగి హోమ్‌పేజీకి వెళ్లి, [మెరుగుపరిచిన రికవరీ]పై క్లిక్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[టార్గెట్ డిస్క్‌ను ఎంచుకుని, [మెరుగుపరిచిన రికవరీ]ని ప్రారంభించండి.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1066">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[NAS మరియు Linux ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[NAS/Linux సిస్టమ్‌ల నుండి మీ డేటాని సులభంగా పునరుద్ధరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[మీ ఫైల్‌లను పునరుద్ధరించడానికి 3 దశలు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[NAS సర్వర్/Linux సిస్టమ్ ఎంచుకోండి ---- సర్వర్‌కు కనెక్ట్ చేయండి ---- పునరుద్ధరించు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[మీ సర్వర్‌ను ఆపాల్సిన అవసరం లేదు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[NAS సేవని ఆపకుండా నిజ సమయ పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[<font color=#00B0F5>NAS సర్వర్ </font>మరియు <font color=#00B0F5>Linux సిస్టమ్</font>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[సర్వర్ లేదా సిస్టమ్‌ని ఎంచుకుని, మీ IP చిరునామా మరియు సమాచారాన్ని నమోదు చేసి, ఆపై మీ డేటాని పునరుద్ధరించండి ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[NAS పునరుద్ధరణ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Linux పునరుద్ధరణ]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[స్థానిక నెట్‌వర్క్‌లో NAS సర్వర్ కోసం శోధిస్తోంది]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[NAS పరికరం చాలా సేపటి వరకు కనుగొనబడకుంటే, "మాన్యువల్‌గా కనెక్ట్ చేయి" క్లిక్ చేసి, మీ IP చిరునామా మరియు ఇతర సమాచారాన్ని నమోదు చేసి, మీ ఫైల్‌లను పునరుద్ధరించడానికి మీరు పునరుద్ధరించాలనుకుంటున్న పరికరాన్ని కనెక్ట్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[శోధించడాన్ని రద్దు చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[మాన్యువల్‌గా కనెక్ట్ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[NAS సర్వర్‌ని శోధించడం విఫలమైంది]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[స్థానిక నెట్‌వర్క్‌లో NAS సర్వర్ కనుగొనబడలేదు. మీ సర్వర్‌కు కనెక్ట్ చేయడానికి <font color=#00B0F5>మాన్యువల్‌గా </font>కనెక్ట్ చేయిని ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[పునరుద్ధరించడాన్ని ప్రారంభించడానికి NAS సర్వర్‌ని ఎంచుకోండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[NAS సర్వర్‌లు ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[తయారీదారు:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మీ NAS సర్వర్‌కు కనెక్ట్ చేయలేరా?</font></a>]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[NAS కనెక్షన్‌ల వైఫల్యాల కోసం పరిష్కారాలు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[మీరు కనెక్షన్ వైఫల్యాన్ని ఎదుర్కొంటే, మీరు SSHని ప్రారంభించి ఉండకపోవచ్చు లేదా మీకు రూట్ అనుమతులతో ఖాతా లేకపోవచ్చు.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[నేను SSHని ఎలా ప్రారంభించగలను?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[1) "నియంత్రణ ప్యానెల్" ఎంచుకుని, -ఆపై "టర్మినల్ & SNMP"ని క్లిక్ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[2) Googleలో "SSHని ఎలా ప్రారంభించడం?" పదబంధం కోసం శోధించండి లేదా నేరుగా NAS పరికర తయారీదారుని సంప్రదించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[సమస్య అలాగే ఉన్నట్లయితే, మమ్మల్ని సంప్రదించడానికి <a href="#"><font color=#00B0F5>ఇక్కడ క్లిక్ చేయండి</font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మరింత తెలుసుకోండి</font></a>]]>
+			</Text>
+		</Item>				
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[నిర్వాహకుడి కంప్యూటర్]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[లక్ష్యం సర్వర్:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue30" Property="string">
+			<Text>
+				<![CDATA[NAS సర్వర్‌కు రిమోట్‌గా కనెక్ట్ చేయడానికి మరియు పునరుద్ధరణని ప్రారంభించడానికి సమాచారాన్ని పూరించండి]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue31" Property="string">
+			<Text>
+				<![CDATA[లక్ష్యం సర్వర్ IP చిరునామా/డొమైన్ పేరు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue32" Property="string">
+			<Text>
+				<![CDATA[దయచేసి IP చిరునామాని నమోదు చేయండి]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue33" Property="string">
+			<Text>
+				<![CDATA[పోర్ట్:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue34" Property="string">
+			<Text>
+				<![CDATA[లక్ష్యం సర్వర్ పోర్ట్]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue35" Property="string">
+			<Text>
+				<![CDATA[దయచేసి పోర్ట్ నంబర్ నమోదు చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue36" Property="string">
+			<Text>
+				<![CDATA[డిఫాల్ట్ పోర్ట్ 22 లేదా దీన్ని నిర్ధారించడానికి మీరు "టర్మినల్ & SNMP"ని తనిఖీ చేయవచ్చు.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue37" Property="string">
+			<Text>
+				<![CDATA[వినియోగదారు ఖాతా:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue38" Property="string">
+			<Text>
+				<![CDATA[లక్ష్యం సర్వర్ ఖాతా]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue39" Property="string">
+			<Text>
+				<![CDATA[దయచేసి వినియోగదారు ఖాతాని నమోదు చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue40" Property="string">
+			<Text>
+				<![CDATA[పాస్‌వర్డ్:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue41" Property="string">
+			<Text>
+				<![CDATA[లక్ష్యం సర్వర్ పాస్‌వర్డ్]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue42" Property="string">
+			<Text>
+				<![CDATA[దయచేసి పాస్‌వర్డ్‌ను నమోదు చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue43" Property="string">
+			<Text>
+				<![CDATA[కనెక్ట్ చేయి]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue44" Property="string">
+			<Text>
+				<![CDATA[ఈ ఖాతాకి యాక్సెస్ పరిమితులు ఉన్నాయి. రూట్ అనుమతులతో మరో ఖాతాని ప్రయత్నించండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue45" Property="string">
+			<Text>
+				<![CDATA[హెచ్చరిక: సమాచారం చెల్లదు. దయచేసి తనిఖీ చేసి, సరైన IP, పోర్ట్ మరియు వినియోగదారు మరియు పాస్‌వర్డ్‌ని పూరించండి.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue46" Property="string">
+			<Text>
+				<![CDATA[1. SSH సేవని తనిఖీ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue47" Property="string">
+			<Text>
+				<![CDATA["నియంత్రణ ప్యానెల్"ని ఎంచుకుని, ఆపై "టర్మినల్ & SNMP"ని క్లిక్ చేసి, SSH సేవ మరియు పోర్టల్‌ని తనిఖీ చేయండి. సాధారణంగా, పోర్ట్ 22 అవుతుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue48" Property="string">
+			<Text>
+				<![CDATA[2. మీ సమాచారం సరిగ్గా ఉందేమో తనిఖీ చేయండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue49" Property="string">
+			<Text>
+				<![CDATA[1) మీరు సరైన IP చిరునామాని నమోదు చేసినట్లు లేదా కనెక్ట్ చేయడానికి డొమైన్ పేరుని ఉపయోగించినట్లు నిర్ధారించుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue50" Property="string">
+			<Text>
+				<![CDATA[2) మీ వినియోగదారు ఖాతా రూట్ అనుమతులను కలిగి ఉన్నట్లు నిర్ధారించుకోండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue51" Property="string">
+			<Text>
+				<![CDATA[3) పాస్‌వర్డ్‌ని నమోదు చేసినప్పుడు సాధారణ టెక్స్ట్ ప్రదర్శనని ఎంచుకోమని మేము మీకు సిఫార్సు చేస్తున్నాము.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue52" Property="string">
+			<Text>
+				<![CDATA[4) SSH సేవ మరియు పోర్ట్‌ని ఒకటికి రెండుసార్లు తనిఖీ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue53" Property="string">
+			<Text>
+				<![CDATA[Linux సిస్టమ్‌కు రిమోట్‌గా కనెక్ట్ చేయడానికి మరియు పునరుద్ధరణని ప్రారంభించడానికి సమాచారాన్ని పూరించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue54" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>మీ Linux సిస్టమ్ కనెక్ట్ చేయలేరా?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue55" Property="string">
+			<Text>
+				<![CDATA[Linux కనెక్షన్‌ల వైఫల్యాల కోసం పరిష్కారాలు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue56" Property="string">
+			<Text>
+				<![CDATA[NAS మరియు Linux పునరుద్ధరణ]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue57" Property="string">
+			<Text>
+				<![CDATA[రేటింగ్ ఇచ్చినందుకు ధన్యవాదాలు. మీరు మా రేటింగ్ సైట్‌లో మీ పునరుద్ధరణ అనుభవాన్ని భాగస్వామ్యం చేస్తారా? మీ సంతృప్తి మా ప్రయత్నాలను నడిపిస్తుంది.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue58" Property="string">
+			<Text>
+				<![CDATA[వెళ్లు]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue59" Property="string">
+			<Text>
+				<![CDATA[లక్ష్య సర్వర్‌కి కనెక్ట్ అవుతోంది, దయచేసి వేచి ఉండండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue60" Property="string">
+			<Text>
+				<![CDATA[సర్వర్(%1) డిస్‌కనెక్ట్ చేయబడింది, మీ నెట్‌వర్క్ వాతావరణాన్ని తనిఖీ చేసి, మళ్లీ కనెక్ట్ చేయండి.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[మళ్లీ ప్రయత్నించండి]]>
+			</Text>
+		</Item>
+		<Item Name="itemValueHome" Property="string">
+			<Text>
+				<![CDATA[హోమ్]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="DetentionHintDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[వీలైనంత త్వరగా కోల్పోయిన డేటాని పునరుద్ధరించాల్సి ఉంది. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[హెచ్చరిక: సమయం ఎంత ఎక్కువగా అయిపోతే, ఫైల్‌లను పునరుద్ధరించడం అంత కష్టం అవుతుంది. స్కాన్ చేసిన డేటాని వెంటనే పునరుద్ధరించమని మీకు సిఫార్సు చేయబడింది.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[అర్థమైంది]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="MessageDisplayWidget">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[మీ ప్రతిష్టాత్మకమైన డేటా మరియు జ్ఞాపకాలను బ్యాకప్ చేసుకోండి మరియు వాటిని మళ్లీ ఎప్పటికీ కోల్పోవద్దు.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[ఆటోమేటిక్, సింపుల్, స్మార్ట్]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[ఇంక్రిమెంటల్ బ్యాకప్]]>
+			</Text>
+		</Item>
+		<Item Name="buttonMore" Property="button">
+			<Text>
+				<![CDATA[1-నెల ట్రయల్‌ను ప్రారంభించండి]]>
+			</Text>
+		</Item>		
+	</Form>
+</Language>
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

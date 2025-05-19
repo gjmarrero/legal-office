@@ -5,9 +5,21 @@ import vue from '@vitejs/plugin-vue';
 // import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+    // server: {
+    //     hmr: {
+    //         host: '192.168.6.221',
+    //         port: 5173,
+    //         strictPort: true
+    //     },
+    // },
     server: {
+        host: '0.0.0.0', // this lets Vite accept external connections
+        port: 5173,
+        cors: true,
         hmr: {
-            host: '192.168.6.221',
+            host: '192.168.6.109', // your actual LAN IP
+            protocol: 'ws',
+            port: 5173,
         },
     },
     esbuild: {

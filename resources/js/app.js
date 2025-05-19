@@ -13,10 +13,10 @@ import { useSettingStore } from './stores/SettingStore';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCircleDown, faLocationArrow, faBook, faRotateRight, faRotateLeft, faPaperclip, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faCircleDown, faLocationArrow, faBook, faRotateRight, faRotateLeft, faPaperclip, faDownload,faSearchPlus,faSearchMinus } from '@fortawesome/free-solid-svg-icons';
 
 
-library.add(faCircleDown,faLocationArrow,faBook,faRotateRight,faRotateLeft,faPaperclip,faDownload);
+library.add(faCircleDown,faLocationArrow,faBook,faRotateRight,faRotateLeft,faPaperclip,faDownload,faSearchPlus,faSearchMinus);
 
 const pinia = createPinia();
 

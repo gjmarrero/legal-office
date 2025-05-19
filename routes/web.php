@@ -29,6 +29,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 //Route::get('/admin/dashboard', function () {
 //    return view('dashboard');
 //});
@@ -96,6 +98,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/outgoing/create', [OutgoingDocumentController::class, 'store']);
     Route::get('/api/outgoing/{document}/edit', [OutgoingDocumentController::class, 'edit']);
     Route::post('/api/outgoing/{document}/edit', [OutgoingDocumentController::class, 'update']);
+    Route::post('/api/outgoing/attach_file', [OutgoingDocumentController::class, 'attachfile']);
 
     Route::get('/api/documents/document/{document}', [DocumentController::class, 'getDocument']);
     Route::post('/api/documents/archive/{document}', [DocumentController::class, 'archive']);
@@ -106,7 +109,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/documents/receive/{document}', [TransactionController::class, 'receive']);
 
     Route::post('/api/documents/route', [TransactionController::class, 'route']);
-    Route::post('/api/documents/attachfile', [DocumentController::class, 'attachfile']);
+    Route::post('/api/documents/attachfile', [DocumentController::class, 'attachFile']);
     Route::get('/api/documents/getAttachedFiles/{document}', [DocumentController::class, 'getAttachedFiles']);
     Route::get('/api/documents/getAdditionalFiles/{document}', [DocumentController::class, 'getAdditionalFiles']);
 
@@ -119,6 +122,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/settings', [SettingController::class, 'update']);
 
     Route::get('/api/employees', [EmployeeController::class, 'index']);
+    Route::post('/api/employees', [EmployeeController::class, 'store']);
 
     Route::get('/api/profile', [ProfileController::class, 'index']);
 

@@ -1,0 +1,3068 @@
+<Language language="Netherland(Nederlands)">
+	<Default>
+		<Font From="Segoe UI" To="Arial" FailTo="Tahoma"/>
+	</Default>  
+	<Strings>
+		<!--有更新的项-->
+		<Item Name="CompressedSize">
+			<Text>
+				<![CDATA[Gecomprimeerde grootte]]>
+			</Text>
+		</Item>
+		<Item Name="noNameDisplayText">
+			<Text>
+				<![CDATA[Geen Naam]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDescs">
+			<Text>
+				<![CDATA[3 bestanden herstel mislukt, als volgt.]]>
+			</Text>
+		</Item>	
+		<Item Name="SaveFailFileDesc">
+			<Text>
+				<![CDATA[1 bestand herstel mislukt, als volgt.]]>
+			</Text>
+		</Item>			
+		<Item Name="SaveFailFileName">
+			<Text>
+				<![CDATA[Bestandsnaam]]>
+			</Text>
+		</Item>
+		<Item Name="LoadingfilesDesc">
+			<Text>
+				<![CDATA[Het bestand wordt geladen...wacht even.]]>
+			</Text>
+		</Item>		
+		<Item Name="FilesFoundDesc">
+			<Text>
+				<![CDATA[Bestanden gevonden:]]>
+			</Text>
+		</Item>
+		<Item Name="ReadingSectorsDesc">
+			<Text>
+				<![CDATA[Sectoren lezen:]]>
+			</Text>
+		</Item>	
+		<Item Name="StopScanningDesc">
+			<Text>
+				<![CDATA[Wilt u het scanproces stoppen voordat het klaar is?<br><br><br>Waarschuwing: Het onderbreken van de scan zal onvolledige resultaten geven voor het herstel.]]>
+			</Text>
+		</Item>
+		<Item Name="HomeStopScanningDesc">
+			<Text>
+				<![CDATA[Wilt u de huidige scanresultaten weggooien en terug naar de startpagina?<br><br><br>Waarschuwing: Als u nu vertrekt, kunnen de huidige scanresultaten verloren gaan. Het wordt aanbevolen om bestanden onmiddellijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningDesc">
+			<Text>
+				<![CDATA[Wilt u de huidige scanresultaten weggooien en het programma sluiten?<br><br><br>Waarschuwing: Als u nu vertrekt, kunnen de huidige scanresultaten verloren gaan. Het wordt aanbevolen om bestanden onmiddellijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ExitStopScanningNoRecoverDesc">
+			<Text>
+				<![CDATA[Wilt u de huidige scanresultaten weggooien en het programma sluiten?<br><br><br>Waarschuwing: Als u nu vertrekt, kunnen de huidige scanresultaten verloren gaan. Het wordt aanbevolen om bestanden onmiddellijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="ListViewDesc">
+			<Text>
+				<![CDATA[Lijstweergave]]>
+			</Text>
+		</Item>
+		<Item Name="DetailViewDesc">
+			<Text>
+				<![CDATA[Detailweergave]]>
+			</Text>
+		</Item>
+		<Item Name="IconViewDesc">
+			<Text>
+				<![CDATA[Icoonwergave]]>
+			</Text>
+		</Item>		
+		<Item Name="ButtonBack">
+			<Text>
+				<![CDATA[Terug]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonOk">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+		<Item Name="ButtonCancel">
+			<Text>
+				<![CDATA[Annuleren]]>
+			</Text>
+		</Item>
+		<Item Name ="ButtonRecover">
+			<Text>
+				<![CDATA[Herstellen]]>
+			</Text>
+		</Item>
+		<Item Name ="ScanDesc">
+			<Text>
+				<![CDATA[Scannen]]>
+			</Text>
+		</Item>
+		<Item Name ="ButtonAdvanceRecover">
+			<Text>
+				<![CDATA[Geavanceerd video herstel]]>
+			</Text>
+		</Item>
+		<Item Name ="AllVideosDesc">
+			<Text>
+				<![CDATA[Alle video's]]>
+			</Text>
+		</Item>
+		<Item Name ="OtherVideosDesc">
+			<Text>
+				<![CDATA[Andere video's]]>
+			</Text>
+		</Item>
+		<Item Name ="OtherPhotosDesc">
+			<Text>
+				<![CDATA[Andere foto's]]>
+			</Text>
+		</Item>
+		<Item Name ="CorruptedVideoDesc">
+			<Text>
+				<![CDATA[Corrupte video]]>
+			</Text>
+		</Item>
+		<Item Name ="VideoFormatDesc">
+			<Text>
+				<![CDATA[Videoformaat]]>
+			</Text>
+		</Item>
+		<Item Name ="RecoveryFailDesc">
+			<Text>
+				<![CDATA[<a href="#"><font color=#FF644D>%1 bestand(en) herstel mislukt</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name ="RecoveryCancelDesc">
+			<Text>
+				<![CDATA[En annuleer herstel van %1 bestand(en).]]>
+			</Text>
+		</Item>
+		<Item Name ="SelectAllDesc">
+			<Text>
+				<![CDATA[Alles selecteren]]>
+			</Text>
+		</Item>
+		<Item Name ="OnlineSupportDesc">
+			<Text>
+				<![CDATA[Online Ondersteuning]]>
+			</Text>
+		</Item>
+		<Item Name ="MoreDesc">
+			<Text>
+				<![CDATA[Meer]]>
+			</Text>
+		</Item>
+		<Item Name ="checkboxScanningDesc">
+			<Text>
+				<![CDATA[Bestanden kunnen niet worden gecontroleerd tijdens het scannen. Pauzeer de scan om bestanden te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name ="lostPartitionTooltipDesc">
+			<Text>
+				<![CDATA[De partitie heeft geen stationsletter en is niet toegankelijk in Windows Verkenner.]]>
+			</Text>
+		</Item>
+		<Item Name ="NoReminderAgain">
+			<Text>
+				<![CDATA[Niet opnieuw tonen]]>
+			</Text>
+		</Item>
+		<Item Name ="lockedDesc">
+			<Text>
+				<![CDATA[Vergrendeld]]>
+			</Text>
+		</Item>
+		<Item Name ="lostFileNameDesc">
+			<Text>
+				<![CDATA[Verloren bestandsnaam]]>
+			</Text>
+		</Item>
+	</Strings>
+	<Form Name="OldFrame">
+		<Item Name="OutofMemoryDesc">
+			<Text>
+				<![CDATA[Computer heeft geen geheugen meer, het scanproces zal worden gepauzeerd en u kunt de gescande bestanden herstellen.<br><br><br>RAM Info: %1, stop andere programma's die veel geheugen gebruiken terwijl u Recoverit gebruikt.]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="string">
+			<Text>
+				<![CDATA[Kies een locatie om het herstel te starten]]>
+			</Text>
+		</Item>	
+		<Item Name="FullDiskDesc_1" Property="string">
+			<Text>
+				<![CDATA[Herstel %1 gratis bestanden, <Font color="#FF641D">%2 nu beschikbaar.</Font>]]>
+			</Text>
+		</Item>
+		<Item Name ="m_free" Property="string">
+			<Text>
+				<![CDATA[Gratis]]>
+			</Text>
+		</Item>
+		<Item Name ="m_stillrecover" Property="string">
+			<Text>
+				<![CDATA[U kunt nog steeds %1 bestanden herstellen voor de gratis versie,]]>
+			</Text>
+		</Item>
+		<Item Name ="m_recoverSelected" Property="string">
+			<Text>
+				<![CDATA[%1 bestanden geselecteerd.]]>
+			</Text>
+		</Item>
+		<Item Name ="lblFreeDesc" Property="string">
+			<Text>
+				<![CDATA[Koop een licentie om gebruik te maken van de Geavanceerde versie.]]>
+			</Text>
+		</Item>
+		<Item Name ="lblFreeWarning" Property="string">
+			<Text>
+				<![CDATA[Het formaat van het geselecteerde bestand is groter dan het beschikbare formaat. ]]>
+			</Text>
+		</Item>
+
+		<Item Name="availableDesc" Property="string">
+			<Text>
+				<![CDATA[beschikbaar]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewFileMaxDesc" Property="string">
+			<Text>
+				<![CDATA[Bestanden <font color=#FF644D>groter dan 1GB</Font> kunnen niet weergegeven worden.]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewUnkownFileDesc1" Property="string">
+			<Text>
+				<![CDATA[Je kunt de bestanden, na het herstellen, op de computer bekijken. ]]>
+			</Text>
+		</Item>
+		<Item Name="ScanningPause" Property="string">
+			<Text>
+				<![CDATA[Scannen onderbroken.]]>
+			</Text>
+		</Item>
+		<Item Name="AdvancedVideoScanHint"  Property="string">
+			<Text>
+				<![CDATA[We moeten een grondige scan doen van de videobestanden, en dat zal enige tijd duren. Wacht alstublieft even om uw video's op te halen.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc1" Property="string">
+			<Text>
+				<![CDATA[Er zijn veel slechte sectoren op de schijf, scannen kan niet doorgaan. We raden je aan om de <b>gescande bestanden</b> zo snel mogelijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="m_RenameText" Property="string">
+			<Text>
+				<![CDATA[De nieuwe naam bestaat al.]]>
+			</Text>
+		</Item>
+		<Item Name="strStopTitle" Property="string">
+			<Text>
+				<![CDATA[Weet je zeker dat je wilt stoppen met herstellen bestanden?]]>
+			</Text>
+		</Item>
+		<Item Name="noDriver" Property="string">
+			<Text>
+				<![CDATA[Apparaat is losgekoppeld. Verbind en probeer opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverRemoveHint" Property="string">
+			<Text>
+				<![CDATA[%1 bestand(en) herstel mislukt omdat de %2 is verwijderd.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverFat32" Property="string">
+			<Text>
+				<![CDATA[Een bestand groter dan 4GB kan niet hersteld worden door de limiten van FAT32, je kunt het naar andere typen partities herstellen.]]>
+			</Text>
+		</Item>	
+		<Item Name="RecoverSuccessDesc" Property="string">
+			<Text>
+				<![CDATA[<Font color="#00B0F5">%1</Font> bestanden hersteld!]]>
+			</Text>
+		</Item>
+		<Item Name="RecoverFailDesc1" Property="string">
+			<Text>
+				<![CDATA[<b>%1 bestand(en)</b> succesvol hersteld! Sommige bestanden zijn niet hersteld, vanwege de volgende reden:]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSaveDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[Herstel is mislukt vanwege het niet-beschikbare opslagapparaat. Plaats het externe opslagmedium opnieuw en herstel uw gegevens opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorSourceDevice_UParationDialog" Property="string">
+			<Text>
+				<![CDATA[Opslag apparaat is niet beschikbaar, verbind externe schijf en probeer opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameRecoverHint" Property="string">
+			<Text>
+				<![CDATA[Selecteer bestand(en) om te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="SourceDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[De schijf is losgekoppeld. Verbind opnieuw en ga door met herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="DestDiskDisconnectedDesc" Property="string">
+			<Text>
+				<![CDATA[Schijf is losgekoppeld! Maak opnieuw verbinding en ga verder met herstellen.]]>
+			</Text>
+		</Item>	
+		<Item Name="strRecoverFilesNum" Property="string">
+			<Text>
+				<![CDATA[Herstellen bestanden: ]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblname" Property="string">
+			<Text>
+				<![CDATA[Naam:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lalsize" Property="string">
+			<Text>
+				<![CDATA[Formaat:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblpath" Property="string">
+			<Text>
+				<![CDATA[Pad:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblecrete" Property="string">
+			<Text>
+				<![CDATA[Datum aangemaakt:]]>
+			</Text>
+		</Item>
+		<Item Name="m_lblmodefy" Property="string">
+			<Text>
+				<![CDATA[Aangepaste datum:]]>
+			</Text>
+		</Item>
+		<Item Name="m_btperview" Property="string">
+			<Text>
+				<![CDATA[Preview]]>
+			</Text>
+		</Item>
+		<Item Name="UnNormalSector" Property="string">
+			<Text>
+				<![CDATA[We don't currently support your device. <b>If the connected device is a camera, you can take the SD card out and insert it into a card reader, then scan it</b>.]]>
+			</Text>
+		</Item>    
+
+		<Item Name="AllRoundScanCompleteed" ControlType = "11" >
+			<Text>
+				<![CDATA[Kunt u verloren bestanden niet vinden? Probeer een diepe scan. ]]>
+			</Text>
+		</Item>
+
+		<Item Name="RawScanCompleteed" Property="string">
+			<Text>
+				<![CDATA[Verloren bestanden niet gevonden? Selecteer Diepe Scan modus en probeer opnieuw.]]>
+			</Text>
+		</Item>
+
+		<Item Name="UnVerifyTrustDesc1" Property="string">
+			<Text>
+				<![CDATA[Je loopt het risico illegale software te gebruiken. Koop een legale kopie om verder te gebruiken.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc2" Property="string">
+			<Text>
+				<![CDATA[Koop]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc3" Property="string">
+			<Text>
+				<![CDATA[Downloaden]]>
+			</Text>
+		</Item>
+		<Item Name="PreviewLoadDesc" Property="string">
+			<Text>
+				<![CDATA[Bestand laden.. even geduld a.u.b.]]>
+			</Text>
+		</Item>
+		<Item Name="UnVerifyTrustDesc4" ControlType="11">
+			<Text>
+				<![CDATA[Koop, download en installeer de legale versie via de officiële website van Recoverit. http://recoverit.wondershare.com]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs1" Property="string">
+			<Text>
+				<![CDATA[Blijft het probleem zich voordoen? <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">Klik hier</Font></a> om aan ons te rapporteren.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs2" Property="string">
+			<Text>
+				<![CDATA[Probeer de Voorbeeld video te veranderen en repareer opnieuw. Als het probleem zich blijft voordoen, <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">klik hier</Font></a> om aan ons te rapporteren.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs3" Property="string">
+			<Text>
+				<![CDATA[Aanmaken mislukt, controleer de verbinding van het apparaat of <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">rapporteer nu</Font></a> aan ons.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs4" Property="string">
+			<Text>
+				<![CDATA[Herscannen lost het probleem niet op? <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">Klik hier</Font></a> om aan ons te rapporteren.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs5" Property="string">
+			<Text>
+				<![CDATA[Om de software te activeren is internetverbinding nodig. Controleer de verbinding of neem contact op met de systeembeheerder. Je kunt ook <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">aan ons rapporteren</Font></a>.]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs6" Property="string">
+			<Text>
+				<![CDATA[Welk deel van Roverit vind je niet goed? <style> a {text-decoration: none} </style><a href="#"><Font color="#00AEE6">Delen</Font></a> met ons kan ons erg helpen!]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs7" Property="string">
+			<Text>
+				<![CDATA[Geen internetverbinding]]>
+			</Text>
+		</Item>
+		<Item Name="ReportToUs8" Property="string">
+			<Text>
+				<![CDATA[Oh nee… we hebben geen internetverbinding. Controleer de verbinding en probeer opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeepHint" Property="string">
+			<Text>
+				<![CDATA[De Diepe scan modus heeft meer tijd nodig.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 items, %2]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameSelectFileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[%1 bestand(en) geselecteerd in %2]]>
+			</Text>
+		</Item>
+		<Item Name="RAWDeep" Property="string">
+			<Text>
+				<![CDATA[<font color=#26324B>Verloren bestanden niet gevonden? Probeer </font> <b><style> a {text-decoration: none} </style><a href="#"><font color=#00AEE6>Diepe Scan</font></a></b>]]>
+			</Text>
+		</Item>
+		<Item Name="NoDataFrameDesc" Property="string">
+			<Text>
+				<![CDATA[<b>Geen bestand gevonden</b><br><br>Selecteer andere bestandstypen om te controleren]]>
+			</Text>
+		</Item>
+		<Item Name="PauseBeforeRecover" Property="string">
+			<Text>
+				<![CDATA[Pauzeer de scan voordat je de bestanden hersteld.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture1" Property="string">
+			<Text>
+				<![CDATA[Kan niet weergegeven worden. Bestand kan beschadigd zijn vanwege: ]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture2"  Property="string">
+			<Text>
+				<![CDATA[1. Gegevens zijn overschreven.]]>
+			</Text>
+		</Item>
+		<Item Name="ErrorPicture3"  Property="string">
+			<Text>
+				<![CDATA[2. Gegevens zijn incompleet. (wacht tot scan is afgerond.)]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantQuit1" Property="string">
+			<Text>
+				<![CDATA[Er is een probleem met de autorisatie van je account.]]>
+			</Text>
+		</Item>
+		<Item Name="UserAssistantRetry"  Property="string">
+			<Text>
+				<![CDATA[Probeer opnieuw]]>
+			</Text>
+		</Item>
+		<Item Name="m_BuyNowButton"  Property="string">
+			<Text>
+				<![CDATA[Koop]]>
+			</Text>
+		</Item>
+		<Item Name="bootretry"  Property="string">
+			<Text>
+				<![CDATA[Opnieuw proberen]]>
+			</Text>
+		</Item>
+		<Item Name="bootformatnow"  Property="string">
+			<Text>
+				<![CDATA[Formatteren]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc3"  Property="string">
+			<Text>
+				<![CDATA[Verander pad]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Ja]]>
+			</Text>
+		</Item>
+		<Item Name="Stop0_m_NoButton"  Property="string">
+			<Text>
+				<![CDATA[Nee]]>
+			</Text>
+		</Item>	 
+		<Item Name="Stop1_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Stoppen]]>
+			</Text>
+		</Item>
+		<Item Name="Stop1_m_cancelButton"  Property="string">
+			<Text>
+				<![CDATA[Annuleren]]>
+			</Text>
+		</Item>
+		<Item Name="Stop2_m_ExitButton" Property="string">
+			<Text>
+				<![CDATA[Afsluiten]]>
+			</Text>
+		</Item>
+		<Item Name="Stop5_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Overwrite]]>
+			</Text>
+		</Item>
+
+		<Item Name="Stop6_m_sureButton"  Property="string">
+			<Text>
+				<![CDATA[Opslaan]]>
+			</Text>
+		</Item>
+		<Item Name="PasswordDialogText"  Property="string">
+			<Text>
+				<![CDATA[De geselecteerde schijf is vergrendeld met een wachtwoord. Voer wachtwoord in om volledig te scannen.]]>
+			</Text>
+		</Item>  
+		<Item Name="IsAdmin"  Property="string">
+			<Text>
+				<![CDATA[Je moet beheerdersrechten hebben om de software te kunnen draaien]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strError"  Property="string">
+			<Text>
+				<![CDATA[Wondershare Recoverit is nog bezig!]]>
+			</Text>
+		</Item>
+		<Item Name="DataPublic_strWaring" Property="string">
+			<Text>
+				<![CDATA[Waarschuwing]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyNetWorkDesc" Property="string">
+			<Text>
+				<![CDATA[Om de software te activeren is internetverbinding nodig. Controleer de verbinding of neem contact op met de systeembeheerder.]]>
+			</Text>
+		</Item>
+		<Item Name="NewAntiPiracyDesc" Property="string">
+			<Text>
+				<![CDATA[De software is niet legaal. Download en upgrade de legale versie om gegevens te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc1" Property="string">
+			<Text>
+				<![CDATA[Je loopt het risico illegale software te gebruiken!]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc2" Property="string">
+			<Text>
+				<![CDATA[Waarschuwing:]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc3" Property="string">
+			<Text>
+				<![CDATA[Je computer kan een virus krijgen door het gebruik van illegale software. Dit kan er zelfs voor zorgen dat de gegevens opnieuw verloren gaan.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc4" Property="string">
+			<Text>
+				<![CDATA[Hier is de tijdelijke aanbieding voor jou]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc5" Property="string">
+			<Text>
+				<![CDATA[60% korting op een licentie.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc6" Property="string">
+			<Text>
+				<![CDATA[Notitie: We raden aan om de gescande bestanden zo snel mogelijk te herstellen. De gegevens kunnen overschreven worden waardoor ze verloren gaan.]]>
+			</Text>
+		</Item>	
+		<Item Name="PiracyDesc7" Property="string">
+			<Text>
+				<![CDATA[De applicatie lijkt beschadigd of onvolledig te zijn, download de officiële versie en installeer deze opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="PiracyDesc8" Property="string">
+			<Text>
+				<![CDATA[<style> a {text-decoration: none} </style><a href="#"><font color=#00AEE6>Officiële Website</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="ScanFramePauseTooltip">
+			<Text>
+				<![CDATA[Pauze]]>
+			</Text>
+		</Item>
+		<Item Name="ScanFrameStopTooltip">
+			<Text>
+				<![CDATA[Stop]]>
+			</Text>
+		</Item>
+		<Item Name="MulItemSelected">
+			<Text>
+				<![CDATA[%1 geselecteerd]]>
+			</Text>
+		</Item>	
+		<Item Name="m_strArchive">
+			<Text>
+				<![CDATA[Archief]]>
+			</Text>
+		</Item>
+		<Item Name="m_strAudio">
+			<Text>
+				<![CDATA[Audio]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDataBase">
+			<Text>
+				<![CDATA[DataBase]]>
+			</Text>
+		</Item>
+		<Item Name="m_strDocument">
+			<Text>
+				<![CDATA[Document]]>
+			</Text>
+		</Item>
+		<Item Name="m_strEmail">
+			<Text>
+				<![CDATA[E-mail]]>
+			</Text>
+		</Item>
+		<Item Name="m_strGraphic">
+			<Text>
+				<![CDATA[Grafisch]]>
+			</Text>
+		</Item>
+		<Item Name="m_strInternetWeb">
+			<Text>
+				<![CDATA[Internet&amp;Web]]>
+			</Text>
+		</Item>
+		<Item Name="m_strMiscellaneous">
+			<Text>
+				<![CDATA[Diversen]]>
+			</Text>
+		</Item>
+		<Item Name="m_strVideo">
+			<Text>
+				<![CDATA[Video]]>
+			</Text>
+		</Item>
+		<Item Name="m_strNoExtension">
+			<Text>
+				<![CDATA[Geen Uitbreiding]]>
+			</Text>
+		</Item>
+		<Item Name="m_strFileNamePath">
+			<Text>
+				<![CDATA[Zoek bestandnaam of pad]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip1">
+			<Text>
+				<![CDATA[Filter]]>
+			</Text>
+		</Item>
+		<Item Name="FilteToolTip2">
+			<Text>
+				<![CDATA[Voorwaarden filterbestand %1-bestand.]]>
+			</Text>
+		</Item>		
+		<Item Name="UpdateAuthorDesc0">
+			<Text>
+				<![CDATA[Upgrade]]>
+			</Text>
+		</Item>
+		<Item Name="loginDesc">
+			<Text>
+				<![CDATA[Log in]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleRemoveDesc">
+			<Text>
+				<![CDATA[%1 is verwijderd, sluit het op de computer aan en probeer het opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="LostPartitionDesc">
+			<Text>
+				<![CDATA[Verloren partitie]]>
+			</Text>
+		</Item>
+		<Item Name="LocalDiskDesc">
+			<Text>
+				<![CDATA[Local Disk]]>
+			</Text>
+		</Item>
+		<Item Name="RawFilesDesc">
+			<Text>
+				<![CDATA[RUWE Bestanden]]>
+			</Text>
+		</Item>
+		<Item Name="FolderDesc">
+			<Text>
+				<![CDATA[Map]]>
+			</Text>
+		</Item>
+		<Item Name="lostlocationDesc">
+			<Text>
+				<![CDATA[Bestand zonder pad]]>
+			</Text>
+		</Item>
+		<Item Name="RecycleBinDesc">
+			<Text>
+				<![CDATA[Prullenbak]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerDesc">
+			<Text>
+				<![CDATA[De geselecteerde schijf is vergrendeld door Windows BitLocker, ontgrendel het en probeer opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="LostBitLockerDesc">
+			<Text>
+				<![CDATA[%1 is beschermd met BitLocker, ontgrendel het om te scannen. ]]>
+			</Text>
+		</Item>		
+		<Item Name="DiskRefreshDesc">
+			<Text>
+				<![CDATA[Schijf informatie aan het laden, een ogenblik geduld…]]>
+			</Text>
+		</Item>
+		<Item Name="ScanWaitFrameDesc3">
+			<Text>
+				<![CDATA[Scan is gestopt en probeert het opnieuw, heb even geduld…]]>
+			</Text>
+		</Item>
+		<Item Name="DesktopDesc">
+			<Text>
+				<![CDATA[Desktop]]>
+			</Text>
+		</Item>
+		<Item Name="SelectFolderkDesc">
+			<Text>
+				<![CDATA[Selecteer Map]]>
+			</Text>
+		</Item>		
+		<Item Name="Unknown">
+			<Text>
+				<![CDATA[Onbekend]]>
+			</Text>
+		</Item>
+		<Item Name="findHardDriver1">
+			<Text>
+				<![CDATA[We ondersteunen uw cameramodel nog niet. <br><br><br>U kunt de SD-kaart eruit halen en in een kaartlezer plaatsen en vervolgens scannen.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2">
+			<Text>
+				<![CDATA[Uw schijf is beschadigd. Het wordt aanbevolen om uw bestanden zo snel mogelijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDesc2_1">
+			<Text>
+				<![CDATA[Detecteert dat uw schijf enkele problemen heeft.]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="CalendarFrame">	
+		<Item Name="Week1" Property="string">
+			<Text>
+				<![CDATA[Ma]]>
+			</Text>
+		</Item>
+		<Item Name="Week2" Property="string">
+			<Text>
+				<![CDATA[Di]]>
+			</Text>
+		</Item>
+		<Item Name="Week3" Property="string">
+			<Text>
+				<![CDATA[Wo]]>
+			</Text>
+		</Item>
+		<Item Name="Week4" Property="string">
+			<Text>
+				<![CDATA[Do]]>
+			</Text>
+		</Item>
+		<Item Name="Week5" Property="string">
+			<Text>
+				<![CDATA[Vr]]>
+			</Text>
+		</Item>
+		<Item Name="Week6" Property="string">
+			<Text>
+				<![CDATA[Za]]>
+			</Text>
+		</Item>
+		<Item Name="Week7" Property="string">
+			<Text>
+				<![CDATA[Zo]]>
+			</Text>
+		</Item>	  
+		<Item Name="Mon1" Property="string">
+			<Text>
+				<![CDATA[Januari]]>
+			</Text>
+		</Item>
+		<Item Name="Mon2" Property="string">
+			<Text>
+				<![CDATA[Februari]]>
+			</Text>
+		</Item>
+		<Item Name="Mon3" Property="string">
+			<Text>
+				<![CDATA[Maart]]>
+			</Text>
+		</Item>
+		<Item Name="Mon4" Property="string">
+			<Text>
+				<![CDATA[April]]>
+			</Text>
+		</Item>
+		<Item Name="Mon5" Property="string">
+			<Text>
+				<![CDATA[Mei]]>
+			</Text>
+		</Item>
+		<Item Name="Mon6" Property="string">
+			<Text>
+				<![CDATA[Juni]]>
+			</Text>
+		</Item>
+		<Item Name="Mon7" Property="string">
+			<Text>
+				<![CDATA[Juli]]>
+			</Text>
+		</Item>
+		<Item Name="Mon8" Property="string">
+			<Text>
+				<![CDATA[Agustus]]>
+			</Text>
+		</Item>
+		<Item Name="Mon9" Property="string">
+			<Text>
+				<![CDATA[September]]>
+			</Text>
+		</Item>
+		<Item Name="Mon10" Property="string">
+			<Text>
+				<![CDATA[Oktober]]>
+			</Text>
+		</Item>
+		<Item Name="Mon11" Property="string">
+			<Text>
+				<![CDATA[November]]>
+			</Text>
+		</Item>
+		<Item Name="Mon12" Property="string">
+			<Text>
+				<![CDATA[December]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RowHeaderFrame">	
+		<Item Name="Head0" Property="string">
+			<Text>
+				<![CDATA[       Name]]>
+			</Text>
+		</Item>
+		<Item Name="Head1"  Property="string">
+			<Text>
+				<![CDATA[Size]]>
+			</Text>
+		</Item>
+		<Item Name="Head2"  Property="string">
+			<Text>
+				<![CDATA[Path]]>
+			</Text>
+		</Item>
+		<Item Name="Head3" Property="string">
+			<Text>
+				<![CDATA[Created Date]]>
+			</Text>
+		</Item>
+		<Item Name="Head4"  Property="string">
+			<Text>
+				<![CDATA[Date Modified]]>
+			</Text>
+		</Item>
+		<Item Name="Head5"  Property="string">
+			<Text>
+				<![CDATA[Type]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MainMenu">		
+		<Item Name="m_StrStatus" Property="string">
+			<Text>
+				<![CDATA[Feedback]]>
+			</Text>
+		</Item>	  
+		<Item Name="m_optionsAction" Property="string">
+			<Text>
+				<![CDATA[Taal]]>
+			</Text>
+		</Item>
+		<Item Name="m_helpAction" Property="string">
+			<Text>
+				<![CDATA[Help]]>
+			</Text>
+		</Item>
+		<Item Name="m_purchaseAction" Property="string">
+			<Text>
+				<![CDATA[Aankopen]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction" Property="string">
+			<Text>
+				<![CDATA[Activeren]]>
+			</Text>
+		</Item>
+		<Item Name="m_registerAction1" Property="string">
+			<Text>
+				<![CDATA[Account]]>
+			</Text>
+		</Item>
+		<Item Name="m_suppotAction" Property="string">
+			<Text>
+				<![CDATA[Gebruiksaanwijzing]]>
+			</Text>
+		</Item>
+		<Item Name="m_diskToolAction" Property="string">
+			<Text>
+				<![CDATA[Disk Tools]]>
+			</Text>
+		</Item>
+		<Item Name="m_logfilesAction" Property="string">
+			<Text>
+				<![CDATA[Log bestanden]]>
+			</Text>
+		</Item>
+		<Item Name="m_updateAction" Property="string">
+			<Text>
+				<![CDATA[Controleren op updates]]>
+			</Text>
+		</Item>
+		<Item Name="m_userGuideAction" Property="string">
+			<Text>
+				<![CDATA[Gebruiksaanwijzing]]>
+			</Text>
+		</Item>
+		<Item Name="m_aboutAction" Property="string">
+			<Text>
+				<![CDATA[Over]]>
+			</Text>
+		</Item>
+		<Item Name="m_contactusAction" Property="string">
+			<Text>
+				<![CDATA[FAQ]]>
+			</Text>
+		</Item>	  
+	</Form>
+	<Form Name="cmenuOption">
+		<Item Name="Language" Property="string">
+			<Text>
+				<![CDATA[Taal]]>
+			</Text>
+		</Item>
+		<Item Name="languageCombox" Property="string">
+			<Text>
+				<![CDATA[English(English),Japanese(日本語),French(Français),German(Deutsch),Chinese Traditional(中国香港),Chinese Traditional(中国台湾),Portuguese(Portuguese),Italiano(Italiano),Spanish(Español),Netherland(Nederlands),Arab( العربية ),Korean(한국어),Sweden(Swédia),Indonesia(Indonesia),Russian(русский)]]>
+			</Text>
+		</Item>
+		<Item Name="okButton" Property="string">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+		<Item Name="cancelButton" Property="string">
+			<Text>
+				<![CDATA[Annuleren]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BitLockerPasswordDialog">
+		<Item Name="lblTextValue" Property="string">
+			<Text>
+				<![CDATA[De door u geselecteerde schijf is vergrendeld met Bitlocker. Voer uw wachtwoord in om te ontgrendelen.]]>
+			</Text>
+		</Item>
+		<Item Name="lineEditPlaceholderText" Property="string">
+			<Text>
+				<![CDATA[wachtwoord/herstelsleutel]]>
+			</Text>
+		</Item>
+		<Item Name="lblHowTo" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Wachtwoord vergeten? </font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc1" Property="string">
+			<Text>
+				<![CDATA[Herstelsleutel vinden op deze PC]]>
+			</Text>
+		</Item>
+		<Item Name="labelError" Property="label">
+			<Text>
+				<![CDATA[Onjuist wachtwoord]]>
+			</Text>
+		</Item>		
+		<Item Name="BtnSearch" Property="button">
+			<Text>
+				<![CDATA[Aan het zoeken]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc2" Property="string">
+			<Text>
+				<![CDATA[Aan het zoeken...]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc3" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>Niet gevonden</font>. <a href="#"><font color=#00B0F5>Andere manieren om de herstelsleutel te vinden.</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc4" Property="string">
+			<Text>
+				<![CDATA[Succesvol ontgrendeld. ]]>
+			</Text>
+		</Item>
+		<Item Name="TextDesc5" Property="string">
+			<Text>
+				<![CDATA[Herstelsleutel gevonden. Succesvol ontgrendeld. ]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanNoDataFrame">
+		<Item Name="LastScanProgressSynced" Property="string">
+			<Text>
+				<![CDATA[Voortgang van laatste scan gesynchroniseerd]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc1" Property="label">
+			<Text>
+				<![CDATA[Aan het scannen]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc2" Property="label">
+			<Text>
+				<![CDATA[Sluit het huidige proces niet af tot de scan is voltooid.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="RepairFileDataFrame">
+		<Item Name="textDesc1" Property="string">
+			<Text>
+				<![CDATA[Het beschadigde bestand kan niet worden bekeken. Repairit-component wordt opgestart om te proberen uw beschadigde bestand te herstellen…]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc2" Property="string">
+			<Text>
+				<![CDATA[Beschadigde bestand toch herstellen?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc3" Property="string">
+			<Text>
+				<![CDATA[Het herstellen is niet voltooid. Het bestand is nog steeds beschadigd.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc4" Property="string">
+			<Text>
+				<![CDATA[Bezig met herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc5" Property="string">
+			<Text>
+				<![CDATA[Annuleren]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc6" Property="string">
+			<Text>
+				<![CDATA[Het herstellen van uw bestand is gelukt!]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc7" Property="string">
+			<Text>
+				<![CDATA[Herstellen mislukt. Het bestand is ernstig beschadigd en kan niet worden bekeken.]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc8" Property="string">
+			<Text>
+				<![CDATA[Beschadigde bestand toch herstellen?]]>
+			</Text>
+		</Item>
+		<Item Name="textDesc9" Property="string">
+			<Text>
+				<![CDATA[Het bestand kan beschadigd zijn. Controleer dit zodra de poging tot herstellen is voltooid en probeer dit op te lossen.]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="CrashContinueDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Doorgaan met onvoltooide scan?]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Er is een softwareprobleem opgetreden. Uw scan is nog niet voltooid. Wilt u doorgaan?]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOK" Property="button">
+			<Text>
+				<![CDATA[Doorgaan]]>
+			</Text>
+		</Item>
+		<Item Name="BtnCancel" Property="button">
+			<Text>
+				<![CDATA[Annuleren]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="LockDriverDialog">
+		<Item Name="LockDriverDialog1" Property="string">
+			<Text>
+				<![CDATA[Overslaan]]>
+			</Text>
+		</Item>
+		<Item Name="LockDriverDialog2" Property="string">
+			<Text>
+				<![CDATA[Ontgrendelen]]>
+			</Text>
+		</Item>
+		<Item Name="BitLockerLink" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Hoe ontgrendelen?</font></a>]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="FilterFrame">
+		<Item Name="FilterDesc" Property="string">
+			<Text>
+				<![CDATA[Filter]]>
+			</Text>
+		</Item>
+		<Item Name="ResetDesc" Property="string">
+			<Text>
+				<![CDATA[Reset]]>
+			</Text>
+		</Item>
+		<Item Name="FileTypeDesc" Property="string">
+			<Text>
+				<![CDATA[File Type]]>
+			</Text>
+		</Item>		
+		<Item Name="TimeDesc" Property="string">
+			<Text>
+				<![CDATA[Tijd]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDesc" Property="string">
+			<Text>
+				<![CDATA[Bestandsgrootte]]>
+			</Text>
+		</Item>
+		<Item Name="FileSizeDescText" Property="string">
+			<Text>
+				<![CDATA[Bestandsgrootte]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText1" Property="string">
+			<Text>
+				<![CDATA[Altijd]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText2" Property="string">
+			<Text>
+				<![CDATA[De vorige dag]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText3" Property="string">
+			<Text>
+				<![CDATA[vorige week]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText4" Property="string">
+			<Text>
+				<![CDATA[vorige maand]]>
+			</Text>
+		</Item>
+		<Item Name="FilterDateTimeText5" Property="string">
+			<Text>
+				<![CDATA[Vorig jaar]]>
+			</Text>
+		</Item>		
+		<Item Name="FilterDateTimeText6" Property="string">
+			<Text>
+				<![CDATA[Aanpassen…]]>
+			</Text>
+		</Item>
+		<Item Name="Lessthan1MB" Property="string">
+			<Text>
+				<![CDATA[Monder dan 1 MB]]>
+			</Text>
+		</Item>
+		<Item Name="1GBabove" Property="string">
+			<Text>
+				<![CDATA[Meer dan 1 GB]]>
+			</Text>
+		</Item>
+		<Item Name="AllFiles" Property="string">
+			<Text>
+				<![CDATA[Alle bestanden]]>
+			</Text>
+		</Item>	
+		<Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[Verwijderde bestanden]]>
+			</Text>
+		</Item>
+		<Item Name="FilteringDesc" Property="string">
+			<Text>
+				<![CDATA[Filteren]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchingDesc" Property="string">
+			<Text>
+				<![CDATA[Zoeken]]>
+			</Text>
+		</Item>	
+		<Item Name="SearchresultsFilesEx" Property="string">
+			<Text>
+				<![CDATA[Zoekresultaat: %1 items; %2 bestanden]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFiles" Property="string">
+			<Text>
+				<![CDATA[Zoekresultaten: %1 bestanden]]>
+			</Text>
+		</Item>
+		<Item Name="Searchresults" Property="string">
+			<Text>
+				<![CDATA[Zoekresultaat voor %1]]>
+			</Text>
+		</Item>
+		<Item Name="SearchresultsFile" Property="string">
+			<Text>
+				<![CDATA[Zoekresultaten: 0 bestanden]]>
+			</Text>
+		</Item>	
+		<Item Name="Less100MB" Property="string">
+			<Text>
+				<![CDATA[1MB~100MB]]>
+			</Text>
+		</Item>	
+		<Item Name="Less1GB" Property="string">
+			<Text>
+				<![CDATA[100MB~1GB]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="ShowBannerFrame">
+		<Item Name="ShowBannerFrameCrashSystem1_1" Property="string">
+			<Text>
+				<![CDATA[Opstartbare USB maken]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem1_2" Property="string">
+			<Text>
+				<![CDATA[Krijg toegang tot uw gecrashte computergegevens door een opstartbare USB-drive te maken.]]>
+			</Text>
+		</Item>		
+		<Item Name="ShowBannerFrameCrashSystem2_1" Property="string">
+			<Text>
+				<![CDATA[Blauwe scherm van dood]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem2_2" Property="string">
+			<Text>
+				<![CDATA[Stel de opstartopties in op de gecrashte pc om de reddingsgegevens te starten.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_1" Property="string">
+			<Text>
+				<![CDATA[Zwart scherm van de dood]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameCrashSystem3_2" Property="string">
+			<Text>
+				<![CDATA[Kopieer of herstel eenvoudig en eenvoudig verwijderde gegevens van een gecrashte pc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_1" Property="string">
+			<Text>
+				<![CDATA[# 1 om verwijderde of diep verborgen video's te herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo1_2" Property="string">
+			<Text>
+				<![CDATA[Wanneer u iets onverwachts ziet gebeuren tijdens het opnemen of bewerken van een video.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_1" Property="string">
+			<Text>
+				<![CDATA[Herstel Ultra HD, 4K en 8K video's]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo2_2" Property="string">
+			<Text>
+				<![CDATA[Wij ondersteunen het herstel van Ultra HD, 4K en zelfs 8K video's, dat krachtiger is dan ooit.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_1" Property="string">
+			<Text>
+				<![CDATA[Herstel video van alle apparaten]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideo3_2" Property="string">
+			<Text>
+				<![CDATA[Herstel van DSLR, Digitale camera's, Drones, Dashcams, SD kaarten etc.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_1" Property="string">
+			<Text>
+				<![CDATA[Schade veroorzaakt door onopzettelijk gebruik]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit1_2" Property="string">
+			<Text>
+				<![CDATA[Opnemen na een crash, waterschade, schudden, vallen, lege batterij, onverwachte uitschakeling tijdens video-opname, enz.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_1" Property="string">
+			<Text>
+				<![CDATA[Video's werden hersteld maar konden niet worden afgespeeld]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit2_2" Property="string">
+			<Text>
+				<![CDATA[Verloren video hersteld maar speelt niet af om onbekende redenen.]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_1" Property="string">
+			<Text>
+				<![CDATA[Repareer video van veelgebruikte cameramerken]]>
+			</Text>
+		</Item>
+		<Item Name="ShowBannerFrameAdvanceVideoRepairit3_2" Property="string">
+			<Text>
+				<![CDATA[Ondersteuning voor Cannon, Nikon, Sony, Panasonic, GoPro, DJI etc.]]>
+			</Text>
+		</Item>			
+	</Form>	
+	<Form Name="FindHardDriverDialog">
+		<Item Name="FindHardDriverDialogOtherState1" Property="string">
+			<Text>
+				<![CDATA[Cause]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState2" Property="string">
+			<Text>
+				<![CDATA[If your disk status is the following status:<br>Offline/Missing/Unreadable/Failed/Unknown/Foreign]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState3" Property="string">
+			<Text>
+				<![CDATA[Solution]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogOtherState4" Property="string">
+			<Text>
+				<![CDATA[Please refer to Microsoft tips to solve it: <a href="#"><font color=#00B0F5>Microsoft Trouble Shooting</font></a>]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNotInitialized1" Property="string">
+			<Text>
+				<![CDATA[Cause]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized2" Property="string">
+			<Text>
+				<![CDATA[The disk doesn't have a valid disk signature.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNotInitialized3" Property="string">
+			<Text>
+				<![CDATA[Solution]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNotInitialized4" Property="string">
+			<Text>
+				<![CDATA[Right-click Disk Management to initialize the drive. Then use Recoverit to scan and recover data from it.]]>
+			</Text>
+		</Item>
+
+		<Item Name="FindHardDriverDialogNoMedia1" Property="string">
+			<Text>
+				<![CDATA[Cause]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia2" Property="string">
+			<Text>
+				<![CDATA[If your disk status is "No Media", it might has severe hardware damage.]]>
+			</Text>
+		</Item>		
+		<Item Name="FindHardDriverDialogNoMedia3" Property="string">
+			<Text>
+				<![CDATA[Solution]]>
+			</Text>
+		</Item>
+		<Item Name="FindHardDriverDialogNoMedia4" Property="string">
+			<Text>
+				<![CDATA[Please send the disk to a repair shop for inspection.]]>
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="mainframe">
+		<Item Name="MainBannerFrameDataRecovery" Property="string">
+			<Text>
+				<![CDATA[Harde schijven en locaties]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameCrashSystem" Property="string">
+			<Text>
+				<![CDATA[Systeem heeft de computer laten vastlopen]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameAdvanceVideo" Property="string">
+			<Text>
+				<![CDATA[Professioneel video herstel]]>
+			</Text>
+		</Item>
+		<Item Name="MainBannerFrameVideoRepair" Property="string">
+			<Text>
+				<![CDATA[Corrupte Video Reparatie]]>
+			</Text>
+		</Item>
+		<Item Name="labelDataRecover" Property="label">
+			<Text>
+				<![CDATA[Bestand herstellen]]>
+			</Text>
+		</Item>	
+		<Item Name="labelDataRepair" Property="label">
+			<Text>
+				<![CDATA[Bestand repareren]]>
+			</Text>
+		</Item>
+		<Item Name="mainformlblDesc" Property="label">
+			<Text>
+				<![CDATA[De video wordt geanalyseerd, even geduld a.u.b....]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="fulldiskframe">
+		<Item Name="labelAdvanceText" Property="label">
+			<Text>
+				<![CDATA[Herstel uw verloren video's van alle apparaten]]>
+			</Text>
+		</Item>
+		<Item Name="label_5" Property="label">
+			<Text>
+				<![CDATA[Kies een locatie om het herstel te starten]]>
+			</Text>
+		</Item>	
+		<Item Name="lblHardTitle" Property="label">
+			<Text>
+				<![CDATA[Harde schijven]]>
+			</Text>
+		</Item>
+		<Item Name="lblExternTitle" Property="label">
+			<Text>
+				<![CDATA[Externe schijven]]>
+			</Text>
+		</Item>
+		<Item Name="lblSpecificTitle" Property="label">
+			<Text>
+				<![CDATA[Snelle toegang]]>
+			</Text>
+		</Item>	
+		<Item Name="lblFeedback" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Kan uw harde schijf niet detecteren?</font></a>]]>
+			</Text>
+		</Item>	
+		<Item Name="refreshbtn" Property="tooltip">
+			<Text>
+				<![CDATA[Verversen]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Verversen]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Verversen]]>
+			</Text>
+		</Item>
+		<Item Name="refreshbtn2" Property="tooltip">
+			<Text>
+				<![CDATA[Verversen]]>
+			</Text>
+		</Item>
+		<Item Name="advanceVideoDesc" Property="string">
+			<Text>
+				<![CDATA[Selecteer de harde schijf om Professionel Video Herstel te starten:]]>
+			</Text>
+		</Item>
+	</Form>
+
+	<Form Name="CrashSystemShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Red uw gegevens van een vastgelopen computer]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Maak een opstartbare USB om de vastgelopen computer op te starten en er gegevens van te halen:]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Starten]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Gepatenteerde technologie om diep verborgen video's te herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Exclusieve gepatenteerde innovatie technologie wordt geleverd door Recoverit - haal video clips eruit en integreer]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Starten]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="VideoRepairShowFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Snelle & Geavanceerde Video Reparatie, Blijf Uit de Buurt Van Video Corruptie]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[3 stappen om beschadigde video's te herstellen, een alles-in-één toolkit voor scenario's met meerdere beschadigingen]]>
+			</Text>
+		</Item>
+		<Item Name="buttonStart" Property="button">
+			<Text>
+				<![CDATA[Voeg video toe]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CommonWaitFrame">
+		<Item Name="lblDiskDesc1" Property="label">
+			<Text>
+				<![CDATA[Schijf laden…]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Al lang vast bij het laden?</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="RemoveExternalDisk">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Verwijder alle externe apparaten en probeer het opnieuw]]>
+			</Text>
+		</Item>
+		<Item Name="labelTex1" Property="label">
+			<Text>
+				<![CDATA[Verwijder alle externe schijven die op de computer zijn aangesloten en wacht tot het laden is voltooid.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelTex2" Property="label">
+			<Text>
+				<![CDATA[Sluit de schijf die u wilt herstellen weer aan en start het scannen.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Begrepen]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[Doet het probleem zich nog steeds voor? <a href="#"><font color=#00B0F5>Klik hier</font></a> om het ons te melden.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FindHardDriverDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Harde schijf niet gevonden]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Open <a href="#"><font color=#00B0F5> Disk Management</font></a>, check your disk status:]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNotInit" Property="button">
+			<Text>
+				<![CDATA[Niet geïnitialiseerd]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonNoMedia" Property="button">
+			<Text>
+				<![CDATA[Geen media]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOther" Property="button">
+			<Text>
+				<![CDATA[Andere status]]>			    
+			</Text>
+		</Item>		
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Begrepen]]>
+			</Text>
+		</Item>
+		<Item Name="labelWorkOrder" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Neem contact op</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MobileDialog">
+		<Item Name="MobileDialogDownload">
+			<Text>
+				<![CDATA[Ga naar download]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Recoverit]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1_1" Property="label">
+			<Text>
+				<![CDATA[Herstel bestanden van PC's, harde schijven en externe opslagapparaten.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[dr.fone - Gegevensherstel]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2_1" Property="label">
+			<Text>
+				<![CDATA[Herstel gegevens van iOS/Android apparaten.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="BadSectorDialog">
+		<Item Name="BadSectorFrameDriver" Property="string">
+			<Text>
+				<![CDATA[Slechte sectoren gedetecteerd in (%1:).]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameViewDetails" Property="string">
+			<Text>
+				<![CDATA[Bekijk details]]>
+			</Text>
+		</Item>
+
+		<Item Name="BadSectorFrameSkipSector" Property="string">
+			<Text>
+				<![CDATA[Probeer slechte sectoren over te slaan, even wachten...]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorFrameLearnMore" Property="string">
+			<Text>
+				<![CDATA[Lees verder]]>
+			</Text>
+		</Item>
+		<Item Name="BadSectorDialogDesc" Property="string">
+			<Text>
+				<![CDATA[There are %1 bad sectors in the disk]]>
+			</Text>
+		</Item>		
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Herstel uw bestanden zo snel mogelijk, en maak onmiddellijk een back-up om te voorkomen dat u weer gegevens verliest.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Meteen backup maken]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblGoodText" Property="label">
+			<Text>
+				<![CDATA[Goed]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblPoorText" Property="label">
+			<Text>
+				<![CDATA[Slecht]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblSevereText" Property="label">
+			<Text>
+				<![CDATA[Ernstig]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblDamagedText" Property="label">
+			<Text>
+				<![CDATA[Beschadigd]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblUnkownText" Property="label">
+			<Text>
+				<![CDATA[Onbekend]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchHintFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Sorry, geen bestand gevonden!]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[1. Sommige bestanden missen originele bestandsnamen, controleer ze in <a href="#"><font color=#00B0F5>Unsourced files</font></a>]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[2. Wacht tot de scan voltooid is en zoek opnieuw.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[3. Probeer het Filter te gebruiken om uw bestanden te vinden]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SearchDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Hoe bestanden te vinden in Bestanden zonder bron]]>
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Bestanden zonder bron zijn hun bestandsnaam kwijt, u kunt niet zoeken op de originele namen. Hier zijn enkele tips voor het vinden van bestanden in Bestanden zonder bron:]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[1. Klik op [Bestanden zonder bron].]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[2. Selecteer het bestandstype dat hersteld moet worden.]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[3. Bekijk ze om te bevestigen of het de bestanden zijn die u nodig hebt.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Begrepen]]>			    
+			</Text>
+		</Item>	
+	</Form>
+	<Form Name="PreviewSimilarErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Oeps, bestandsvoorbeeld is mislukt om de volgende reden:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Het bestand is mogelijk overschreven. Het wordt aanbevolen om te herstellen naar de computer.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Wat is het bestand dat wordt overschreven? </font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewErrorFrame">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Oeps, bestandsvoorbeeld is mislukt om de volgende reden:]]>
+			</Text>
+		</Item>
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Het bestand is mogelijk overschreven. Het wordt aanbevolen om te herstellen naar de computer.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Wat is het bestand dat wordt overschreven? </font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="ScanPreviewErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Oeps, bestandsvoorbeeld is mislukt om de volgende reden:]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[Het bestand is nog onvolledig, bekijk het nadat het scannen voltooid is.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Controleer de formaten die voorvertoning ondersteunen</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="PreviewUnkownFileFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Oeps, bestandsformaat ondersteunt geen voorbeeld]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Maak u geen zorgen, u kunt zulke bestanden bekijken nadat ze zijn hersteld op uw computer.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Controleer de formaten die voorvertoning ondersteunen</font></a>]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewAdanceVideoErrorFrame">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Oeps, video voorvertoning mislukt.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Try <b>Verbeterd herstel</b> to scan for the hidden video fragments.]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblTitle3" Property="label">
+			<Text>
+				<![CDATA[Opmerking: Sla de gescande bestanden op voordat u Verbeterd herstel start]]>			    
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="PreviewVideoErrorFrame">
+		<Item Name="lblTitle1" Property="string">
+			<Text>
+				<![CDATA[Oeps, video voorvertoning mislukt.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="string">
+			<Text>
+				<![CDATA[Herstel naar de computer en probeer Video Reparatie om de beschadigde video's te repareren.]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DocumentViewOrderFrame">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[De video voorvertoning is beperkt tot 30 seconden.  Als u de volledige video wilt afspelen, kunt u deze herstellen naar uw computer.]]>
+			</Text>
+		</Item>
+		<Item Name="labelOfficeText" Property="label">
+			<Text>
+				<![CDATA[Alleen de eerste pagina van het bestand kan worden bekeken.<br>Als u meer inhoud wilt zien, zet het bestand dan terug op uw computer.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFrameTree">
+		<Item Name="TipDiskRawDesc" Property="string">
+			<Text>
+				<![CDATA[Deze bestanden hebben niet langer hun oorspronkelijke bestandsnaam, bestandsgrootte en tijdstempel.  Maar ze kunnen precies zijn wat u nodig hebt.]]>
+			</Text>
+		</Item>
+		<Item Name="TipLostLocationDesc" Property="string">
+			<Text>
+				<![CDATA[Deze bestanden hebben geen informatie over hun oorspronkelijke opslagpad, u kunt controleren of het is wat u nodig hebt.]]>
+			</Text>
+		</Item>
+		<Item Name="btnpath" Property="button">
+			<Text>
+				<![CDATA[Bestandslocatie]]>
+			</Text>
+		</Item>
+		<Item Name="btntype" Property="button">
+			<Text>
+				<![CDATA[File Type]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ReconnectDialog">
+		<Item Name="ReconnectDiskDesc" Property="string">
+			<Text>
+				<![CDATA[Schijf (%1:) losgekoppeld, opnieuw aansluiten en opnieuw scannen.]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Opnieuw scannen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDRlibDialog">
+		<Item Name="lblTitle" Property="label">
+			<Text>
+				<![CDATA[Software fout, terug naar home en opnieuw scannen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[Terug]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ScanFinishDialog">
+		<Item Name="ScanCompleteedAdvanceDesc" Property="string">
+			<Text>
+				<![CDATA[Scan voltooid! Sorry, we didn't find your files, <a href="#"><Font color="#00B0F5">feedback to us</Font></a> for further check.]]>
+			</Text>
+		</Item>
+		<Item Name="ScanCompleteedDesc" Property="string">
+			<Text>
+				<![CDATA[Scan voltooid! xx bestanden zijn gevonden!]]>
+			</Text>
+		</Item>
+		<Item Name="lblDesc" Property="label">
+			<Text>
+				<![CDATA[Opmerking: Herstel zo snel mogelijk om te voorkomen dat de bestanden worden overschreven.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideo">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Kunt u de video die u nodig heeft niet vinden?]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[We raden u aan de Geavanceerd video herstel functie te gebruiken.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Lees verder]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurnToAdvanceVideoDialog">
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Geavanceerd video herstel]]>
+			</Text>
+		</Item>
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Sla de momenteel gescande bestanden op die u nodig hebt]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Terug naar de homepage, klik op [Geavanceerd video herstel].]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Selecteer video formaten en start Geavanceerd video herstel.]]>			    
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Begrepen]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="TurntoDeepRecycleFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Als u verwijderde bestanden niet kunt vinden, probeer dan een diepe scan.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Een diepe scan kost meer tijd om alle schijfsectoren te scannen om meer bestanden te vinden.]]>			    
+			</Text>
+		</Item>
+		<Item Name="buttonOk" Property="button">
+			<Text>
+				<![CDATA[Diepe scan]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectPathDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[Selecteer locatie om herstel te starten]]>
+			</Text>
+		</Item>
+		<Item Name="label" Property="label">
+			<Text>
+				<![CDATA[Invoer pad:]]>			    
+			</Text>
+		</Item>
+		<Item Name="lblHint" Property="label">
+			<Text>
+				<![CDATA[Ongeldig bestand pad！]]>			    
+			</Text>
+		</Item>			
+		<Item Name="m_sDocumentItem" Property="string">
+			<Text>
+				<![CDATA[Mijn documenten]]>
+			</Text>
+		</Item>
+		<Item Name="m_sDeskTopItem" Property="string">
+			<Text>
+				<![CDATA[Desktop]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Mijn computer]]>
+				<![CDATA[Mijn computer]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[OK]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProtectedDialog">
+		<Item Name="ProtectedDialogTitle1" Property="string">
+			<Text>
+				<![CDATA[Onvoldoende toestemming!]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle2" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF0000><b>Onvoldoende toestemming</b></font><font color=#26324B> om bestanden op te slaan op geselecteerde schijf. Selecteer een andere schijf.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle4" Property="string">
+			<Text>
+				<![CDATA[Niet genoeg ruimte!]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">//ProtectedDialogTitle3
+			<Text>
+				<![CDATA[Selecteer opnieuw]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoveryDialog">
+		<Item Name="lblTipText" Property="label">
+			<Text>
+				<![CDATA[Selecteer Pad om bestanden op te slaan:]]>
+			</Text>
+		</Item>	
+		<Item Name="OverrideDesc" Property="string">
+			<Text>
+				<![CDATA[Sla geen bestanden op op een schijf (xx:) die u kwijt bent geraakt, want dan worden ze overschreven.]]>
+			</Text>
+		</Item>
+		<Item Name="NewFolderDesc" Property="string">
+			<Text>
+				<![CDATA[Nieuwe map]]>
+			</Text>
+		</Item>
+		<Item Name="t_strNewName" Property="string">
+			<Text>
+				<![CDATA[NieuweMap]]>
+			</Text>
+		</Item>
+		<Item Name="ProtectedDialogTitle5" Property="string">
+			<Text>
+				<![CDATA[<font color=#FF644D>%1</font> <font color=#26324B>in %2 bestand(en) geselecteerd en er is </font><font color=#676F81><b>niet genoeg ruimte</b></font><font color=#26324B> op de geselecteerde schijf. Selecteer een andere schijf.</font>]]>
+			</Text>
+		</Item>
+		<Item Name="strWaring" Property="string">
+			<Text>
+				<![CDATA[Opslaan op de partitie van de bron vermindert de kans op succesvol herstel. Toch opslaan?]]>
+			</Text>
+		</Item>
+		<Item Name="m_sComputerItem" Property="string">
+			<Text>
+				<![CDATA[Mijn computer]]>
+			</Text>
+		</Item>
+		<Item Name="strRecycleSave" Property="string">
+			<Text>
+				<![CDATA[Het wordt aangeraden om herstelde bestanden op een externe schijf op te slaan om overschrijven te voorkomen.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc1" Property="string">
+			<Text>
+				<![CDATA[<b>We raden aan om de bestanden op te slaan op <font color=#00AEE6>een externe schijf</font>.</b><br><br>Opslaan op dezelfde schijf als waar de bestanden verloren gingen vermindert de kans op succesvol herstel.]]>
+			</Text>
+		</Item>
+		<Item Name="RecoveryDialogSaveDesc2" Property="string">
+			<Text>
+				<![CDATA[We suggest you save files to <font color=#00B0F5>another drive</font>.<br><br><br>Because save files to the same drive that you lost them will reduce the chance of a successful recovery.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnRecovery" Property="button">
+			<Text>
+				<![CDATA[Herstellen]]>			    
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RecoverSuccessDialog">
+		<Item Name="OpenFile" Property="string">
+			<Text>
+				<![CDATA[Open map]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText" Property="label">
+			<Text>
+				<![CDATA[Gefeliciteerd! Deel nu uw herstelervaring!]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText1" Property="label">
+			<Text>
+				<![CDATA[Gemakkelijk te gebruiken]]>
+			</Text>
+		</Item>
+		<Item Name="labelShareText2" Property="label">
+			<Text>
+				<![CDATA[Succesvol herstel]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="SelectAdvanceVideoDialog">
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[Video formaten kiezen]]>
+			</Text>
+		</Item>
+		<Item Name="labelCheckBoxDesc" Property="label">
+			<Text>
+				<![CDATA[Alles selecteren <font color=#8C9295>(Opmerking: hoe meer formaten worden geselecteerd, hoe meer scantijd er wordt besteed)</font>]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Starten ]]>			    
+			</Text>
+		</Item>
+		<Item Name="labelDesc" Property="label">//SelectAdvanceVideoDialogHint1
+			<Text>
+				<![CDATA[Selecteer typen om te scannen!]]>
+			</Text>
+		</Item>
+		<Item Name="labelMoreText" Property="label">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Meer formaten nodig.</font></a>]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="MessagePushDialog">		
+		<Item Name="labelNoMessage" Property="string">
+			<Text>
+				<![CDATA[Geen bericht]]>
+			</Text>
+		</Item>
+		<Item Name="strSimilarLoading" Property="string">
+			<Text>
+				<![CDATA[Laden]]>
+			</Text>
+		</Item>	
+		<Item Name="MessageCenter" Property="string">
+			<Text>
+				<![CDATA[Berichten Centrum]]>
+			</Text>
+		</Item>
+		<Item Name="labelText" Property="string">
+			<Text>
+				<![CDATA[Recoverit Chatbot]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="HintDialog">		
+		<Item Name="lblMid3" Property="label">
+			<Text>
+				<![CDATA[Koop Recoverit om bestanden te herstellen ZO SNEL MOGELIJK]]>
+			</Text>
+		</Item>
+		<Item Name="labelTrail" Property="label">
+			<Text>
+				<![CDATA[Essentieel]]>
+			</Text>
+		</Item>	
+		<Item Name="labelTraiIText1" Property="label">
+			<Text>
+				<![CDATA[Gegevensherstel]]>
+			</Text>
+		</Item>	
+		<Item Name="BtnBuy1" Property="button">
+			<Text>
+				<![CDATA[Kopen]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasic" Property="label">
+			<Text>
+				<![CDATA[Standaard]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText1" Property="label">
+			<Text>
+				<![CDATA[Gegevensherstel]]>
+			</Text>
+		</Item>	
+		<Item Name="labelBasicText2" Property="label">
+			<Text>
+				<![CDATA[Systeem Vastgelopen Computer Herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy2" Property="button">
+			<Text>
+				<![CDATA[Kopen]]>
+			</Text>
+		</Item>	
+
+		<Item Name="labelPro" Property="label">
+			<Text>
+				<![CDATA[Premium]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText1" Property="label">
+			<Text>
+				<![CDATA[Gegevensherstel]]>
+			</Text>
+		</Item>	
+		<Item Name="labelProText2" Property="label">
+			<Text>
+				<![CDATA[Systeem Vastgelopen Computer Herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText3" Property="label">
+			<Text>
+				<![CDATA[Corrupte Video Reparatie]]>
+			</Text>
+		</Item>
+		<Item Name="labelProText4" Property="label">
+			<Text>
+				<![CDATA[Recuperación avanzada de video]]>
+			</Text>
+		</Item>
+		<Item Name="BtnBuy3" Property="button">
+			<Text>
+				<![CDATA[Kopen]]>
+			</Text>
+		</Item>		
+		<Item Name="labelHint" Property="label">
+			<Text>
+				<![CDATA[Al gekocht?]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="UpdateAuthorDialog">		
+		<Item Name="labelDesc" Property="label">
+			<Text>
+				<![CDATA[Upgrade naar het Premium Abonnement om deze functie te gebruiken]]>
+			</Text>
+		</Item>
+		<Item Name="labelTitle" Property="label">
+			<Text>
+				<![CDATA[Recoverit Geavanceerd]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Gegevensherstel]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Systeem Vastgelopen Computer Herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Herstel beschadigde video's]]>
+			</Text>
+		</Item>
+		<Item Name="labelText4" Property="label">
+			<Text>
+				<![CDATA[Recuperación avanzada de video]]>
+			</Text>
+		</Item>
+		<Item Name="UpgradeNowDesc" Property="string">
+			<Text>
+				<![CDATA[Actualizar Ahora]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="ProgressDialog">		
+		<Item Name="labelUBackitDesc1" Property="label">
+			<Text>
+				<![CDATA[Maak een back-up van uw dierbare gegevens en herinneringen en raak ze nooit meer kwijt.]]>
+			</Text>
+		</Item>
+		<Item Name="labelUBackitDesc2" Property="label">
+			<Text>
+				<![CDATA[Automatisch, Eenvoudig, Slim]]>
+			</Text>
+		</Item>	
+		<Item Name="labelUBackitDesc3" Property="label">
+			<Text>
+				<![CDATA[Incrementele back-up]]>
+			</Text>
+		</Item>
+		<Item Name="buttonUBackit" Property="button">
+			<Text>
+				<![CDATA[Start een proefperiode van 1 maand]]>
+			</Text>
+		</Item>
+		<Item Name="BackupDataDesc" Property="string">
+			<Text>
+				<![CDATA[Gegevens backuppen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="CorruptVideoFrame">	
+		<Item Name="labelText" Property="label">
+			<Text>
+				<![CDATA[U kunt herstellen naar de computer en de beschadigde video's repareren.]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Herstel beschadigde video naar de computer.]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Tab op [Corrupte Video Herstel].]]>
+			</Text>
+		</Item>	
+		<Item Name="labelText3" Property="label">
+			<Text>
+				<![CDATA[Voeg beschadigde video toe om de reparatie te starten.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="RestartDREDialog">
+		<Item Name="lblTitle1" Property="label">
+			<Text>
+				<![CDATA[Softwarefout.]]>
+			</Text>
+		</Item>
+		<Item Name="lblTitle2" Property="label">
+			<Text>
+				<![CDATA[Selecteer bestanden en herstel, ga dan terug naar de startpagina om het opnieuw te proberen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnOk" Property="button">
+			<Text>
+				<![CDATA[OK]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="OnlineWidget">
+		<Item Name="labelNetWorkText1" Property="label">
+			<Text>
+				<![CDATA[Oeps, netwerkfout.]]>
+			</Text>
+		</Item>
+		<Item Name="labelNetWorkText2" Property="label">
+			<Text>
+				<![CDATA[Controleer uw netwerk en probeer het opnieuw.]]>
+			</Text>
+		</Item>
+		<Item Name="buttonRefresh" Property="button">
+			<Text>
+				<![CDATA[Verversen]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="AdvanceVideoSuffixDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Als u wilt andere video formaten te herstellen, kunt u feedback sturen naar ons.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Verzenden]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="FilterTipsFrame">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Tips voor filteren:]]>
+			</Text>
+		</Item>
+		<Item Name="labelText2" Property="label">
+			<Text>
+				<![CDATA[Gebruik een filter om snel de gewenste bestanden te vinden]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue1" Property="label">
+			<Text>
+				<![CDATA[Foto, video, audio…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue2" Property="label">
+			<Text>
+				<![CDATA[Dag, week, maand, jaar…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue3" Property="label">
+			<Text>
+				<![CDATA[1 MB, 1-100 MB, 100 MB-1 GB…]]>
+			</Text>
+		</Item>
+		<Item Name="labelValue4" Property="label">
+			<Text>
+				<![CDATA[Bestaande bestanden, verwijderde bestanden]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="NewFilterModel">
+		<Item Name="FileStatusDesc" Property="string">
+			<Text>
+				<![CDATA[Bestandsstatus]]>
+			</Text>
+		</Item>
+		 <Item Name="DeletedFiles" Property="string">
+			<Text>
+				<![CDATA[Verwijderd]]>
+			</Text>
+		</Item>
+	    <Item Name="ExistsFiles" Property="string">
+			<Text>
+				<![CDATA[Bestaand]]>
+			</Text>
+		</Item>
+		<Item Name="WhatTypeText" Property="string">
+			<Text>
+				<![CDATA[Welk type]]>
+			</Text>
+		</Item>
+		<Item Name="AlltypesText" Property="string">
+			<Text>
+				<![CDATA[Alle typen]]>
+			</Text>
+		</Item>		
+		<Item Name="tagText" Property="string">
+			<Text>
+				<![CDATA[Labels]]>
+			</Text>
+		</Item>
+		<Item Name="alltagText" Property="string">
+			<Text>
+				<![CDATA[Alle labels]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseDialog">
+		<Item Name="lblText" Property="label">
+			<Text>
+				<![CDATA[Weet u zeker dat u de software wilt afsluiten? ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Tip: als u nu afsluit, worden belangrijke gegevens niet hersteld. Het wordt aanbevolen hier te blijven en het herstel eerst te voltooien.]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="DetentionCloseFeedbackDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[We vinden het jammer dat we niet aan uw wensen konden voldoen]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Kunt u ons vertellen waarom u bent weggegaan bij Recoverit?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemText1" Property="string">
+			<Text>
+				<![CDATA[Het bevat niet de functie die ik nodig heb]]>
+			</Text>
+		</Item>
+		<Item Name="itemText2" Property="string">
+			<Text>
+				<![CDATA[Ik heb de schijf waarop de gegevens verloren zijn gegaan niet gevonden]]>
+			</Text>
+		</Item>
+		<Item Name="itemText3" Property="string">
+			<Text>
+				<![CDATA[Ik ben niet tevreden over de vormgeving van de software-interface]]>
+			</Text>
+		</Item>
+		<Item Name="itemText4" Property="string">
+			<Text>
+				<![CDATA[Ik wist niet hoe ik deze software kon gebruiken]]>
+			</Text>
+		</Item>
+		<Item Name="itemText5" Property="string">
+			<Text>
+				<![CDATA[Andere redenen (die u met ons kunt delen)]]>
+			</Text>
+		</Item>
+		<Item Name="lblText3" Property="label">
+			<Text>
+				<![CDATA[Bedankt voor uw feedback.]]>
+			</Text>
+		</Item>
+		<Item Name="btnSubmit" Property="button">
+			<Text>
+				<![CDATA[Verzenden]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1064">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[Video/foto herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Verbeterd herstel]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[Herstel uw verloren video's/foto's op al uw apparaten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[Denk hierbij aan Canon, Sony, DJI, GoPro, Seagate, SD-kaart, enz. Alles is mogelijk.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[Selecteer een schijf om uw verloren video's en foto's te herstellen:]]>
+			</Text>
+		</Item>	
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[Wat is Verbeterd herstel?]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[1. Herstel verloren of verborgen video's.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[2. Er zijn twee herstelmodi om video's en foto's terug te halen: de snelle en grondige modus.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[Selecteer video-indelingen voor een grondige scan]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[Er kunnen 11 specifieke indelingen worden hersteld in de grondige modus. U kunt de indelingen selecteren die u nodig hebt.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Herstelduur: hoe meer bestandstypen worden geselecteerd, hoe langer het duurt.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[Selecteer ten minste een indeling voor een grondige scan.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Het scannen van de video kan enige tijd duren. Een ogenblik geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Herstelmodus:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[U kunt een voorbeeld van de weergegeven video- en fotobestanden bekijken]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Snel]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Grondig]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[Duur:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[Snelle scan is voltooid.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[De meeste video's en foto's kunnen worden gescand. U kunt een <b>voorbeeld ervan bekijken en ze herstellen</b>.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[Tips：de grondige scan probeert meer bestanden voor u te vinden. Het zal even duren, heb geduld.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[Wat is een grondige scan?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Als de snelle scan uw bestanden niet kan vinden, zoekt de grondige scan naar meer bestanden. ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Verbeterd herstel proberen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[Als u bestanden wilt herstellen van de SD-kaart van de camera, raden we u aan Verbeterd herstel te gebruiken om uw video's en foto's te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[Doorgaan met scannen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Proberen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[Wij raden u aan de functie Verbeterd herstel te gebruiken.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[Ga terug naar de startpagina en klik op [Verbeterd herstel].]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[Selecteer de doelschijf en start [Verbeterd herstel].]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue30" Property="string">
+			<Text>
+				<![CDATA[GEEN]]>
+			</Text>
+		</Item>
+	</Form>
+	<Form Name="Recoverit1066">
+		<Item Name="itemValue1" Property="string">
+			<Text>
+				<![CDATA[NAS en Linux]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue2" Property="string">
+			<Text>
+				<![CDATA[Uw gegevens op NAS-/Linux-systemen eenvoudig herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue3" Property="string">
+			<Text>
+				<![CDATA[3 stappen om uw bestanden te herstellen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue4" Property="string">
+			<Text>
+				<![CDATA[Kies NAS-server/Linux-systeem ---- Verbind met server ----- Herstel]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue5" Property="string">
+			<Text>
+				<![CDATA[U hoeft uw server niet te stoppen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue6" Property="string">
+			<Text>
+				<![CDATA[Realtime herstellen zonder de NAS-service te stoppen]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue7" Property="string">
+			<Text>
+				<![CDATA[Ondersteunt herstel op <font color=#00B0F5>NAS-servers</font> en<font color=#00B0F5> Linux-systemen</font>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue8" Property="string">
+			<Text>
+				<![CDATA[Selecteer de server of het systeem, voer uw IP-adres en andere gegevens in en herstel dan eenvoudig uw gegevens]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue9" Property="string">
+			<Text>
+				<![CDATA[Herstel voor NAS]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue10" Property="string">
+			<Text>
+				<![CDATA[Herstel voor Linux]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue11" Property="string">
+			<Text>
+				<![CDATA[Zoeken naar een NAS-server op het lokale netwerk]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue12" Property="string">
+			<Text>
+				<![CDATA[Als het NAS-apparaat na lang zoeken niet wordt gedetecteerd, klikt u op Handmatig verbinden. Voer uw IP-adres en andere gegevens in en maak verbinding met het apparaat met de bestanden die u wilt herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue13" Property="string">
+			<Text>
+				<![CDATA[Zoeken annuleren]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue14" Property="string">
+			<Text>
+				<![CDATA[Handmatig verbinden]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue15" Property="string">
+			<Text>
+				<![CDATA[Zoeken naar een NAS-server mislukt]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue16" Property="string">
+			<Text>
+				<![CDATA[Geen NAS-server gevonden op het lokale netwerk. Probeer <font color=#00B0F5>Handmatig verbinden</font> om verbinding te maken met uw server.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue17" Property="string">
+			<Text>
+				<![CDATA[Selecteer een NAS-server om het herstel te starten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue18" Property="string">
+			<Text>
+				<![CDATA[NAS-servers ]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue19" Property="string">
+			<Text>
+				<![CDATA[Fabrikant:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue20" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Kunt u geen verbinding maken met uw NAS-server?</font></a>]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue21" Property="string">
+			<Text>
+				<![CDATA[Oplossingen voor NAS-verbindingsfouten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue22" Property="string">
+			<Text>
+				<![CDATA[Als de verbinding mislukt, kan dat komen doordat SSH niet is ingeschakeld of doordat u geen account met rootmachtigingen hebt.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue23" Property="string">
+			<Text>
+				<![CDATA[Hoe schakel ik SSH in?]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue24" Property="string">
+			<Text>
+				<![CDATA[1) Selecteer Configuratiescherm en klik vervolgens op Terminal en SNMP]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue25" Property="string">
+			<Text>
+				<![CDATA[2) Zoek in Google op de zin "SSH inschakelen" of neem rechtstreeks contact op met de fabrikant van het NAS-apparaat.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue26" Property="string">
+			<Text>
+				<![CDATA[Als het probleem zich blijft voordoen, <a href="#"><font color=#00B0F5>klikt u hier</font></a> om contact met ons op te nemen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue27" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Meer informatie</font></a>]]>
+			</Text>
+		</Item>				
+		<Item Name="itemValue28" Property="string">
+			<Text>
+				<![CDATA[Computer van de beheerder]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue29" Property="string">
+			<Text>
+				<![CDATA[Doelserver:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue30" Property="string">
+			<Text>
+				<![CDATA[Vul de gegevens in om op afstand verbinding te maken met de NAS-server en het herstel te starten]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue31" Property="string">
+			<Text>
+				<![CDATA[IP-adres/domeinnaam van de doelserver]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue32" Property="string">
+			<Text>
+				<![CDATA[Voer het IP-adres in]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue33" Property="string">
+			<Text>
+				<![CDATA[Poort:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue34" Property="string">
+			<Text>
+				<![CDATA[Poort van de doelserver]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue35" Property="string">
+			<Text>
+				<![CDATA[Voer het poortnummer in]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue36" Property="string">
+			<Text>
+				<![CDATA[De standaardpoort is 22. U kunt dit ook controleren via Terminal & SNMP.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue37" Property="string">
+			<Text>
+				<![CDATA[Gebruikersaccount:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue38" Property="string">
+			<Text>
+				<![CDATA[Account van de doelserver]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue39" Property="string">
+			<Text>
+				<![CDATA[Voer het gebruikersaccount in]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue40" Property="string">
+			<Text>
+				<![CDATA[Wachtwoord:]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue41" Property="string">
+			<Text>
+				<![CDATA[Wachtwoord van de doelserver]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue42" Property="string">
+			<Text>
+				<![CDATA[Voer het wachtwoord in]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue43" Property="string">
+			<Text>
+				<![CDATA[Verbinden]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue44" Property="string">
+			<Text>
+				<![CDATA[Voor dit account gelden toegangsbeperkingen. Probeer een ander account met rootmachtigingen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue45" Property="string">
+			<Text>
+				<![CDATA[Waarschuwing: gegevens zijn onjuist. Controleer de informatie en vul de juiste gegevens in voor IP-adres, poort, gebruiker en wachtwoord.]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue46" Property="string">
+			<Text>
+				<![CDATA[1. Controleer de SSH-service]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue47" Property="string">
+			<Text>
+				<![CDATA[Selecteer Configuratiescherm, klik vervolgens op Terminal en SNMP, en controleer de SSH-service en de poort. De poort is doorgaans 22.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue48" Property="string">
+			<Text>
+				<![CDATA[2. Controleer of de gegevens juist zijn]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue49" Property="string">
+			<Text>
+				<![CDATA[1) Controleer of u het juiste IP-adres hebt ingevoerd of gebruik de domeinnaam om verbinding te maken.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue50" Property="string">
+			<Text>
+				<![CDATA[2) Controleer of uw gebruikersaccount rootmachtigingen heeft.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue51" Property="string">
+			<Text>
+				<![CDATA[3) Wij raden u aan om bij het invoeren van het wachtwoord tekst zonder opmaak te selecteren.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue52" Property="string">
+			<Text>
+				<![CDATA[4) Controleer de SSH-service en de poort nogmaals.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue53" Property="string">
+			<Text>
+				<![CDATA[Vul de gegevens in om op afstand verbinding te maken met het Linux-systeem en het herstel te starten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue54" Property="string">
+			<Text>
+				<![CDATA[<a href="#"><font color=#00B0F5>Kunt u geen verbinding maken met uw Linux-systeem?</font></a>]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue55" Property="string">
+			<Text>
+				<![CDATA[Oplossingen voor Linux-verbindingsfouten]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue56" Property="string">
+			<Text>
+				<![CDATA[Herstel voor NAS en Linux]]>
+			</Text>
+		</Item>		
+		<Item Name="itemValue57" Property="string">
+			<Text>
+				<![CDATA[Bedankt voor uw beoordeling. Zou u uw herstelervaring willen delen op onze beoordelingssite? Uw tevredenheid is de drijvende kracht achter onze inspanningen.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue58" Property="string">
+			<Text>
+				<![CDATA[Verder]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue59" Property="string">
+			<Text>
+				<![CDATA[Verbinding maken met de doelserver, even geduld a.u.b.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue60" Property="string">
+			<Text>
+				<![CDATA[Verbinding met server(%1) onderbroken. Controleer uw netwerkomgeving en maak opnieuw verbinding.]]>
+			</Text>
+		</Item>
+		<Item Name="itemValue61" Property="string">
+			<Text>
+				<![CDATA[Probeer het nog eens]]>
+			</Text>
+		</Item>
+		<Item Name="itemValueHome" Property="string">
+			<Text>
+				<![CDATA[Start]]>
+			</Text>
+		</Item>
+	</Form>	
+	<Form Name="DetentionHintDialog">
+		<Item Name="lblText1" Property="label">
+			<Text>
+				<![CDATA[Verloren gegevens moeten zo snel mogelijk worden hersteld. ]]>
+			</Text>
+		</Item>
+		<Item Name="lblText2" Property="label">
+			<Text>
+				<![CDATA[Waarschuwing: hoe meer tijd er verstrijkt, hoe groter de kans dat bestanden niet kunnen worden hersteld. Het wordt aanbevolen om de gescande gegevens onmiddellijk te herstellen.]]>
+			</Text>
+		</Item>
+		<Item Name="BtnSure" Property="button">
+			<Text>
+				<![CDATA[Ik begrijp het]]>
+			</Text>
+		</Item>		
+	</Form>
+	<Form Name="MessageDisplayWidget">
+		<Item Name="labelText1" Property="label">
+			<Text>
+				<![CDATA[Maak een back-up van kostbare gegevens en herinneringen en raak ze nooit meer kwijt]]>
+			</Text>
+		</Item>

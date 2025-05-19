@@ -59,27 +59,37 @@
     "file": "assets/fa-solid-900-9834b82a.woff2",
     "src": "node_modules/admin-lte/plugins/fontawesome-free/webfonts/fa-solid-900.woff2"
   },
+  "node_modules/vue3-pdfjs/node_modules/pdfjs-dist/legacy/web/images/loading-icon.gif": {
+    "file": "assets/loading-icon-483c4a03.gif",
+    "src": "node_modules/vue3-pdfjs/node_modules/pdfjs-dist/legacy/web/images/loading-icon.gif"
+  },
+  "node_modules/vue3-pdfjs/node_modules/pdfjs-dist/legacy/web/images/shadow.png": {
+    "file": "assets/shadow-bbf63a8d.png",
+    "src": "node_modules/vue3-pdfjs/node_modules/pdfjs-dist/legacy/web/images/shadow.png"
+  },
   "public/favicon.ico": {
     "file": "assets/favicon-3c1c4e26.ico",
     "src": "public/favicon.ico"
   },
   "resources/css/app.css": {
-    "file": "assets/app-46c33ad0.css",
+    "file": "assets/app-20eb4c01.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.css": {
-    "file": "assets/app-c0212312.css",
+    "file": "assets/app-e9f608af.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
     "assets": [
-      "assets/favicon-3c1c4e26.ico"
+      "assets/favicon-3c1c4e26.ico",
+      "assets/shadow-bbf63a8d.png",
+      "assets/loading-icon-483c4a03.gif"
     ],
     "css": [
-      "assets/app-c0212312.css"
+      "assets/app-e9f608af.css"
     ],
-    "file": "assets/app-62fc1c94.js",
+    "file": "assets/app-88c7a421.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }
