@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useToastr } from '../../toastr';
 import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+// import { SimpleBootstrap4Pagination } from 'laravel-vue-pagination';
 import { Form, Field } from 'vee-validate';
 import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
@@ -90,7 +91,7 @@ const createRouteDocument = () => {
     formData.append('employee_id', form.employee_id);
     formData.append('action', form.action);
     formData.append('document_file', form.file);
-    
+
     if (routeOutside.value) {
         formData.append('routeOutside', 1);
     } else {
@@ -99,7 +100,7 @@ const createRouteDocument = () => {
 
     axios.post(`/api/documents/route`, formData)
         .then((response) => {
-            $('#moveDocumentModal').modal('hide');            
+            $('#moveDocumentModal').modal('hide');
             const index = documents.value.data.findIndex(document => document.id === response.data[0].id);
             documents.value.data[index] = response.data[0];
             updateDocumentStatusCount(response.data[0].id);
@@ -176,9 +177,9 @@ const updateDocumentStatusCount = (id) => {
     const updatedDocumentStatus = documents.value.data.find(document => document.id === id).status.name;
     const statusToUpdate = documentStatus.value.find(status => status.name === updatedDocumentStatus);
     // if (statusToUpdate.name === 'ACTIVE') {
-        statusToUpdate.count++;
-        const statusToAdd = documentStatus.value.find(status => status.name != statusToUpdate.name);
-        statusToAdd.count--;
+    statusToUpdate.count++;
+    const statusToAdd = documentStatus.value.find(status => status.name != statusToUpdate.name);
+    statusToAdd.count--;
     // }
 }
 
@@ -367,7 +368,8 @@ onMounted(() => {
                                 @click="getSelectedStatus(status.value)" type="button" class="btn"
                                 :class="[selectedStatus == status.value ? 'btn-secondary' : 'btn-default']">
                                 <span class="mr-1">{{ status.name }}</span>
-                                <span class="badge badge-pill" :class="`badge-${status.color}`">{{ status.count }}</span>
+                                <span class="badge badge-pill" :class="`badge-${status.color}`">{{ status.count
+                                }}</span>
                             </button>
                         </div>
                     </div>
@@ -391,7 +393,8 @@ onMounted(() => {
                                     </select>
                                 </div>
                                 <div v-else class="col-lg-3">
-                                    <input type="text" v-model="searchQuery" class="form-control" placeholder="Search" />
+                                    <input type="text" v-model="searchQuery" class="form-control"
+                                        placeholder="Search" />
                                 </div>
                             </div>
                         </div>
@@ -431,13 +434,9 @@ onMounted(() => {
                                                 document.status.name }}</span>
                                         </td>
                                         <td>
-                                            <DocumentButtons
-                                                v-bind:document="document"
-                                                @archive-document = "archiveDocument"                                                
-                                                @route-document = "routeDocument"
-                                                @reopen-document = "reopenDocument"
-                                                @delete-document = "deleteDocument"
-                                            />
+                                            <DocumentButtons v-bind:document="document"
+                                                @archive-document="archiveDocument" @route-document="routeDocument"
+                                                @reopen-document="reopenDocument" @delete-document="deleteDocument" />
                                         </td>
                                     </tr>
                                 </tbody>
@@ -446,7 +445,11 @@ onMounted(() => {
                                 <p class="text-center font-weight-bold text-monospace">No data found</p>
                             </span>
                         </div>
-                        <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" />
+                        <div class="row pagination-wrapper">
+                            <div class="col d-flex justifiy-content-center">
+                                <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -460,7 +463,7 @@ onMounted(() => {
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
                         <span>Route Document</span>
-                        
+
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -475,8 +478,9 @@ onMounted(() => {
                                         <label for="employee">Employee/Office</label>
                                         <select v-model="form.employee_id" id="employee_id" name="employee_id"
                                             class="form-control">
-                                            <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{
-                                                employee.emp_name }}</option>
+                                            <option v-for="employee in employees" :key="employee.id"
+                                                :value="employee.id">{{
+                                                    employee.emp_name }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -517,3 +521,11 @@ onMounted(() => {
         </div>
     </div>
 </template>
+
+<style lang="css" scoped>
+.pagination-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0.5rem 0;
+}
+</style>

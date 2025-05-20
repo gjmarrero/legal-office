@@ -625,16 +625,13 @@ class DocumentController extends Controller
             
             $converted_file = Storage::disk("public")->path('uploads/documents/converted/'.$sanitized_filename);
 
-<<<<<<< HEAD
             $gsPath = 'C:\\Program Files\\gs\\gs10.05.1\\bin\\gswin64c.exe';
             $command = "\"$gsPath\" -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=\"{$converted_file}\" \"{$sanitized_currentfile}\"";
             exec($command);
 
 
             // exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
-=======
-            exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
->>>>>>> 9b4a72b3e9bae2598cc38aee6504600c75b9dcfb
+            // exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
 
         }
         // $clean_filenames = [];

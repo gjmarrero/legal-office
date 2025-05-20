@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import {ref, onMounted, reactive, watch} from 'vue';
+import {ref, onMounted, reactive, watch, nextTick} from 'vue';
 import {Form, Field, useResetForm} from 'vee-validate';
 import * as yup from 'yup';
 import {useToastr} from '../../toastr.js';
@@ -75,14 +75,18 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
     const editUser = (user) => {
         editing.value = true;
-        form.value.resetForm();
-        $('#userFormModal').modal('show');
+        
         formValues.value = {
             id: user.id,
-            employee: user.employee,
+            employee: user.employee_id,
             name: user.name,
             email: user.email,            
         };
+        nextTick(() => {
+            form.value.resetForm({values: {...formValues.value}})
+        })
+
+        $('#userFormModal').modal('show');
     };
 
     const updateUser = (values, {setErrors}) => {
@@ -304,7 +308,7 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
                         </button>
                       </div>
 
-                    <Form ref="form" @submit="handleSubmit" :validation-schema="editing ? editUserSchema : createUserSchema" v-slot="{ errors }" :initial-values="editing ? formValues : form">
+                    <Form ref="form" @submit="handleSubmit" :validation-schema="editing ? editUserSchema : createUserSchema" v-slot="{ errors }" :initial-values="editing ? {...formValues} : {}">
                       <div class="modal-body">
                             <div class="form-group">
                                 <label for="exampleFormControlInput1">Employee Name</label>
