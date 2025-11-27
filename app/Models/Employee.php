@@ -13,6 +13,10 @@ class Employee extends Model
 
     protected $fillable = ['emp_name','emp_position'];
 
+    public function documents(): HasMany {
+        return $this->hasMany(Document::class);
+    }
+
     public function users(): HasMany{
         return $this->hasMany(User::class);
     }

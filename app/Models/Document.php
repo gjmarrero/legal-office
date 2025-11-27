@@ -46,6 +46,10 @@ class Document extends Model
         );   
     }
 
+    public function employee(): BelongsTo {
+        return $this->belongsTo(Employee::class);
+    }
+
     public function lastTransactionType(): Attribute{
         return Attribute::make(
             get: fn() => $this->transactions()->latest('id')->first()->type,

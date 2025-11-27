@@ -30,6 +30,7 @@ const doc = reactive({
     document_id: '',
     last_assigned: '',
     last_transaction_type: '',
+    employee_name: '',
 });
 const document = ref({ 'data': [] });
 
@@ -64,7 +65,7 @@ const getDocument = () => {
             doc.status = response.data[0].status;
             doc.last_assigned = response.data[0].last_assigned;
             doc.last_transaction_type = response.data[0].last_transaction_type;
-
+            doc.employee_name = response.data[0].employee;
             console.log('def pdf source - getDocument', main_document_path.value, doc.document_file)
             getTransactions();
             getAttachedFiles();
@@ -415,7 +416,7 @@ onMounted(() => {
                             <p>Date Received: {{ doc.date_received }}</p>
                             <p>Client: {{ doc.client_name }}</p>
                             <p>Content: {{ doc.description }}</p>
-
+                            <p>Assigned Employee: {{ doc.employee_name }}</p>
                             <!-- @click.prevent="getFile(doc)" -->
                             <hr class="my-4">
                             <p class="lead">Attachments:</p>

@@ -13,14 +13,14 @@ export default defineConfig({
     //     },
     // },
     server: {
-        host: '0.0.0.0', // this lets Vite accept external connections
+        host: 'localhost', // this lets Vite accept external connections
         port: 5173,
         cors: true,
-        hmr: {
-            host: '192.168.6.109', // your actual LAN IP
-            protocol: 'ws',
-            port: 5173,
-        },
+        // hmr: {
+        //     host: '192.168.6.109', 
+        //     protocol: 'ws',
+        //     port: 5173,
+        // },
     },
     esbuild: {
         supported: {

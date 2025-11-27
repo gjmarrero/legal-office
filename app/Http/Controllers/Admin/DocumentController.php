@@ -41,7 +41,7 @@ class DocumentController extends Controller
         $current_user = Auth::user()->employee_id;
         $query_type = request('query_type');
 
-        $docWithReset = Document::with('client:id,name,office')
+        $docWithReset = Document::with('client:id,name,office','employee:id,emp_name')
             ->whereHas('document_resets', function ($query) use ($searchbyQuery, $searchQuery, $to_do, $current_user, $doc_type, $query_type) {
                 $query
                     ->when(request('query'), function ($query, $selectedStatus) {
@@ -115,7 +115,7 @@ class DocumentController extends Controller
                             });
                     });
             });
-        $docWithoutReset = Document::with('client:id,name,office', 'transactions')
+        $docWithoutReset = Document::with('client:id,name,office', 'transactions', 'employee:id,emp_name')
             ->whereDoesntHave('document_resets')
             ->when(request('query'), function ($query, $selectedStatus) {
                 $query->where('status', $selectedStatus);
@@ -198,6 +198,7 @@ class DocumentController extends Controller
                 'client' => $document->client,
                 'title' => $document->title,
                 'description' => $document->description,
+                'employee' => $document->employee?->emp_name,
                 'remarks' => $document->remarks,
                 'status' => [
                     'name' => $document->status->name,
@@ -399,14 +400,16 @@ class DocumentController extends Controller
             'title' => 'required',
             'description' => 'required',
             'date_received' => 'required',
+            'employee_id' => 'nullable'
         ], [
             'client_id.required' => "Client name is required",
+            
         ]);
 
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ','_',$original_filename);
+            $sanitized_filename = str_replace(' ', '_', $original_filename);
             $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
             $path = 'uploads/documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
@@ -421,6 +424,7 @@ class DocumentController extends Controller
             'remarks' => request('remarks'),
             'document_file' => $file_name,
             'status' => DocumentStatus::ACTIVE,
+            'employee_id' => $validated['employee_id'],
         ]);
 
         Transaction::create([
@@ -451,12 +455,13 @@ class DocumentController extends Controller
             'date_received' => 'required',
         ], [
             'client_id.required' => "Client name is required",
+            'employee_id' => 'nullable'
         ]);
 
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ','_',$original_filename);
+            $sanitized_filename = str_replace(' ', '_', $original_filename);
             $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
             $path = 'public/uploads/documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
@@ -556,6 +561,7 @@ class DocumentController extends Controller
                 'type' => $doc->type->name,
                 'days_active' => $doc->days_active,
                 'document_file' => $doc->document_file,
+                'employee' => $doc->employee->emp_name,
             ]);
 
         return $document;
@@ -574,7 +580,7 @@ class DocumentController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ','_',$original_filename);
+            $sanitized_filename = str_replace(' ', '_', $original_filename);
             $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
             $path = 'uploads/documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
@@ -591,7 +597,8 @@ class DocumentController extends Controller
 
     }
 
-    public function getAdditionalFiles(Document $document){
+    public function getAdditionalFiles(Document $document)
+    {
         $additional_files = DB::table('document_attachments')->select('document_file')->where('document_id', $document->id)->get();
 
         return $additional_files;
@@ -600,56 +607,58 @@ class DocumentController extends Controller
     public function getAttachedFiles(Document $document)
     {
 
-        $main_file = DB::table('documents')->select('document_file','updated_at',DB::raw("'main' as file_type"))->where([['id', $document->id],['document_file', '<>', NULL],['document_file','<>','']]);
+        $main_file = DB::table('documents')->select('document_file', 'updated_at', DB::raw("'main' as file_type"))->where([['id', $document->id], ['document_file', '<>', NULL], ['document_file', '<>', '']]);
 
-        $transaction_files = DB::table('transactions')->select('document_file','updated_at',DB::raw("'transaction' as file_type"))->where([['document_id', $document->id],['document_file','<>',null],['document_file','<>','']]);
+        $transaction_files = DB::table('transactions')->select('document_file', 'updated_at', DB::raw("'transaction' as file_type"))->where([['document_id', $document->id], ['document_file', '<>', null], ['document_file', '<>', '']]);
 
-        $additional_files = DB::table('document_attachments')->select('document_file','updated_at',DB::raw("'additional' as file_type"))->where([['document_id', $document->id],['document_file','<>',null],['document_file','<>','']]);
+        $additional_files = DB::table('document_attachments')->select('document_file', 'updated_at', DB::raw("'additional' as file_type"))->where([['document_id', $document->id], ['document_file', '<>', null], ['document_file', '<>', '']]);
 
-        $all_files = $main_file->union($transaction_files)->union($additional_files)->orderBy('updated_at')->get();        
+        $all_files = $main_file->union($transaction_files)->union($additional_files)->orderBy('updated_at')->get();
 
-        $pdfVersion = "1.4";
+        $pdfVersion = "1.7";
 
         $original_filename = "";
-        
+
         foreach ($all_files as $attached_file) {
             $original_filename = $attached_file->document_file;
-            
-            if($attached_file->file_type === 'transaction'){
-                $current_file = Storage::disk("public")->path('uploads/transaction_documents/'.$attached_file->document_file);
-            }else{
-                $current_file = Storage::disk("public")->path('uploads/documents/'.$attached_file->document_file);
+
+            $current_file = ($attached_file->file_type === 'transaction')
+                ? Storage::disk("public")->path('uploads/transaction_documents/' . $attached_file->document_file)
+                : Storage::disk("public")->path('uploads/documents/' . $attached_file->document_file);
+
+            $sanitized_filename = str_replace(' ', '-', $original_filename);
+            $converted_file = Storage::disk("public")->path('uploads/documents/converted/' . $sanitized_filename);
+
+            if (!file_exists(dirname($converted_file))) {
+                mkdir(dirname($converted_file), 0777, true);
             }
-            $sanitized_currentfile = str_replace(' ', '-', $current_file);
-            $sanitized_filename = str_replace(' ','-', $original_filename);
-            
-            $converted_file = Storage::disk("public")->path('uploads/documents/converted/'.$sanitized_filename);
 
             $gsPath = 'C:\\Program Files\\gs\\gs10.05.1\\bin\\gswin64c.exe';
-            $command = "\"$gsPath\" -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=\"{$converted_file}\" \"{$sanitized_currentfile}\"";
-            exec($command);
+            $command = "\"$gsPath\" -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -dNOPAUSE -dBATCH -sOutputFile=\"{$converted_file}\" \"{$current_file}\"";
 
+            exec($command, $output, $returnVar);
 
-            // exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
-            // exec("gswin64c -sDEVICE=pdfwrite -dCompatibilityLevel=$pdfVersion -o -dNOPAUSE -dBATCH -sOutputFile=$converted_file $current_file");
-
+            if ($returnVar !== 0) {
+                throw new \Exception("Ghostscript conversion failed for {$current_file}: " . implode("\n", $output));
+            }
         }
+
         // $clean_filenames = [];
         $oMerger = PDFMerger::init();
-        foreach ($all_files as $converted){
+        foreach ($all_files as $converted) {
             $original_filename = $converted->document_file;
-            $sanitized_file = str_replace(' ','-',$original_filename);
-            $oMerger->addPDF(Storage::disk('public')->path('uploads/documents/converted/'.$sanitized_file));
+            $sanitized_file = str_replace(' ', '-', $original_filename);
+            $oMerger->addPDF(Storage::disk('public')->path('uploads/documents/converted/' . $sanitized_file));
             // $clean_filenames[] = $sanitized_file;
-        }        
+        }
         $oMerger->merge();
 
-        $merged_file = 'merged_'.$document->id.'.pdf';
+        $merged_file = 'merged_' . $document->id . '.pdf';
 
-        $oMerger->save(Storage::disk('public')->path('uploads/merged/merged_'.$document->id.'.pdf'));
+        $oMerger->save(Storage::disk('public')->path('uploads/merged/merged_' . $document->id . '.pdf'));
 
-        foreach ($all_files as $delete_file){
-            unlink(Storage::disk("public")->path('uploads/documents/converted/'.str_replace(' ','-',$delete_file->document_file)));
+        foreach ($all_files as $delete_file) {
+            unlink(Storage::disk("public")->path('uploads/documents/converted/' . str_replace(' ', '-', $delete_file->document_file)));
         }
 
         return $merged_file;

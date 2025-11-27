@@ -183,7 +183,9 @@ const selectedReferralTypeTotal = ref('referrals');
 const selectedCaseTypeTotal = ref('cases');
 const totalReferrals = ref(0);
 const totalCases = ref(0);
+
 const getTotals = () => {
+    console.log("Type of referral filter", selectedReferralTypeTotal.value)
     axios.get('/api/dashboard/stats/totals', {
         params: {
             ref_doc_type: selectedReferralTypeTotal.value,
@@ -481,7 +483,7 @@ onMounted(() => {
                                                     name: 'admin.documents',
                                                     query: {
                                                         query_type: 'all',
-                                                        doc_type: 'referrals'
+                                                        doc_type: selectedReferralTypeTotal
                                                     }
                                                 }">
                                                     View
@@ -498,8 +500,8 @@ onMounted(() => {
                                                             class="px-1 rounded border-0 form-control">
                                                             <option value="cases" selected>All</option>
                                                             <option value="administrative">Administrative</option>
-                                                            <option value="judicial">Municipal</option>
-                                                            <option value="quasi">Provincial</option>
+                                                            <option value="judicial">Judicial</option>
+                                                            <option value="quasi">Quasi-Judicial</option>
                                                         </select>
                                                     </div>
                                                     <p>Total Cases</p>
@@ -512,7 +514,7 @@ onMounted(() => {
                                                     name: 'admin.documents',
                                                     query: {
                                                         query_type: 'all',
-                                                        doc_type: 'cases',
+                                                        doc_type: selectedCaseTypeTotal,
                                                     }
                                                 }">
                                                     View

@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, ref, computed, reactive, watch } from 'vue';
+import { onMounted, ref, computed, reactive, watch, nextTick } from 'vue';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useToastr } from '../../toastr';
@@ -299,11 +299,21 @@ const getDocuments = (page = 1) => {
         });
 }
 
+const filteredDocuments = computed(() => {
+    return documents.value.data.filter(doc => {
+        return (!columnSearch.type || doc.type.name.toLowerCase().includes(columnSearch.type.toLowerCase()))
+            && (!columnSearch.date_received || doc.date_received.includes(columnSearch.date_received))
+            && (!columnSearch.client || doc.client.name.toLowerCase().includes(columnSearch.client.toLowerCase()))
+            && (!columnSearch.office || doc.client.office.toLowerCase().includes(columnSearch.office.toLowerCase()))
+            && (!columnSearch.title || doc.title.toLowerCase().includes(columnSearch.title.toLowerCase()))
+            && (!columnSearch.description || doc.description.toLowerCase().includes(columnSearch.description.toLowerCase()))
+    })
+})
+
+
 const documentCount = computed(() => {
     return documentStatus.value.map(status => status.count).reduce((acc, value) => acc + value, 0);
 });
-
-
 
 const selectedSearchByQuery = ref('');
 
@@ -313,12 +323,21 @@ const setSearchByQuery = () => {
     selectedSearchByQuery.value = searchbyQuery.value;
 }
 
+const columnSearch = reactive({
+    type: '',
+    date_received: '',
+    client: '',
+    office: '',
+    title: '',
+    description: '',
+})
+
 watch(searchQuery, debounce(() => {
     getDocuments();
     getDocumentStatus();
 }, 300));
 
-onMounted(() => {
+onMounted(async () => {
     getDocuments();
     getDocumentStatus();
     getDocumentType();
@@ -401,34 +420,59 @@ onMounted(() => {
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <table v-if="documentsCount > 0" class="table table-bordered">
+                            <table v-if="documentsCount > 0" class="table table-bordered table-fixed" id="documentTable"
+                                style="table-layout: fixed;">
                                 <thead>
                                     <tr>
                                         <!-- <th>D</th>
                                         <th>L</th>
                                         <th>DA</th> -->
-                                        <th scope="col">#</th>
-                                        <th scope="col">Type</th>
-                                        <th scope="col">Date Received</th>
+                                        <th scope="col" width="50">#</th>
+                                        <th scope="col" width="200">Type</th>
+                                        <th scope="col" width="150">Date Received</th>
                                         <th scope="col">Client Name</th>
                                         <th scope="col">Client Office</th>
                                         <th scope="col">Title</th>
                                         <th scope="col">Description</th>
+                                        <th scope="col">Assigned Employee</th>
                                         <th scope="col">Status</th>
+                                        <th></th>
                                     </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th width="180"><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.type" placeholder="Search Type" />
+                                        </th>
+                                        <th width="150"><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.date_received" placeholder="Search Date" style="width:120px;" /></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.client"
+                                                placeholder="Search Client" style="width:140px;"/></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.office"
+                                                placeholder="Search Office" style="width:140px;"/></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.title"
+                                                placeholder="Search Title" style="width:140px;"/></th>
+                                        <th><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.description" placeholder="Search Description" style="width:140px;"/>
+                                        </th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
+                                                placeholder="Search Employee" style="width:140px;"/></th>
+                                        <th></th>
+                                    </tr>
+
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(document, index) in documents.data" :key="document.id">
+                                    <tr v-for="(document, index) in filteredDocuments" :key="document.id">
                                         <!-- <td>{{ document.date_to_count }}</td>
                                         <td>{{ document.last_assigned }}</td>
                                         <td>{{ document.days_active }}</td> -->
                                         <td>{{ index + 1 }}</td>
-                                        <td>{{ document.type.name }}</td>
-                                        <td>{{ document.date_received }}</td>
+                                        <td width="180">{{ document.type.name }}</td>
+                                        <td width="180">{{ document.date_received }}</td>
                                         <td>{{ document.client.name }}</td>
                                         <td>{{ document.client.office }}</td>
                                         <td>{{ document.title }}</td>
                                         <td>{{ document.description }}</td>
+                                        <td>{{ document.employee }}</td>
                                         <td>
                                             <span class="badge" :class="`badge-${document.status.color}`">{{
                                                 document.status.name }}</span>
