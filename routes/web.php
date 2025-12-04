@@ -58,11 +58,11 @@ Route::middleware('auth')->group(function() {
     Route::get('/api/employees/getCurrentEmployee', [EmployeeController::class, 'getCurrentEmployee']);   
 
     Route::get('/api/stats/filtered_documents', [DashboardStatController::class, 'getFilteredDocuments']);
-    Route::get('/api/stats/referrals', [DashboardStatController::class, 'getReferralNearDueCount']);
-    Route::get('/api/stats/cases', [DashboardStatController::class, 'getCaseNearDueCount']);
+    Route::get('/api/stats/referrals/{referral_type}', [DashboardStatController::class, 'getReferralNearDueCount']);
+    Route::get('/api/stats/cases/{case_type}', [DashboardStatController::class, 'getCaseNearDueCount']);
 
-    Route::get('/api/stats/past_due_referrals', [DashboardStatController::class, 'getReferralPastDueCount']);
-    Route::get('/api/stats/past_due_cases', [DashboardStatController::class, 'getCasePastDueCount']);
+    Route::get('/api/stats/past_due_referrals/{referral_type}', [DashboardStatController::class, 'getReferralPastDueCount']);
+    Route::get('/api/stats/past_due_cases/{case_type}', [DashboardStatController::class, 'getCasePastDueCount']);
 
     Route::get('/api/stats/to-do', [DashboardStatController::class, 'to_do']);
 

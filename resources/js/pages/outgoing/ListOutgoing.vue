@@ -4,13 +4,14 @@ import { onMounted, ref, computed, reactive, watch } from 'vue';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useToastr } from '../../toastr';
-import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+// import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 import { Form, Field } from 'vee-validate';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import { useAuthUserStore } from '../../stores/AuthUserStore.js';
 import VuePdfEmbed from 'vue-pdf-embed';
 import DocPreview from '../../components/DocPreview.vue';
+import Pagination from '../../components/Pagination.vue';
 
 const authUserStore = useAuthUserStore();
 
@@ -284,7 +285,11 @@ onMounted(() => {
                                 <p class="text-center font-weight-bold text-monospace">No data found</p>
                             </span>
                         </div>
-                        <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" />
+                        <!-- <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" /> -->
+                        <Pagination v-if="documents && documents.current_page && documents.last_page"
+                                    :current-page="documents.current_page" :last-page="documents.last_page"
+                                    :prev-url="documents.prev_page_url" :next-url="documents.next_page_url"
+                                    @change-page="getDocuments" />
                     </div>
                 </div>
             </div>
@@ -294,21 +299,6 @@ onMounted(() => {
     <div v-if="show">
         <DocPreview v-bind:document_source="document_source" @modal-stat="handleValue" />
     </div>
-    <!-- <div class="modal" tabindex="-1" id="myModal">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Document</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal">
-                <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <vue-pdf-embed :source="document_source" />
-          </div>
-        </div>
-      </div>
-    </div> -->
 
     <div class="modal fade" id="attachFileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">

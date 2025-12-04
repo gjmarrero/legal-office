@@ -30,118 +30,133 @@ const getOverdueDocumentsCount = () => {
         })
 }
 
-const selectedReferralNearDueType = ref('referrals');
+const selectedReferralNearDueType = ref('referral');
 const nearDueReferrals = ref({ 'data': [] });
 const totalReferralNearDueCount = ref(0);
 
 const getReferralNearDueCount = () => {
-    const selectedReferralType = selectedReferralNearDueType.value;
-    axios.get('/api/stats/filtered_documents', {
-        params: {
-            doc_type: selectedReferralType,
-        }
+    // const selectedReferralType = selectedReferralNearDueType.value;
+    // axios.get('/api/stats/filtered_documents', {
+    //     params: {
+    //         doc_type: selectedReferralType,
+    //     }
+    // })
+    //     .then((response) => {
+    //         nearDueReferrals.value.data = response.data;
+    //         if (selectedReferralType === 'referrals') {
+    //             nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+    //                 (referral.type === 8 && (referral.days_active >= 1 && referral.days_active <= 3)) ||
+    //                 ((referral.type === 1 || referral.type === 2 || referral.type === 4) && (referral.days_active >= 4 && referral.days_active <= 7)) ||
+    //                 (referral.type === 3 && (referral.days_active >= 7 && referral.days_active <= 10))
+    //             )
+    //         } else if (selectedReferralType === 'admin_docs') {
+    //             nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+    //                 (referral.days_active >= 1 && referral.days_active <= 3)
+    //             )
+    //         } else if (selectedReferralType === 'municipal' || selectedReferralType === 'provincial' || selectedReferralType === 'other_referral') {
+    //             nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+    //                 (referral.days_active >= 4 && referral.days_active <= 7)
+    //             )
+    //         } else if (selectedReferralType === 'code') {
+    //             nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
+    //                 (referral.days_active >= 7 && referral.days_active <= 10)
+    //             )
+    //         }
+    //         totalReferralNearDueCount.value = nearDueReferrals.value.data.length;
+    //     })
+    axios.get(`/api/stats/referrals/${selectedReferralNearDueType.value}`).then((response) => {
+        totalReferralNearDueCount.value = response.data.totalReferralNearDueCount;
     })
-        .then((response) => {
-            nearDueReferrals.value.data = response.data;
-            if (selectedReferralType === 'referrals') {
-                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                    (referral.type === 8 && (referral.days_active >= 1 && referral.days_active <= 3)) ||
-                    ((referral.type === 1 || referral.type === 2 || referral.type === 4) && (referral.days_active >= 4 && referral.days_active <= 7)) ||
-                    (referral.type === 3 && (referral.days_active >= 7 && referral.days_active <= 10))
-                )
-            } else if (selectedReferralType === 'admin_docs') {
-                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                    (referral.days_active >= 1 && referral.days_active <= 3)
-                )
-            } else if (selectedReferralType === 'municipal' || selectedReferralType === 'provincial' || selectedReferralType === 'other_referral') {
-                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                    (referral.days_active >= 4 && referral.days_active <= 7)
-                )
-            } else if (selectedReferralType === 'code') {
-                nearDueReferrals.value.data = nearDueReferrals.value.data.filter(referral =>
-                    (referral.days_active >= 7 && referral.days_active <= 10)
-                )
-            }
-            totalReferralNearDueCount.value = nearDueReferrals.value.data.length;
-        })
 }
 
-const selectedReferralPastDueType = ref('referrals');
+const selectedReferralPastDueType = ref('referral');
 const pastDueReferrals = ref({ 'data': [] });
 const totalReferralPastDueCount = ref(0);
 
 const getReferralPastDueCount = () => {
-    const selectedReferralType = selectedReferralPastDueType.value;
-    axios.get('/api/stats/filtered_documents', {
-        params: {
-            doc_type: selectedReferralType,
-        }
+    // const selectedReferralType = selectedReferralPastDueType.value;
+    // axios.get('/api/stats/filtered_documents', {
+    //     params: {
+    //         doc_type: selectedReferralType,
+    //     }
+    // })
+    //     .then((response) => {
+    //         pastDueReferrals.value.data = response.data;
+    //         if (selectedReferralType === 'referrals') {
+    //             pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+    //                 (referral.type === 8 && referral.days_active > 3) ||
+    //                 (referral.type === 1 && referral.days_active > 7) ||
+    //                 (referral.type === 2 && referral.days_active > 7) ||
+    //                 (referral.type === 3 && referral.days_active > 10) ||
+    //                 (referral.type === 4 && referral.days_active > 7)
+    //             )
+    //         } else if (selectedReferralType === 'admin_docs') {
+    //             pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+    //                 referral.days_active > 3
+    //             )
+    //         } else if (selectedReferralType === 'municipal' || selectedReferralType === 'municipal' || selectedReferralType === 'other_referral') {
+    //             pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+    //                 referral.days_active > 7
+    //             )
+    //         } else if (selectedReferralType === 'code') {
+    //             pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
+    //                 referral.days_active > 10
+    //             )
+    //         }
+    //         totalReferralPastDueCount.value = pastDueReferrals.value.data.length;
+    //     })
+    axios.get(`/api/stats/past_due_referrals/${selectedReferralPastDueType.value}`).then((response) => {
+        totalReferralPastDueCount.value = response.data.totalReferralPastDueCount;
     })
-        .then((response) => {
-            pastDueReferrals.value.data = response.data;
-            if (selectedReferralType === 'referrals') {
-                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                    (referral.type === 8 && referral.days_active > 3) ||
-                    (referral.type === 1 && referral.days_active > 7) ||
-                    (referral.type === 2 && referral.days_active > 7) ||
-                    (referral.type === 3 && referral.days_active > 10) ||
-                    (referral.type === 4 && referral.days_active > 7)
-                )
-            } else if (selectedReferralType === 'admin_docs') {
-                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                    referral.days_active > 3
-                )
-            } else if (selectedReferralType === 'municipal' || selectedReferralType === 'municipal' || selectedReferralType === 'other_referral') {
-                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                    referral.days_active > 7
-                )
-            } else if (selectedReferralType === 'code') {
-                pastDueReferrals.value.data = pastDueReferrals.value.data.filter(referral =>
-                    referral.days_active > 10
-                )
-            }
-            totalReferralPastDueCount.value = pastDueReferrals.value.data.length;
-        })
 }
 
-const selectedCaseNearDueType = ref('cases');
+const selectedCaseNearDueType = ref('case');
 const nearDueCases = ref({ 'data': [] });
 const totalCaseNearDueCount = ref(0);
 
 const getCaseNearDueCount = () => {
-    const selectedCaseType = selectedCaseNearDueType.value;
-    axios.get('/api/stats/filtered_documents', {
-        params: {
-            doc_type: selectedCaseType,
-        }
+    // const selectedCaseType = selectedCaseNearDueType.value;
+    // axios.get('/api/stats/filtered_documents', {
+    //     params: {
+    //         doc_type: selectedCaseType,
+    //     }
+    // })
+    //     .then((response) => {
+    //         nearDueCases.value.data = response.data;
+
+    //         nearDueCases.value.data = nearDueCases.value.data.filter(court_case =>
+    //             court_case.days_active >= 12 && court_case.days_active <= 15
+    //         )
+    //         console.log("Ret data near due", nearDueCases.value.data)
+    //         totalCaseNearDueCount.value = nearDueCases.value.data.length;
+    //     })
+
+    axios.get(`/api/stats/cases/${selectedCaseNearDueType.value}`).then((response) => {
+        totalCaseNearDueCount.value = response.data.totalCaseNearDueCount;
     })
-        .then((response) => {
-            nearDueCases.value.data = response.data;
-            nearDueCases.value.data = nearDueCases.value.data.filter(court_case =>
-                court_case.days_active >= 12 && court_case.days_active <= 15
-            )
-            totalCaseNearDueCount.value = nearDueCases.value.data.length;
-        })
 }
 
-const selectedCasePastDueType = ref('cases');
+const selectedCasePastDueType = ref('case');
 const pastDueCases = ref({ 'data': [] });
 const totalCasePastDueCount = ref(0);
 
 const getCasePastDueCount = () => {
-    const selectedCaseType = selectedCasePastDueType.value;
-    axios.get('/api/stats/filtered_documents', {
-        params: {
-            doc_type: selectedCaseType,
-        }
+    // const selectedCaseType = selectedCasePastDueType.value;
+    // axios.get('/api/stats/filtered_documents', {
+    //     params: {
+    //         doc_type: selectedCaseType,
+    //     }
+    // })
+    //     .then((response) => {
+    //         pastDueCases.value.data = response.data;
+    //         pastDueCases.value.data = pastDueCases.value.data.filter(court_case =>
+    //             court_case.days_active > 15
+    //         )
+    //         totalCasePastDueCount.value = pastDueCases.value.data.length;
+    //     })
+    axios.get(`/api/stats/past_due_cases/${selectedCasePastDueType.value}`).then((response) => {
+        totalCasePastDueCount.value = response.data.totalCasePastDueCount;
     })
-        .then((response) => {
-            pastDueCases.value.data = response.data;
-            pastDueCases.value.data = pastDueCases.value.data.filter(court_case =>
-                court_case.days_active > 15
-            )
-            totalCasePastDueCount.value = pastDueCases.value.data.length;
-        })
 }
 
 const totalToReceiveCount = ref(0);
@@ -185,7 +200,6 @@ const totalReferrals = ref(0);
 const totalCases = ref(0);
 
 const getTotals = () => {
-    console.log("Type of referral filter", selectedReferralTypeTotal.value)
     axios.get('/api/dashboard/stats/totals', {
         params: {
             ref_doc_type: selectedReferralTypeTotal.value,
@@ -305,12 +319,13 @@ onMounted(() => {
                                                             @change="getReferralNearDueCount()"
                                                             style="height: 2rem; outline: 2px solid transparent;"
                                                             class="px-1 rounded border-0 form-control">
-                                                            <option value="referrals" selected>All</option>
+                                                            <option value="referral" selected>All</option>
                                                             <option value="code">Code</option>
                                                             <option value="municipal">Municipal</option>
                                                             <option value="provincial">Provincial</option>
                                                             <option value="other_referral">Other Referrals</option>
                                                             <option value="admin_docs">Admin Docs</option>
+                                                            <option value="notaries">Notary</option>
                                                         </select>
                                                     </div>
                                                     <p>Referrals</p>
@@ -340,7 +355,7 @@ onMounted(() => {
                                                             @change="getCaseNearDueCount()"
                                                             style="height: 2rem; outline: 2px solid transparent;"
                                                             class="px-1 rounded border-0 form-control">
-                                                            <option value="cases">All</option>
+                                                            <option value="case">All</option>
                                                             <option value="administrative">Administrative</option>
                                                             <option value="judicial">Judicial</option>
                                                             <option value="quasi">Quasi-Judicial</option>
@@ -382,7 +397,7 @@ onMounted(() => {
                                                             @change="getReferralPastDueCount()"
                                                             style="height: 2rem; outline: 2px solid transparent;"
                                                             class="px-1 rounded border-0 form-control">
-                                                            <option value="referrals">All</option>
+                                                            <option value="referral">All</option>
                                                             <option value="code">Code</option>
                                                             <option value="municipal">Municipal</option>
                                                             <option value="provincial">Provincial</option>
@@ -417,7 +432,7 @@ onMounted(() => {
                                                             @change="getCasePastDueCount()"
                                                             style="height: 2rem; outline: 2px solid transparent;"
                                                             class="px-1 rounded border-0 form-control">
-                                                            <option value="cases">All</option>
+                                                            <option value="case">All</option>
                                                             <option value="administrative">Administrative</option>
                                                             <option value="judicial">Judicial</option>
                                                             <option value="quasi">Quasi Judicial</option>

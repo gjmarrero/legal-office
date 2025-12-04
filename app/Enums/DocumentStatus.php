@@ -12,4 +12,11 @@ enum DocumentStatus: int{
             DocumentStatus::ARCHIVED => 'success',
         };
     }
+
+    public function label() {
+        return match($this){
+            DocumentStatus::ACTIVE => 'Active',
+            DocumentStatus::ARCHIVED => 'Archived',
+        };
+    }
 }

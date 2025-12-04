@@ -4,13 +4,14 @@ import { onMounted, ref, computed, reactive, watch, nextTick } from 'vue';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useToastr } from '../../toastr';
-import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+// import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 // import { SimpleBootstrap4Pagination } from 'laravel-vue-pagination';
 import { Form, Field } from 'vee-validate';
 import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import { useAuthUserStore } from '../../stores/AuthUserStore.js';
 import DocumentButtons from './DocumentButtons.vue';
+import Pagination from '../../components/Pagination.vue';
 
 const authUserStore = useAuthUserStore();
 
@@ -83,6 +84,16 @@ const clearRouteForm = () => {
     form.file = null;
     form.remarks = '';
 }
+
+const columnSearch = reactive({
+    type: '',
+    date_received: '',
+    client: '',
+    office: '',
+    title: '',
+    description: '',
+    employee: '',
+})
 
 const createRouteDocument = () => {
     const formData = new FormData();
@@ -199,6 +210,10 @@ const documentsCount = ref(0);
 
 const documentsCountFiltered = ref(0);
 
+const currentPage = ref(1)
+
+const perPage = 10
+
 const getDocumentStatus = () => {
     axios.get('/api/document-status', {
         params: {
@@ -241,10 +256,18 @@ const getDocuments = (page = 1) => {
             query_doc_status: route.query.status,
             query_to_do: route.query.to_do,
             query_type: route.query.query_type,
+            filter_type: columnSearch.type,
+            filter_date_received: columnSearch.date_received,
+            filter_client: columnSearch.client,
+            filter_office: columnSearch.office,
+            filter_title: columnSearch.title,
+            filter_description: columnSearch.description,
+            filter_employee: columnSearch.employee,
         }
     })
         .then((response) => {
             documents.value = response.data;
+            console.log("Documents", documents.value)
             if (route.query.status === 'past_due') {
                 if (route.query.doc_type === 'referrals') {
                     documents.value.data = documents.value.data.filter(document =>
@@ -299,16 +322,20 @@ const getDocuments = (page = 1) => {
         });
 }
 
-const filteredDocuments = computed(() => {
-    return documents.value.data.filter(doc => {
-        return (!columnSearch.type || doc.type.name.toLowerCase().includes(columnSearch.type.toLowerCase()))
-            && (!columnSearch.date_received || doc.date_received.includes(columnSearch.date_received))
-            && (!columnSearch.client || doc.client.name.toLowerCase().includes(columnSearch.client.toLowerCase()))
-            && (!columnSearch.office || doc.client.office.toLowerCase().includes(columnSearch.office.toLowerCase()))
-            && (!columnSearch.title || doc.title.toLowerCase().includes(columnSearch.title.toLowerCase()))
-            && (!columnSearch.description || doc.description.toLowerCase().includes(columnSearch.description.toLowerCase()))
-    })
-})
+const getDocumentsByUrl = (url) => {
+    if (!url) return;
+    axios.get(url).then((response) => {
+        documents.value = response.data;
+    });
+};
+
+watch(
+    columnSearch,
+    debounce(() => {
+        getDocuments(1);
+    }, 300),
+    { deep: true }
+);
 
 
 const documentCount = computed(() => {
@@ -323,14 +350,7 @@ const setSearchByQuery = () => {
     selectedSearchByQuery.value = searchbyQuery.value;
 }
 
-const columnSearch = reactive({
-    type: '',
-    date_received: '',
-    client: '',
-    office: '',
-    title: '',
-    description: '',
-})
+
 
 watch(searchQuery, debounce(() => {
     getDocuments();
@@ -388,7 +408,7 @@ onMounted(async () => {
                                 :class="[selectedStatus == status.value ? 'btn-secondary' : 'btn-default']">
                                 <span class="mr-1">{{ status.name }}</span>
                                 <span class="badge badge-pill" :class="`badge-${status.color}`">{{ status.count
-                                }}</span>
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -420,7 +440,7 @@ onMounted(async () => {
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <table v-if="documentsCount > 0" class="table table-bordered table-fixed" id="documentTable"
+                            <table class="table table-bordered table-fixed" id="documentTable"
                                 style="table-layout: fixed;">
                                 <thead>
                                     <tr>
@@ -428,54 +448,57 @@ onMounted(async () => {
                                         <th>L</th>
                                         <th>DA</th> -->
                                         <th scope="col" width="50">#</th>
-                                        <th scope="col" width="200">Type</th>
+                                        <th scope="col" width="150">Type</th>
                                         <th scope="col" width="150">Date Received</th>
                                         <th scope="col">Client Name</th>
                                         <th scope="col">Client Office</th>
                                         <th scope="col">Title</th>
-                                        <th scope="col">Description</th>
+                                        <th scope="col" width="400">Description</th>
                                         <th scope="col">Assigned Employee</th>
-                                        <th scope="col">Status</th>
-                                        <th></th>
+                                        <th scope="col" width="100">Status</th>
+                                        <th scope="col" width="100"></th>
                                     </tr>
                                     <tr>
                                         <th></th>
-                                        <th width="180"><input type="text" class="form-control-sm"
-                                                v-model="columnSearch.type" placeholder="Search Type" />
-                                        </th>
-                                        <th width="150"><input type="text" class="form-control-sm"
-                                                v-model="columnSearch.date_received" placeholder="Search Date" style="width:120px;" /></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.client"
-                                                placeholder="Search Client" style="width:140px;"/></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.office"
-                                                placeholder="Search Office" style="width:140px;"/></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.title"
-                                                placeholder="Search Title" style="width:140px;"/></th>
                                         <th><input type="text" class="form-control-sm"
-                                                v-model="columnSearch.description" placeholder="Search Description" style="width:140px;"/>
+                                                v-model="columnSearch.type" placeholder="Search Type" style="width:120px;"/>
+                                        </th>
+                                        <th><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.date_received" placeholder="Search Date"
+                                                style="width:120px;" /></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.client"
+                                                placeholder="Search Client" style="width:140px;" /></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.office"
+                                                placeholder="Search Office" style="width:140px;" /></th>
+                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.title"
+                                                placeholder="Search Title" style="width:140px;" /></th>
+                                        <th><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.description" placeholder="Search Description"
+                                                style="width:350px;" />
                                         </th>
                                         <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
-                                                placeholder="Search Employee" style="width:140px;"/></th>
+                                                placeholder="Search Employee" style="width:140px;" /></th>
                                         <th></th>
                                     </tr>
 
                                 </thead>
-                                <tbody>
-                                    <tr v-for="(document, index) in filteredDocuments" :key="document.id">
+                                <tbody v-if="documentsCount > 0">
+                                    <tr v-for="(document, index) in documents.data" :key="document.id">
+
                                         <!-- <td>{{ document.date_to_count }}</td>
                                         <td>{{ document.last_assigned }}</td>
                                         <td>{{ document.days_active }}</td> -->
                                         <td>{{ index + 1 }}</td>
-                                        <td width="180">{{ document.type.name }}</td>
+                                        <td width="150">{{ document.type_label }}</td>
                                         <td width="180">{{ document.date_received }}</td>
                                         <td>{{ document.client.name }}</td>
                                         <td>{{ document.client.office }}</td>
                                         <td>{{ document.title }}</td>
                                         <td>{{ document.description }}</td>
-                                        <td>{{ document.employee }}</td>
+                                        <td>{{ document?.employee?.emp_name }}</td>
                                         <td>
-                                            <span class="badge" :class="`badge-${document.status.color}`">{{
-                                                document.status.name }}</span>
+                                            <span class="badge" :class="`badge-${document.status_info.color}`">{{
+                                                document.status_info.name }}</span>
                                         </td>
                                         <td>
                                             <DocumentButtons v-bind:document="document"
@@ -484,16 +507,21 @@ onMounted(async () => {
                                         </td>
                                     </tr>
                                 </tbody>
+                                <tbody v-else>
+                                    <tr>
+                                        <td colspan="10" class="text-center font-weight-bold text-monospace py-3">
+                                            No data found
+                                        </td>
+                                    </tr>
+                                </tbody>
+
                             </table>
-                            <span v-else>
-                                <p class="text-center font-weight-bold text-monospace">No data found</p>
-                            </span>
+
                         </div>
-                        <div class="row pagination-wrapper">
-                            <div class="col d-flex justifiy-content-center">
-                                <Bootstrap4Pagination :data="documents" @pagination-change-page="getDocuments" />
-                            </div>
-                        </div>
+                        <Pagination v-if="documents && documents.current_page && documents.last_page"
+                            :current-page="documents.current_page" :last-page="documents.last_page"
+                            :prev-url="documents.prev_page_url" :next-url="documents.next_page_url"
+                            @change-page="getDocuments" />
                     </div>
                 </div>
             </div>

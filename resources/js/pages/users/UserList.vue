@@ -6,7 +6,8 @@ import * as yup from 'yup';
 import {useToastr} from '../../toastr.js';
 import UserListItem from './UserListItem.vue';
 import {debounce} from 'lodash';
-import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+import Pagination from '../../components/Pagination.vue';
+// import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
     const toastr = useToastr();
     const users = ref({'data': []});
@@ -255,7 +256,10 @@ import { Bootstrap4Pagination } from 'laravel-vue-pagination';
                             </tbody>
                         </table>
                     </div>
-                    <Bootstrap4Pagination :data="users" @pagination-change-page="getUsers" />
+                    <Pagination v-if="users && users.current_page && users.last_page"
+                            :current-page="users.current_page" :last-page="users.last_page"
+                            :prev-url="users.prev_page_url" :next-url="users.next_page_url"
+                            @change-page="getUsers" />
                 </div>
            </div>
 

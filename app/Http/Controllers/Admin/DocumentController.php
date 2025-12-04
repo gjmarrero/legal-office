@@ -14,19 +14,14 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-// use League\CommonMark\Node\Block\Document;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\DocumentAttachment;
 use Webklex\PDFMerger\Facades\PDFMergerFacade as PDFMerger;
-// use GrofGraf\LaravelPDFMerger\PDFMerger;
-// use Softplaceweb\PdfMerger\Facades\PdfMerger;
 use Symfony\Component\Filesystem\Filesystem,
 Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand,
 Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 use Symfony\Component\Process\Process;
-
-
 use App\Models\Document;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -34,124 +29,232 @@ class DocumentController extends Controller
 {
     public function index()
     {
-        $searchQuery = request('query_search');
-        $searchbyQuery = request('query_searchby');
-        $doc_type = request('query_doc_type');
-        $to_do = request('query_to_do');
-        $current_user = Auth::user()->employee_id;
-        $query_type = request('query_type');
+        $perPage = request('per_page', 10);
 
-        $docWithReset = Document::with('client:id,name,office','employee:id,emp_name')
-            ->whereHas('document_resets', function ($query) use ($searchbyQuery, $searchQuery, $to_do, $current_user, $doc_type, $query_type) {
-                $query
-                    ->when(request('query'), function ($query, $selectedStatus) {
-                        $query->where('status', $selectedStatus);
-                    })
-                    ->when(request('query_search'), function ($query) use ($searchQuery, $searchbyQuery) {
-                        $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery) {
-                            $query->whereHas('client', function ($query) use ($searchQuery) {
-                                $query->where('clients.name', 'like', "%{$searchQuery}%");
-                            });
-                        });
-                        $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function ($query) use ($searchQuery, $searchbyQuery) {
-                            $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
-                        });
-                        $query->when($searchbyQuery === 'type', function ($query) use ($searchQuery) {
-                            $query->where('type', $searchQuery);
-                        });
-                    })
-                    ->when(request('query_to_do'), function ($query) use ($to_do, $current_user) {
-                        $query->when($to_do === 'to-receive', function ($query) use ($current_user) {
-                            $query->whereHas('transactions', function ($query) use ($current_user) {
-                                $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', null]]);
-                            });
-                        });
-                        $query->when($to_do === 'to-release', function ($query) use ($current_user) {
-                            $query->whereHas('transactions', function ($query) use ($current_user) {
-                                $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', TransactionType::RECEIVED]]);
-                            });
-                        });
-                    })
-                    ->when(request('query_type'), function ($query) use ($doc_type, $query_type) {
-                        $query
-                            ->when($query_type === 'active', function ($query) {
-                                $query->active();
-                            })
-                            ->when($query_type === 'all', function ($query) {
-                                $query->userCount();
-                            })
-                            ->when($doc_type === 'cases', function ($query) {
-                                $query->case();
-                            })
-                            ->when($doc_type === 'administrative', function ($query) {
-                                $query->administrativeCases();
-                            })
-                            ->when($doc_type === 'judicial', function ($query) {
-                                $query->judicialCases();
-                            })
-                            ->when($doc_type === 'quasi', function ($query) {
-                                $query->quasiCases();
-                            })
-                            ->when($doc_type === 'referrals', function ($query) {
-                                $query->referral();
-                            })
-                            ->when($doc_type === 'admin_docs', function ($query) {
-                                $query->adminDocs();
-                            })
-                            ->when($doc_type === 'municipal', function ($query) {
-                                $query->municipalOrdinances();
-                            })
-                            ->when($doc_type === 'other_referral', function ($query) {
-                                $query->otherReferrals();
-                            })
-                            ->when($doc_type == 'provincial', function ($query) {
-                                $query->provincialOrdinances();
-                            })
-                            ->when($doc_type === 'code', function ($query) {
-                                $query->codes();
-                            })
-                            ->when($doc_type === 'notary', function ($query) {
-                                $query->notaries();
-                            });
-                    });
-            });
-        $docWithoutReset = Document::with('client:id,name,office', 'transactions', 'employee:id,emp_name')
-            ->whereDoesntHave('document_resets')
-            ->when(request('query'), function ($query, $selectedStatus) {
-                $query->where('status', $selectedStatus);
+        $filters = [
+            'type' => request('filter_type'),
+            'date_received' => request('filter_date_received'),
+            'client' => request('filter_client'),
+            'office' => request('filter_office'),
+            'title' => request('filter_title'),
+            'description' => request('filter_description'),
+            'employee' => request('filter_employee'),
+        ];
+
+        $query = Document::with(['client', 'employee']);
+
+        // RESET FILTER
+        $resetFilter = request('query_to_do'); // with_reset, without_reset
+
+        if ($resetFilter === 'with_reset') {
+            $query->whereHas('document_resets');
+        }
+
+        if ($resetFilter === 'without_reset') {
+            $query->whereDoesntHave('document_resets');
+        }
+
+        // APPLY COLUMN FILTERS
+        $query
+            ->when($filters['type'], function ($q) use ($filters) {
+                $search = strtolower($filters['type']);
+
+                $matched = collect(DocumentType::cases())
+                    ->first(
+                        fn($case) =>
+                        str_contains(strtolower($case->label()), $search) ||
+                        str_contains(strtolower($case->name), $search)
+                    );
+
+                if ($matched) {
+                    $q->where('type', $matched->value);
+                } else {
+                    $q->whereRaw('0=1'); // no results
+                }
             })
-            ->when(request('query_search'), function ($query) use ($searchQuery, $searchbyQuery) {
-                $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery) {
-                    $query->whereHas('client', function ($query) use ($searchQuery) {
-                        $query->where('name', 'like', "%{$searchQuery}%");
-                    });
-                });
-                $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function ($query) use ($searchQuery, $searchbyQuery) {
-                    $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
-                });
-                $query->when($searchbyQuery === 'type', function ($query) use ($searchQuery) {
-                    $query->where('type', $searchQuery);
-                });
-            })
-            ->when(request('query_to_do'), function ($query) use ($to_do, $current_user) {
-                $query->when($to_do === 'to-receive', function ($query) use ($current_user) {
-                    $query->whereHas('transactions', function ($query) use ($current_user) {
-                        $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', null]]);
-                    });
-                });
-                $query->when($to_do === 'to-release', function ($query) use ($current_user) {
-                    $query->whereHas('transactions', function ($query) use ($current_user) {
-                        $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', TransactionType::RECEIVED]]);
-                    });
-                });
-            })
-            ->when(request('query_type'), function ($query) use ($doc_type, $query_type) {
-                $query
-                    ->when($query_type === 'all', function ($query) {
-                        $query->userCount();
+            ->when($filters['date_received'], fn($q) => $q->where('date_received', 'like', "%{$filters['date_received']}%"))
+            ->when($filters['title'], fn($q) => $q->where('title', 'like', "%{$filters['title']}%"))
+            ->when($filters['description'], fn($q) => $q->where('description', 'like', "%{$filters['description']}%"))
+            ->when(
+                $filters['client'],
+                fn($q) =>
+                $q->whereHas(
+                    'client',
+                    fn($c) =>
+                    $c->where('name', 'like', "%{$filters['client']}%")
+                )
+            )
+            ->when(
+                $filters['office'],
+                fn($q) =>
+                $q->whereHas(
+                    'client',
+                    fn($c) =>
+                    $c->where('office', 'like', "%{$filters['office']}%")
+                )
+            )
+            ->when(
+                $filters['employee'],
+                fn($q) =>
+                $q->whereHas(
+                    'employee',
+                    fn($e) =>
+                    $e->where('emp_name', 'like', "%{$filters['employee']}%")
+                )
+            );
+
+        // SEARCH BAR FILTER
+        $search = request('query');
+        $searchBy = request('query_searchby');
+
+        if ($search && $searchBy) {
+            if ($searchBy === 'id') {
+                $query->where('id', $search);
+            } elseif ($searchBy === 'client') {
+                $query->whereHas('client', fn($c) =>
+                    $c->where('name', 'like', "%{$search}%"));
+            } elseif ($searchBy === 'employee') {
+                $query->whereHas('employee', fn($e) =>
+                    $e->where('emp_name', 'like', "%{$search}%"));
+            } else {
+                $query->where($searchBy, 'like', "%{$search}%");
+            }
+        }
+
+        //DASHBOARD FILTERS
+        $doc_type = request('query_doc_type');
+        $query_type = request('query_type');
+        $to_do = request('query_to_do');
+        $query_doc_status = request('query_doc_status');
+        $current_user = Auth::user()->employee_id;
+
+        $query->when(request('query_type'), function ($query) use ($doc_type, $query_type, $query_doc_status, $to_do, $current_user) {
+            $query->when($query_doc_status === 'near_due', function ($query) use ($doc_type) {
+                $query->active()
+                    ->when($doc_type === 'case', function ($query) {
+                        $query->case()->nearDueFifteenDays();
                     })
-                    ->when($query_type === 'active', function ($query) {
-                        $query->active();
+                    ->when($doc_type === 'administrative', function ($query) {
+                        $query->administrativeCases()->nearDueFifteenDays();
+                    })
+                    ->when($doc_type === 'judicial', function ($query) {
+                        $query->judicialCases()->nearDueFifteenDays();
+                    })
+                    ->when($doc_type === 'quasi', function ($query) {
+                        $query->quasiCases()->nearDueFifteenDays();
+                    })
+                    ->when($doc_type === 'admin_docs', function ($query) {
+                        $query->adminDocs()->nearDueThreeDays();
+                    })->when($doc_type === 'other_referral', function ($query) {
+                        $query->otherReferrals()->nearDueSevenDays();
+                    })->when($doc_type === 'municipal', function ($query) {
+                        $query->municipalOrdinances()->nearDueSevenDays();
+                    })->when($doc_type === 'provincial', function ($query) {
+                        $query->provincialOrdinances()->nearDueTenDays();
+                    })->when($doc_type === 'code', function ($query) {
+                        $query->codes()->nearDueTenDays();
+                    })->when($doc_type === 'referral', function ($query) {
+                        $query->where(function ($q) {
+                            $q->where(function ($x) {
+                                $x->adminDocs()->nearDueThreeDays();
+                            })
+                                ->orWhere(function ($x) {
+                                    $x->otherReferrals()->nearDueSevenDays();
+                                })
+                                ->orWhere(function ($x) {
+                                    $x->municipalOrdinances()->nearDueSevenDays();
+                                })
+                                ->orWhere(function ($x) {
+                                    $x->provincialOrdinances()->nearDueTenDays();
+                                })
+                                ->orWhere(function ($x) {
+                                    $x->codes()->nearDueTenDays();
+                                });
+
+                        });
+                    });
+
+            })
+                ->when($query_doc_status === 'past_due', function ($query) use ($doc_type) {
+                    $query->active()
+                        ->when($doc_type === 'case', function ($query) {
+                            return $query->case()->pastDueFifteenDays();
+                        })
+                        ->when($doc_type === 'administrative', function ($query) {
+                            return $query->administrativeCases()->pastDueFifteenDays();
+                        })
+                        ->when($doc_type === 'judicial', function ($query) {
+                            return $query->judicialCases()->pastDueFifteenDays();
+                        })
+                        ->when($doc_type === 'quasi', function ($query) {
+                            return $query->quasiCases()->pastDueFifteenDays();
+                        })
+                        ->when($doc_type === 'admin_docs', function ($query) {
+                            return $query->adminDocs()->pastDueThreeDays();
+                        })
+                        ->when($doc_type === 'other_referral', function ($query) {
+                            return $query->otherReferrals()->pastDueSevenDays();
+                        })
+                        ->when($doc_type === 'municipal', function ($query) {
+                            return $query->municipalOrdinances()->pastDueSevenDays();
+                        })
+                        ->when($doc_type === 'provincial', function ($query) {
+                            return $query->provincialOrdinances()->pastDueTenDays();
+                        })
+                        ->when($doc_type === 'code', function ($query) {
+                            return $query->codes()->pastDueTenDays();
+                        })
+                        ->when($doc_type === 'referral', function ($query) {
+                            return $query->where(function ($q) {
+                                $q->orWhere(function ($x) {
+                                    return $x->adminDocs()->pastDueThreeDays();
+                                })
+                                    ->orWhere(function ($x) {
+                                        return $x->otherReferrals()->pastDueSevenDays();
+                                    })
+                                    ->orWhere(function ($x) {
+                                        return $x->municipalOrdinances()->pastDueSevenDays();
+                                    })
+                                    ->orWhere(function ($x) {
+                                        return $x->provincialOrdinances()->pastDueTenDays();
+                                    })
+                                    ->orWhere(function ($x) {
+                                        return $x->codes()->pastDueTenDays();
+                                    });
+                            });
+                        });
+                })
+                ->when(request('query_to_do'), function ($query) use ($to_do, $current_user) {
+                    $query->when($to_do === 'to-receive', function ($query) use ($current_user) {
+                        $query->whereHas('transactions', function ($query) use ($current_user) {
+                            $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', null]]);
+                        });
+                    });
+                    $query->when($to_do === 'to-release', function ($query) use ($current_user) {
+                        $query->whereHas('transactions', function ($query) use ($current_user) {
+                            $query->where([['transactions.status', TransactionStatus::PENDING], ['transactions.employee_id', $current_user], ['type', TransactionType::RECEIVED]]);
+                        });
+                    });
+                })
+                ->when($query_type === 'all', function ($query) use ($doc_type) {
+                    $query
+                    ->when($doc_type === 'referrals', function ($query) {
+                        $query->referral();
+                    })
+                    ->when($doc_type === 'code', function ($query) {
+                        $query->codes();
+                    })
+                    ->when($doc_type === 'municipal', function ($query) {
+                        $query->municipalOrdinances();
+                    })
+                    ->when($doc_type === 'provincial', function ($query) {
+                        $query->provincialOrdinances();
+                    })
+                    ->when($doc_type === 'other_referral', function ($query) {
+                        $query->otherReferrals();
+                    })
+                    ->when($doc_type === 'admin_docs', function ($query) {
+                        $query->adminDocs();
                     })
                     ->when($doc_type === 'cases', function ($query) {
                         $query->case();
@@ -164,200 +267,18 @@ class DocumentController extends Controller
                     })
                     ->when($doc_type === 'quasi', function ($query) {
                         $query->quasiCases();
-                    })
-                    ->when($doc_type === 'referrals', function ($query) {
-                        $query->referral();
-                    })
-                    ->when($doc_type === 'admin_docs', function ($query) {
-                        $query->adminDocs();
-                    })
-                    ->when($doc_type === 'municipal', function ($query) {
-                        $query->municipalOrdinances();
-                    })
-                    ->when($doc_type === 'other_referral', function ($query) {
-                        $query->otherReferrals();
-                    })
-                    ->when($doc_type == 'provincial', function ($query) {
-                        $query->provincialOrdinances();
-                    })
-                    ->when($doc_type === 'code', function ($query) {
-                        $query->codes();
-                    })
-                    ->when($doc_type === 'notary', function ($query) {
-                        $query->notaries();
                     });
-            });
+                });
 
-        $documents_union = $docWithReset->unionAll($docWithoutReset);
+        });
+        $query->orderBy('date_received', 'desc');
 
-        $documents = $documents_union
-            ->latest()->paginate(setting('pagination_limit'))
-            ->through(fn($document) => [
-                'id' => $document->id,
-                'date_received' => $document->date_received,
-                'client' => $document->client,
-                'title' => $document->title,
-                'description' => $document->description,
-                'employee' => $document->employee?->emp_name,
-                'remarks' => $document->remarks,
-                'status' => [
-                    'name' => $document->status->name,
-                    'color' => $document->status->color(),
-                ],
-                'type' => [
-                    'name' => $document->type->name,
-                ],
-                'date_to_count' => $document->date_to_count,
-                'last_assigned' => $document->last_assignment,
-                'last_transaction_type' => $document->last_transaction_type,
-                'days_active' => $document->days_active,
-                'additional_attachments' => $document->attachments,
-            ]);
+        $paginator = $query->paginate($perPage);
 
-
-        return $documents;
-
-        // $documents = Document::query()
-        //     ->with('client:id,name,office','transactions')
-        //     ->when(request('query'), function($query, $selectedStatus){
-        //         $query->where('status', $selectedStatus);
-        //     })
-        //     ->when(request('query_search'), function($query) use ($searchQuery,$searchbyQuery){
-        //         $query->when($searchbyQuery === 'client', function ($query) use ($searchQuery){
-        //             $query->whereHas('client', function($query) use($searchQuery){
-        //                 $query->where('name','like',"%{$searchQuery}%");
-        //             });
-        //         });
-        //         $query->when($searchbyQuery === 'title' || $searchbyQuery === 'description', function($query) use($searchQuery,$searchbyQuery){
-        //             $query->where($searchbyQuery, 'like', "%{$searchQuery}%");
-        //         });
-        //         $query->when($searchbyQuery === 'type', function ($query) use($searchQuery){
-        //             $query->where('type', $searchQuery);
-        //         });
-        //     })
-        //     ->when(request('query_to_do'), function($query) use($to_do,$current_user){
-        //         $query->when($to_do === 'to-receive', function($query) use($current_user){
-        //             $query->whereHas('transactions', function($query) use($current_user){
-        //                 $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',null]]);
-        //             });
-        //         });
-        //         $query->when($to_do === 'to-release', function($query) use($current_user){
-        //             $query->whereHas('transactions', function($query) use($current_user){
-        //                 $query->where([['transactions.status',TransactionStatus::PENDING],['transactions.employee_id',$current_user],['type',TransactionType::RECEIVED]]);
-        //             });
-        //         });
-        //     })
-        //     ->when(request('query_doc_status') === 'past_due', function ($query) use($doc_type){
-        //         $query
-        //             ->when($doc_type==='administrative'||$doc_type==='judicial'||$doc_type==='quasi'||$doc_type==='cases', function ($query) use($doc_type){
-        //                 $query->case()->fifteenDays()->pastDueFifteenDays()                
-        //                 ->when($doc_type === 'administrative', function ($query){
-        //                     $query->administrativeCases();
-        //                 })
-        //                 ->when($doc_type === 'judicial', function ($query) {
-        //                     $query->judicialCases();
-        //                 })
-        //                 ->when($doc_type === 'quasi', function ($query) {
-        //                     $query->quasiCases();
-        //                 });
-        //             })
-        //             ->when($doc_type==='admin_docs'||$doc_type==='municipal'||$doc_type==='other_referral'||$doc_type==='provincial'||$doc_type==='code'||$doc_type==='referrals', function ($query) use($doc_type){
-        //                 $query->referral()
-        //                 ->when($doc_type==='admin_docs', function ($query){
-        //                     $query->threeDays()->pastDueThreeDays();
-        //                 })
-        //                 ->when($doc_type==='municipal', function ($query){
-        //                     $query->sevenDays()->pastDueSevenDays()->where('type',DocumentType::MUNICIPAL_ORDINANCE);
-        //                 })
-        //                 ->when($doc_type==='other_referral', function ($query){
-        //                     $query->sevenDays()->pastDueSevenDays()->where('type',DocumentType::OTHER_REFERRAL);
-        //                 })
-        //                 ->when($doc_type=='provincial', function ($query){
-        //                     $query->tenDays()->pastDueTenDays()->where('type',DocumentType::PROVINCIAL_ORDINANCE);
-        //                 })
-        //                 ->when($doc_type==='code', function ($query) {
-        //                     $query->tenDays()->pastDueTenDays()->where('type',DocumentType::CODE);
-        //                 })
-        //                 ->when($doc_type === 'referrals', function ($query) {
-        //                     $query->where(function ($query){
-        //                         $query->threeDays()->pastDueThreeDays();
-        //                     })
-        //                     ->orWhere(function ($query) {
-        //                         $query->sevenDays()->pastDueSevenDays();
-        //                     })
-        //                     ->orWhere(function ($query) {
-        //                         $query->tenDays()->pastDueTenDays();
-        //                     });
-        //                 });
-        //             })->active();                
-        //     })
-        //     ->when(request('query_doc_status') === 'near_due', function ($query) use($doc_type){
-        //         $query
-        //             ->when($doc_type==='administrative'||$doc_type==='judicial'||$doc_type==='quasi'||$doc_type==='cases', function ($query) use($doc_type){
-        //                 $query->case()->fifteenDays()->nearDueFifteenDays()
-        //                 ->when($doc_type==='administrative', function ($query) {
-        //                     $query->administrativeCases();
-        //                 })
-        //                 ->when($doc_type==='judicial', function ($query) {
-        //                     $query->judicialCases();
-        //                 })
-        //                 ->when($doc_type==='quasi', function ($query) {
-        //                     $query->quasiCases();
-        //                 });
-        //             })
-        //             ->when($doc_type==='admin_docs'||$doc_type==='municipal'||$doc_type==='other_referral'||$doc_type==='provincial'||$doc_type==='code'||$doc_type==='referrals', function ($query) use($doc_type){
-        //                 $query->referral()
-        //                 ->when($doc_type==='admin_docs', function ($query){
-        //                     $query->threeDays()->nearDueThreeDays();
-        //                 })
-        //                 ->when($doc_type==='municipal', function ($query){
-        //                     $query->sevenDays()->nearDueSevenDays()->where('type', DocumentType::MUNICIPAL_ORDINANCE);
-        //                 })
-        //                 ->when($doc_type==='other_referral', function ($query){
-        //                     $query->sevenDays()->nearDueSevenDays()->where('type', DocumentType::OTHER_REFERRAL);
-        //                 })
-        //                 ->when($doc_type==='provincial', function ($query){
-        //                     $query->tenDays()->nearDueTenDays()->where('type', DocumentType::PROVINCIAL_ORDINANCE);
-        //                 })
-        //                 ->when($doc_type==='code', function($query){
-        //                     $query->tenDays()->nearDueTenDays()->where('type', DocumentType::CODE);
-        //                 })
-        //                 ->when($doc_type === 'referrals', function ($query) {
-        //                     $query->where(function ($query){
-        //                         $query->threeDays()->nearDueThreeDays();
-        //                     })
-        //                     ->orWhere(function ($query) {
-        //                         $query->sevenDays()->nearDueSevenDays();
-        //                     })
-        //                     ->orWhere(function ($query) {
-        //                         $query->tenDays()->nearDueTenDays();
-        //                     });
-        //                 });
-        //             })->active();
-
-        //     })
-        //     ->latest()->paginate()
-        //     ->through(fn ($document) => [
-        //         'id' => $document->id,
-        //         'date_received' => $document->date_received,
-        //         'client' => $document->client,
-        //         'title' => $document->title,
-        //         'description' => $document->description,
-        //         'remarks' => $document->remarks,
-        //         'status' => [
-        //             'name' => $document->status->name,
-        //             'color' => $document->status->color(),
-        //         ],
-        //         'type' => [
-        //             'name' => $document->type->name,
-        //         ],
-        //         'date_to_count' => $document->date_to_count,
-        //         // 'last_assigned' => $document->last_transaction,
-        //         'days_active' => $document->days_active,
-        //     ]);
-
+        return $this->shortenLinks($paginator, 1);
 
     }
+
 
     // public function getOverdueDocuments(){
     //     $searchQuery = request('query_search');
@@ -403,7 +324,7 @@ class DocumentController extends Controller
             'employee_id' => 'nullable'
         ], [
             'client_id.required' => "Client name is required",
-            
+
         ]);
 
         if (request()->hasFile('document_file')) {
@@ -561,7 +482,7 @@ class DocumentController extends Controller
                 'type' => $doc->type->name,
                 'days_active' => $doc->days_active,
                 'document_file' => $doc->document_file,
-                'employee' => $doc->employee->emp_name,
+                'employee' => $doc->employee?->emp_name,
             ]);
 
         return $document;
@@ -670,5 +591,68 @@ class DocumentController extends Controller
         $downloadpath = Storage::disk('public')->path('uploads/documents/' . $document->document_file);
         return response()->download($downloadpath);
     }
+
+    private function shortenLinks($paginator, $onEachSide = 1)
+    {
+        $current = $paginator->currentPage();
+        $last = $paginator->lastPage();
+
+        $pages = [];
+
+        // Always show first page
+        $pages[] = 1;
+
+        // Left ellipsis
+        if ($current - $onEachSide > 2) {
+            $pages[] = '...';
+        }
+
+        // Middle range
+        for ($i = max(2, $current - $onEachSide); $i <= min($last - 1, $current + $onEachSide); $i++) {
+            $pages[] = $i;
+        }
+
+        // Right ellipsis
+        if ($current + $onEachSide < $last - 1) {
+            $pages[] = '...';
+        }
+
+        // Always show last page
+        if ($last > 1) {
+            $pages[] = $last;
+        }
+
+        // Recreate "links" array
+        $links = [];
+
+        // Previous
+        $links[] = [
+            'url' => $paginator->previousPageUrl(),
+            'label' => '&laquo; Previous',
+            'active' => false,
+        ];
+
+        foreach ($pages as $page) {
+            $links[] = [
+                'url' => $page === '...' ? null : $paginator->url($page),
+                'label' => (string) $page,
+                'active' => $page === $current,
+            ];
+        }
+
+        // Next
+        $links[] = [
+            'url' => $paginator->nextPageUrl(),
+            'label' => 'Next &raquo;',
+            'active' => false,
+        ];
+
+        // Replace original links
+        $paginator->setCollection($paginator->getCollection());
+        $paginator->links = $links;
+
+        return $paginator;
+    }
+
 
 }
