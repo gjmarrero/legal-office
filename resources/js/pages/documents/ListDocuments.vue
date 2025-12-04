@@ -263,6 +263,7 @@ const getDocuments = (page = 1) => {
             filter_title: columnSearch.title,
             filter_description: columnSearch.description,
             filter_employee: columnSearch.employee,
+            status_filter: selectedStatus.value
         }
     })
         .then((response) => {
@@ -447,37 +448,37 @@ onMounted(async () => {
                                         <!-- <th>D</th>
                                         <th>L</th>
                                         <th>DA</th> -->
-                                        <th scope="col" width="50">#</th>
-                                        <th scope="col" width="150">Type</th>
-                                        <th scope="col" width="150">Date Received</th>
-                                        <th scope="col">Client Name</th>
-                                        <th scope="col">Client Office</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col" width="400">Description</th>
-                                        <th scope="col">Assigned Employee</th>
-                                        <th scope="col" width="100">Status</th>
-                                        <th scope="col" width="100"></th>
+                                        <th scope="col" width="5%">#</th>
+                                        <th scope="col" width="10%">Type</th>
+                                        <th scope="col" width="8%">Date Received</th>
+                                        <th scope="col" width="7%">Client Name</th>
+                                        <th scope="col" width="9%">Client Office</th>
+                                        <th scope="col" width="18%">Title</th>
+                                        <th scope="col" width="50%">Description</th>
+                                        <th scope="col" width="9%">Assigned Employee</th>
+                                        <th scope="col" width="6%">Status</th>
+                                        <th scope="col" width="10%"></th>
                                     </tr>
                                     <tr>
                                         <th></th>
-                                        <th><input type="text" class="form-control-sm"
-                                                v-model="columnSearch.type" placeholder="Search Type" style="width:120px;"/>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.type"
+                                                placeholder="Type" style="width:116px;" />
                                         </th>
-                                        <th><input type="text" class="form-control-sm"
-                                                v-model="columnSearch.date_received" placeholder="Search Date"
-                                                style="width:120px;" /></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.client"
-                                                placeholder="Search Client" style="width:140px;" /></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.office"
-                                                placeholder="Search Office" style="width:140px;" /></th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.title"
-                                                placeholder="Search Title" style="width:140px;" /></th>
-                                        <th><input type="text" class="form-control-sm"
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm"
+                                                v-model="columnSearch.date_received" placeholder="Date"
+                                                style="width:95px;" /></th>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.client"
+                                                placeholder="Client" style="width:80px;" /></th>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.office"
+                                                placeholder="Office" style="width:106px;" /></th>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.title"
+                                                placeholder="Search Title" style="width:212px;" /></th>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm"
                                                 v-model="columnSearch.description" placeholder="Search Description"
-                                                style="width:350px;" />
+                                                style="width:590px;" />
                                         </th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
-                                                placeholder="Search Employee" style="width:140px;" /></th>
+                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.employee"
+                                                placeholder="Employee" style="width:106px;" /></th>
                                         <th></th>
                                     </tr>
 
@@ -599,5 +600,18 @@ onMounted(async () => {
     overflow-x: auto;
     white-space: nowrap;
     padding: 0.5rem 0;
+}
+
+#documentTable th,
+#documentTable td {
+    padding: 1;
+    /* remove padding */
+    margin: 0;
+    /* optional */
+}
+
+#documentTable {
+    border-collapse: collapse;
+    /* optional: removes extra spacing between borders */
 }
 </style>

@@ -238,38 +238,49 @@ class DocumentController extends Controller
                 })
                 ->when($query_type === 'all', function ($query) use ($doc_type) {
                     $query
-                    ->when($doc_type === 'referrals', function ($query) {
-                        $query->referral();
-                    })
-                    ->when($doc_type === 'code', function ($query) {
-                        $query->codes();
-                    })
-                    ->when($doc_type === 'municipal', function ($query) {
-                        $query->municipalOrdinances();
-                    })
-                    ->when($doc_type === 'provincial', function ($query) {
-                        $query->provincialOrdinances();
-                    })
-                    ->when($doc_type === 'other_referral', function ($query) {
-                        $query->otherReferrals();
-                    })
-                    ->when($doc_type === 'admin_docs', function ($query) {
-                        $query->adminDocs();
-                    })
-                    ->when($doc_type === 'cases', function ($query) {
-                        $query->case();
-                    })
-                    ->when($doc_type === 'administrative', function ($query) {
-                        $query->administrativeCases();
-                    })
-                    ->when($doc_type === 'judicial', function ($query) {
-                        $query->judicialCases();
-                    })
-                    ->when($doc_type === 'quasi', function ($query) {
-                        $query->quasiCases();
-                    });
+                        ->when($doc_type === 'referrals', function ($query) {
+                            $query->referral();
+                        })
+                        ->when($doc_type === 'code', function ($query) {
+                            $query->codes();
+                        })
+                        ->when($doc_type === 'municipal', function ($query) {
+                            $query->municipalOrdinances();
+                        })
+                        ->when($doc_type === 'provincial', function ($query) {
+                            $query->provincialOrdinances();
+                        })
+                        ->when($doc_type === 'other_referral', function ($query) {
+                            $query->otherReferrals();
+                        })
+                        ->when($doc_type === 'admin_docs', function ($query) {
+                            $query->adminDocs();
+                        })
+                        ->when($doc_type === 'cases', function ($query) {
+                            $query->case();
+                        })
+                        ->when($doc_type === 'administrative', function ($query) {
+                            $query->administrativeCases();
+                        })
+                        ->when($doc_type === 'judicial', function ($query) {
+                            $query->judicialCases();
+                        })
+                        ->when($doc_type === 'quasi', function ($query) {
+                            $query->quasiCases();
+                        });
                 });
 
+        });
+
+        //STATUS FILTER
+        $status_filter = request('status_filter');
+
+        $query->when($status_filter, function ($query) use ($status_filter) {
+            if ($status_filter == 1) {
+                $query->active();
+            } elseif ($status_filter == 2) {
+                $query->archive();
+            }
         });
         $query->orderBy('date_received', 'desc');
 

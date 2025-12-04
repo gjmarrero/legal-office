@@ -105,6 +105,11 @@ class Document extends Model
         return $query->where('status', DocumentStatus::ACTIVE);
     }
 
+    public function scopeArchive($query)
+    {
+        return $query->where('status', DocumentStatus::ARCHIVED);
+    }
+
     public function scopeWithReset($query)
     {
         return $query->has('document_resets');
