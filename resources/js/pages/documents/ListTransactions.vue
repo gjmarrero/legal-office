@@ -202,6 +202,7 @@ const getEmployees = () => {
 
 const routeDocument = (id) => {
     docIdBeingRouted.value = id;
+    console.log("Route document", id)
     $('#moveDocumentModal').modal('show');
 }
 
@@ -252,27 +253,49 @@ const clearRouteForm = () => {
 }
 
 const createRouteDocument = () => {
-    const formData = new FormData();
-    formData.append('document_id', docIdBeingRouted.value);
-    formData.append('employee_id', form.employee_id);
-    formData.append('action', form.action);
-    formData.append('document_file', form.file);
+    console.log("Route")
 
-    if (routeOutside.value) {
-        formData.append('routeOutside', 1);
-    } else {
-        formData.append('routeOutside', 0);
-    }
+    const formData = new FormData()
+    formData.append('document_id', docIdBeingRouted.value)
+    formData.append('employee_id', form.employee_id)
+    formData.append('action', form.action)
+    formData.append('document_file', form.file)
+    formData.append('routeOutside', routeOutside.value ? 1 : 0)
 
-    axios.post(`/api/documents/route`, formData)
-        .then((response) => {
-            $('#moveDocumentModal').modal('hide');
-            clearRouteForm();
-            toastr.success('Document routed successfully');
-            getDocument();
-            getTransactions();
-        });
+    axios.post('/api/documents/route', formData)
+        .then(() => {
+            $('#moveDocumentModal').modal('hide')
+            clearRouteForm()
+            toastr.success('Document routed successfully')
+            getDocument()
+            getTransactions()
+        })
 }
+
+
+// const createRouteDocument = () => {
+//     console.log("Route")
+//     const formData = new FormData();
+//     formData.append('document_id', docIdBeingRouted.value);
+//     formData.append('employee_id', form.employee_id);
+//     formData.append('action', form.action);
+//     formData.append('document_file', form.file);
+
+//     if (routeOutside.value) {
+//         formData.append('routeOutside', 1);
+//     } else {
+//         formData.append('routeOutside', 0);
+//     }
+
+//     axios.post(`/api/documents/route`, formData)
+//         .then((response) => {
+//             $('#moveDocumentModal').modal('hide');
+//             clearRouteForm();
+//             toastr.success('Document routed successfully');
+//             getDocument();
+//             getTransactions();
+//         });
+// }
 
 const attachedFiles = ref({ 'data': [] });
 
@@ -534,7 +557,7 @@ onMounted(() => {
                 </div>
                 <div class="modal-body">
                     <div v-if="routeDoc">
-                        <Form @submit.prevent="createRouteDocument()">
+                        <Form @submit="createRouteDocument">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -565,7 +588,7 @@ onMounted(() => {
                         </Form>
                     </div>
                     <div v-else>
-                        <Form @submit.prevent="createArchiveDocument()">
+                        <Form @submit="createArchiveDocument">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
