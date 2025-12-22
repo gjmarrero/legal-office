@@ -547,7 +547,7 @@ class DocumentController extends Controller
 
         $all_files = $main_file->union($transaction_files)->union($additional_files)->orderBy('updated_at')->get();
 
-        $pdfVersion = "1.7";
+        $pdfVersion = "1.4";
 
         $original_filename = "";
 
