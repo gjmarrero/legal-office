@@ -448,18 +448,6 @@ onMounted(async () => {
                                         <!-- <th>D</th>
                                         
                                         <th>DA</th> -->
-<<<<<<< HEAD
-                                        <th scope="col" width="5%">#</th>
-                                        <th scope="col" width="10%">Type</th>
-                                        <th scope="col" width="8%">Date Received</th>
-                                        <th scope="col" width="7%">Client Name</th>
-                                        <th scope="col" width="9%">Client Office</th>
-                                        <th scope="col" width="18%">Title</th>
-                                        <th scope="col" width="50%">Description</th>
-                                        <th scope="col" width="9%">Assigned Employee</th>
-                                        <th scope="col" width="6%">Status</th>
-                                        <th scope="col" width="10%"></th>
-=======
                                         <th scope="col" width="50">#</th>
                                         <th scope="col" width="150">Type</th>
                                         <th scope="col" width="150">Date Received</th>
@@ -467,11 +455,10 @@ onMounted(async () => {
                                         <th scope="col">Client Office</th>
                                         <th scope="col">Title</th>
                                         <th scope="col" width="400">Description</th>
-                                        <th scope="col">Assigned Employee</th>
+                                        <!-- <th scope="col">Assigned Employee</th> -->
                                         <!-- <th>L</th> -->
                                         <th scope="col" width="100">Status</th>
                                         <th scope="col" width="100"></th>
->>>>>>> local-dev
                                     </tr>
                                     <tr>
                                         <th></th>
@@ -491,13 +478,8 @@ onMounted(async () => {
                                                 v-model="columnSearch.description" placeholder="Search Description"
                                                 style="width:590px;" />
                                         </th>
-<<<<<<< HEAD
-                                        <th style="padding:0px;"><input type="text" class="form-control-sm" v-model="columnSearch.employee"
-                                                placeholder="Employee" style="width:106px;" /></th>
-=======
                                         <!-- <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
                                                 placeholder="Search Employee" style="width:140px;" /></th> -->
->>>>>>> local-dev
                                         <th></th>
                                     </tr>
 
@@ -516,7 +498,7 @@ onMounted(async () => {
                                         <td>{{ document.title }}</td>
                                         <td>{{ document.description }}</td>
                                         <!-- <td>{{ document?.employee?.emp_name }}</td> -->
-                                        <td>{{ document.last_assigned_employee?.emp_name }}</td>
+                                        <!-- <td>{{ document.last_assigned_employee?.emp_name }}</td> -->
                                         <td>
                                             <span class="badge" :class="`badge-${document.status_info.color}`">{{
                                                 document.status_info.name }}</span>
