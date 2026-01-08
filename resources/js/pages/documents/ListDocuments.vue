@@ -414,7 +414,7 @@ onMounted(async () => {
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="d-flex justify-content-md-center mb-2">
+                            <!-- <div class="d-flex justify-content-md-center mb-2">
                                 <div class="col-lg-3">
                                     <select @change="setSearchByQuery" v-model="searchbyQuery"
                                         class="form-control px-1 rounded border-0">
@@ -435,7 +435,7 @@ onMounted(async () => {
                                     <input type="text" v-model="searchQuery" class="form-control"
                                         placeholder="Search" />
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="card">
@@ -445,7 +445,7 @@ onMounted(async () => {
                                 <thead>
                                     <tr>
                                         <!-- <th>D</th>
-                                        <th>L</th>
+                                        
                                         <th>DA</th> -->
                                         <th scope="col" width="50">#</th>
                                         <th scope="col" width="150">Type</th>
@@ -455,6 +455,7 @@ onMounted(async () => {
                                         <th scope="col">Title</th>
                                         <th scope="col" width="400">Description</th>
                                         <th scope="col">Assigned Employee</th>
+                                        <!-- <th>L</th> -->
                                         <th scope="col" width="100">Status</th>
                                         <th scope="col" width="100"></th>
                                     </tr>
@@ -476,8 +477,8 @@ onMounted(async () => {
                                                 v-model="columnSearch.description" placeholder="Search Description"
                                                 style="width:350px;" />
                                         </th>
-                                        <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
-                                                placeholder="Search Employee" style="width:140px;" /></th>
+                                        <!-- <th><input type="text" class="form-control-sm" v-model="columnSearch.employee"
+                                                placeholder="Search Employee" style="width:140px;" /></th> -->
                                         <th></th>
                                     </tr>
 
@@ -486,7 +487,7 @@ onMounted(async () => {
                                     <tr v-for="(document, index) in documents.data" :key="document.id">
 
                                         <!-- <td>{{ document.date_to_count }}</td>
-                                        <td>{{ document.last_assigned }}</td>
+                                        
                                         <td>{{ document.days_active }}</td> -->
                                         <td>{{ index + 1 }}</td>
                                         <td width="150">{{ document.type_label }}</td>
@@ -495,7 +496,8 @@ onMounted(async () => {
                                         <td>{{ document.client.office }}</td>
                                         <td>{{ document.title }}</td>
                                         <td>{{ document.description }}</td>
-                                        <td>{{ document?.employee?.emp_name }}</td>
+                                        <!-- <td>{{ document?.employee?.emp_name }}</td> -->
+                                        <td>{{ document.last_assigned_employee?.emp_name }}</td>
                                         <td>
                                             <span class="badge" :class="`badge-${document.status_info.color}`">{{
                                                 document.status_info.name }}</span>

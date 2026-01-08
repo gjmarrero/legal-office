@@ -238,40 +238,40 @@ class DocumentController extends Controller
                 })
                 ->when($query_type === 'all', function ($query) use ($doc_type) {
                     $query
-                    ->when($doc_type === 'referrals', function ($query) {
-                        $query->referral();
-                    })
-                    ->when($doc_type === 'code', function ($query) {
-                        $query->codes();
-                    })
-                    ->when($doc_type === 'municipal', function ($query) {
-                        $query->municipalOrdinances();
-                    })
-                    ->when($doc_type === 'provincial', function ($query) {
-                        $query->provincialOrdinances();
-                    })
-                    ->when($doc_type === 'other_referral', function ($query) {
-                        $query->otherReferrals();
-                    })
-                    ->when($doc_type === 'admin_docs', function ($query) {
-                        $query->adminDocs();
-                    })
-                    ->when($doc_type === 'cases', function ($query) {
-                        $query->case();
-                    })
-                    ->when($doc_type === 'administrative', function ($query) {
-                        $query->administrativeCases();
-                    })
-                    ->when($doc_type === 'judicial', function ($query) {
-                        $query->judicialCases();
-                    })
-                    ->when($doc_type === 'quasi', function ($query) {
-                        $query->quasiCases();
-                    });
+                        ->when($doc_type === 'referrals', function ($query) {
+                            $query->referral();
+                        })
+                        ->when($doc_type === 'code', function ($query) {
+                            $query->codes();
+                        })
+                        ->when($doc_type === 'municipal', function ($query) {
+                            $query->municipalOrdinances();
+                        })
+                        ->when($doc_type === 'provincial', function ($query) {
+                            $query->provincialOrdinances();
+                        })
+                        ->when($doc_type === 'other_referral', function ($query) {
+                            $query->otherReferrals();
+                        })
+                        ->when($doc_type === 'admin_docs', function ($query) {
+                            $query->adminDocs();
+                        })
+                        ->when($doc_type === 'cases', function ($query) {
+                            $query->case();
+                        })
+                        ->when($doc_type === 'administrative', function ($query) {
+                            $query->administrativeCases();
+                        })
+                        ->when($doc_type === 'judicial', function ($query) {
+                            $query->judicialCases();
+                        })
+                        ->when($doc_type === 'quasi', function ($query) {
+                            $query->quasiCases();
+                        });
                 });
 
         });
-        $query->orderBy('date_received', 'desc');
+        $query->orderBy('updated_at', 'desc');
 
         $paginator = $query->paginate($perPage);
 
@@ -474,8 +474,12 @@ class DocumentController extends Controller
                 'title' => $doc->title,
                 'description' => $doc->description,
                 'remarks' => $doc->remarks,
-                'status' => [
-                    'name' => $doc->status->name,
+                // 'status' => [
+                //     'name' => $doc->status->name,
+                // ],
+                'status_info' => [
+                    'name' => $document->status->label(),
+                    'color' => $document->status->color(),
                 ],
                 'last_assigned' => $document->last_assignment,
                 'last_transaction_type' => $document->last_transaction_type,

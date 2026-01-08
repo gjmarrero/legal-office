@@ -24,7 +24,7 @@ const doc = reactive({
     title: '',
     description: '',
     document_file: '',
-    status: ({
+    status_info: ({
         name: '',
     }),
     document_id: '',
@@ -62,11 +62,11 @@ const getDocument = () => {
             doc.title = response.data[0].title;
             doc.description = response.data[0].description;
             doc.document_file = response.data[0].document_file;
-            doc.status = response.data[0].status;
+            doc.status_info = response.data[0].status_info;
             doc.last_assigned = response.data[0].last_assigned;
             doc.last_transaction_type = response.data[0].last_transaction_type;
             doc.employee_name = response.data[0].employee;
-            console.log('def pdf source - getDocument', main_document_path.value, doc.document_file)
+            console.log("List Transactions", response)
             getTransactions();
             getAttachedFiles();
             getAdditionalFiles();
