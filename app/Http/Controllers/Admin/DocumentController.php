@@ -282,7 +282,7 @@ class DocumentController extends Controller
                 $query->archive();
             }
         });
-        $query->orderBy('date_received', 'desc');
+        $query->orderBy('updated_at', 'desc');
 
         $paginator = $query->paginate($perPage);
 
@@ -485,8 +485,12 @@ class DocumentController extends Controller
                 'title' => $doc->title,
                 'description' => $doc->description,
                 'remarks' => $doc->remarks,
-                'status' => [
-                    'name' => $doc->status->name,
+                // 'status' => [
+                //     'name' => $doc->status->name,
+                // ],
+                'status_info' => [
+                    'name' => $document->status->label(),
+                    'color' => $document->status->color(),
                 ],
                 'last_assigned' => $document->last_assignment,
                 'last_transaction_type' => $document->last_transaction_type,

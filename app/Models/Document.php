@@ -52,6 +52,20 @@ class Document extends Model
         );
     }
 
+    public function lastAssignedEmployee(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $transaction = $this->transactions()
+                    ->with('employee:id,emp_name')
+                    ->latest('id')
+                    ->first();
+
+                return $transaction?->employee;
+            }
+        );
+    }
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
@@ -479,7 +493,7 @@ class Document extends Model
     }
 
     protected $guarded = [];
-    protected $appends = ['days_active', 'date_to_count', 'last_assignment', 'last_transaction_type', 'type_label', 'status_info'];
+    protected $appends = ['days_active', 'date_to_count', 'last_assignment', 'last_assigned_employee', 'last_transaction_type', 'type_label', 'status_info'];
 
     protected $casts = [
         'status' => DocumentStatus::class,

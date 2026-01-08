@@ -43,6 +43,10 @@ const receiveDocument = (id) => {
     })
 }
 
+onMounted( () => {
+        console.log('Document', props.document)
+    })
+
 </script>
 
 <template>
@@ -58,11 +62,11 @@ const receiveDocument = (id) => {
         href="#" @click.prevent="receiveDocument(document.id)">
         <font-awesome-icon icon="fa fa-circle-down" class="mr-2" />
     </a>
-    <a v-if="(document.status.name === 'ACTIVE' && authUserStore.user.role === 'ADMIN') || route.query.to_do === 'to-receive' || route.query.to_do === 'to-release'"
+    <a v-if="(document.status_info.name === 'Active' && authUserStore.user.role === 'ADMIN') || route.query.to_do === 'to-receive' || route.query.to_do === 'to-release'"
         href="" @click.prevent="$emit('archiveDocument', document.id)">
         <i class="fa fa-archive mr-2"></i>
     </a>
-    <a v-if="(authUserStore.user.role === 'ADMIN' || route.query.to_do === 'to-release' || document.last_assigned === authUserStore.user.employee_id) && (document.status.name === 'ACTIVE')"
+    <a v-if="(authUserStore.user.role === 'ADMIN' || route.query.to_do === 'to-release' || document.last_assigned === authUserStore.user.employee_id) && (document.status_info.name === 'Active')"
         href="#" @click.prevent="$emit('routeDocument', document.id)">
         <font-awesome-icon icon="fa fa-location-arrow" class="mr-2" />
     </a>
@@ -70,7 +74,7 @@ const receiveDocument = (id) => {
         <router-link :to="`/admin/documents/${document.id}/edit`">
             <i class="fa fa-edit mr-2"></i>
         </router-link>
-        <a href="#" v-if="(document.status.name === 'ARCHIVED')" @click.prevent="$emit('reopenDocument', document.id)">
+        <a href="#" v-if="(document.status_info.name === 'Archived')" @click.prevent="$emit('reopenDocument', document.id)">
             <i class="fa fa-folder-open mr-2"></i>
         </a>
 
