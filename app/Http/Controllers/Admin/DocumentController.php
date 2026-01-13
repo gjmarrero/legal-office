@@ -153,6 +153,8 @@ class DocumentController extends Controller
                         $query->provincialOrdinances()->nearDueTenDays();
                     })->when($doc_type === 'code', function ($query) {
                         $query->codes()->nearDueTenDays();
+                    })->when($doc_type === 'ctrc', function ($query) {
+                        $query->ctrcs()->nearDueSevenDays();
                     })->when($doc_type === 'referral', function ($query) {
                         $query->where(function ($q) {
                             $q->where(function ($x) {
@@ -169,6 +171,9 @@ class DocumentController extends Controller
                                 })
                                 ->orWhere(function ($x) {
                                     $x->codes()->nearDueTenDays();
+                                })
+                                ->orWhere(function ($x) {
+                                    $x->ctrcs()->nearDueSevenDays();
                                 });
 
                         });
@@ -204,6 +209,9 @@ class DocumentController extends Controller
                         ->when($doc_type === 'code', function ($query) {
                             return $query->codes()->pastDueTenDays();
                         })
+                        ->when($doc_type === 'ctrc', function ($query) {
+                            return $query->ctrcs()->pastDueSevenDays();
+                        })
                         ->when($doc_type === 'referral', function ($query) {
                             return $query->where(function ($q) {
                                 $q->orWhere(function ($x) {
@@ -220,6 +228,9 @@ class DocumentController extends Controller
                                     })
                                     ->orWhere(function ($x) {
                                         return $x->codes()->pastDueTenDays();
+                                    })
+                                    ->orWhere(function ($x) {
+                                        return $x->ctrcs()->pastDueSevenDays();
                                     });
                             });
                         });
@@ -252,6 +263,9 @@ class DocumentController extends Controller
                         })
                         ->when($doc_type === 'other_referral', function ($query) {
                             $query->otherReferrals();
+                        })
+                        ->when($doc_type === 'ctrc', function ($query) {
+                            $query->ctrcs();
                         })
                         ->when($doc_type === 'admin_docs', function ($query) {
                             $query->adminDocs();
