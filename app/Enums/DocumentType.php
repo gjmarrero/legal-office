@@ -13,6 +13,7 @@ enum DocumentType: int
     case QUASI_JUDICIAL = 7;
     case ADMIN_DOCS = 8;
     case NOTARY = 9;
+    case CTRC = 10;
 
 
 
@@ -28,6 +29,7 @@ enum DocumentType: int
             DocumentType::QUASI_JUDICIAL => 15,
             DocumentType::ADMIN_DOCS => 3,
             DocumentType::NOTARY => 3,
+            DocumentType::CTRC => 7,
         };
     }
 
@@ -43,6 +45,7 @@ enum DocumentType: int
             self::QUASI_JUDICIAL => 'Quasi Judicial',
             self::ADMIN_DOCS => 'Admin Docs',
             self::NOTARY => 'Notary',
+            self::CTRC => 'CTRC',
         };
     }
 }

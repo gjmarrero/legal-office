@@ -81,6 +81,9 @@ class DashboardStatController extends Controller
             ->when(request('ref_doc_type') === 'code', function ($query) {
                 $query->codes();
             })
+            ->when(request('ref_doc_type') === 'ctrc', function ($query){
+                $query->ctrcs();
+            })
             ->count();
 
         $totalCases = Document::case()
@@ -159,7 +162,8 @@ class DashboardStatController extends Controller
             'provincial' => 'provincialOrdinances',
             'other_referral' => 'otherReferrals',
             'admin_docs' => 'adminDocs',
-            'notaries' => 'notaries'
+            'notaries' => 'notaries',
+            'ctrc' => 'ctrcs'
         ];
 
         $durationScope = [
@@ -168,7 +172,8 @@ class DashboardStatController extends Controller
             'provincial' => 'nearDueTenDays',
             'other_referral' => 'nearDueSevenDays',
             'admin_docs' => 'nearDueThreeDays',
-            'notaries' => 'nearDueThreeDays'
+            'notaries' => 'nearDueThreeDays',
+            'ctrc' => 'nearDueSevenDays',
         ];
 
         if ($referral_type === 'referral') {
@@ -260,7 +265,8 @@ class DashboardStatController extends Controller
             'provincial' => 'provincialOrdinances',
             'other_referral' => 'otherReferrals',
             'admin_docs' => 'adminDocs',
-            'notaries' => 'notaries'
+            'notaries' => 'notaries',
+            'ctrc' => 'ctrcs',
         ];
 
         $durationScope = [
@@ -269,7 +275,8 @@ class DashboardStatController extends Controller
             'provincial' => 'pastDueTenDays',
             'other_referral' => 'pastDueSevenDays',
             'admin_docs' => 'pastDueThreeDays',
-            'notaries' => 'pastDueThreeDays'
+            'notaries' => 'pastDueThreeDays',
+            'ctrc' => 'pastDueSevenDays',
         ];
 
         if ($referral_type === 'referral') {

@@ -308,7 +308,7 @@ onMounted(() => {
                         <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <p class="lead">Near Due Documents</p>
+                                    <p class="lead">Near Due Documentsss</p>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="small-box bg-info">
@@ -326,6 +326,7 @@ onMounted(() => {
                                                             <option value="other_referral">Other Referrals</option>
                                                             <option value="admin_docs">Admin Docs</option>
                                                             <option value="notaries">Notary</option>
+                                                            <option value="ctrc">CTRC</option>
                                                         </select>
                                                     </div>
                                                     <p>Referrals</p>
@@ -403,6 +404,7 @@ onMounted(() => {
                                                             <option value="provincial">Provincial</option>
                                                             <option value="other_referral">Other Referrals</option>
                                                             <option value="admin_docs">Admin Docs</option>
+                                                            <option value="ctrc">CTRC</option>
                                                         </select>
                                                     </div>
                                                     <p>Referrals</p>
@@ -487,6 +489,7 @@ onMounted(() => {
                                                             <option value="provincial">Provincial</option>
                                                             <option value="other_referral">Other Referrals</option>
                                                             <option value="admin_docs">Admin Docs</option>
+                                                            <option value="ctrc">CTRC</option>
                                                         </select>
                                                     </div>
                                                     <p>Total Referrals</p>

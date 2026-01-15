@@ -9,7 +9,7 @@ for /F "tokens=1,2,3 delims=_" %%i in ('PowerShell -Command "& {Get-Date -format
 set name=%YEAR%%MONTH%%DAY%
 cd\
 c:
-c:\xampp\mysql\bin\mysqldump --user=root --result-file="D:\backup_legal_office\%name%_legal_office.sql" legal_office
+c:\xampp\mysql\bin\mysqldump --user=root --result-file="D:\backup_legal_office\%name%_legal_office.sql" legal-office
 cd\
 d:
 

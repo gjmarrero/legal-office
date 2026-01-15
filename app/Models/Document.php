@@ -153,6 +153,9 @@ class Document extends Model
                     ->when(request('referral_type') === 'other_referral', function ($query) {
                         $query->nearDueSevenDays()->otherReferrals();
                     })
+                    ->when(request('referral_type') === 'ctrc', function ($query) {
+                        $query->nearDueSevenDays()->ctrcs();
+                    })
                     ->when(request('referral_type') === 'referrals', function ($query) {
                         $query->where(function ($query) {
                             $query->nearDueThreeDays()->adminDocs();
@@ -168,6 +171,9 @@ class Document extends Model
                             })
                             ->orWhere(function ($query) {
                                 $query->nearDueSevenDays()->otherReferrals();
+                            })
+                            ->orWhere(function ($query) {
+                                $query->nearDueSevenDays()->ctrcs();
                             });
                     });
 
@@ -193,6 +199,9 @@ class Document extends Model
                     })
                     ->orWhere(function ($query) {
                         $query->nearDueSevenDays()->otherReferrals();
+                    })
+                    ->orWhere(function ($query) {
+                        $query->nearDueSevenDays()->ctrcs();
                     });
             })
             ->when(request('referral_type') === 'admin_docs', function ($query) {
@@ -209,6 +218,9 @@ class Document extends Model
             })
             ->when(request('referral_type') === 'code', function ($query) {
                 $query->nearDueTenDays()->codes();
+            })
+            ->when(request('referral_type') === 'ctrc', function ($query) {
+                $query->nearDueSevenDays()->ctrcs();
             });
     }
 
@@ -231,6 +243,9 @@ class Document extends Model
                     ->when(request('referral_type') === 'other_referral', function ($query) {
                         $query->pastDueSevenDays()->otherReferrals();
                     })
+                    ->when(request('referral_type') === 'ctrc', function ($query) {
+                        $query->pastDueSevenDays()->ctrcs();
+                    })
                     ->when(request('referral_type') === 'referrals', function ($query) {
                         $query->where(function ($query) {
                             $query->pastDueThreeDays()->adminDocs();
@@ -246,6 +261,9 @@ class Document extends Model
                             })
                             ->orWhere(function ($query) {
                                 $query->pastDueSevenDays()->otherReferrals();
+                            })
+                            ->orWhere(function ($query) {
+                                $query->pastDueSevenDays()->ctrcs();
                             });
                     });
 
@@ -271,6 +289,9 @@ class Document extends Model
                     })
                     ->orWhere(function ($query) {
                         $query->pastDueSevenDays()->otherReferrals();
+                    })
+                    ->orWhere(function ($query) {
+                        $query->pastDueSevenDays()->ctrcs();
                     });
             })
             ->when(request('referral_type') === 'admin_docs', function ($query) {
@@ -287,6 +308,9 @@ class Document extends Model
             })
             ->when(request('referral_type') === 'code', function ($query) {
                 $query->pastDueTenDays()->codes();
+            })
+            ->when(request('referral_type') === 'ctrc', function ($query) {
+                $query->pastDueSevenDays()->ctrcs();
             });
     }
 
@@ -386,11 +410,14 @@ class Document extends Model
             })
             ->when(request('doc_type') === 'code', function ($query) {
                 $query->codes();
+            })
+            ->when(request('doc_type') === 'ctrc', function ($query) {
+                $query->ctrcs();
             });
     }
     public function scopeReferral($query)
     {
-        return $query->whereIn('type', [DocumentType::MUNICIPAL_ORDINANCE, DocumentType::PROVINCIAL_ORDINANCE, DocumentType::OTHER_REFERRAL, DocumentType::CODE, DocumentType::ADMIN_DOCS]);
+        return $query->whereIn('type', [DocumentType::MUNICIPAL_ORDINANCE, DocumentType::PROVINCIAL_ORDINANCE, DocumentType::OTHER_REFERRAL, DocumentType::CODE, DocumentType::ADMIN_DOCS, DocumentType::CTRC]);
     }
 
     public function scopeCase($query)
@@ -451,6 +478,11 @@ class Document extends Model
     public function scopeNotaries($query)
     {
         return $query->where('type', DocumentType::NOTARY);
+    }
+
+    public function scopeCtrcs($query)
+    {
+        return $query->where('type', DocumentType::CTRC);
     }
 
     public function scopeMunicipalOrdinances($query)
