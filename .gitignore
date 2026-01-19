@@ -1,5 +1,7 @@
-/storage/
+/storage/*
+!/storage/app/.gitignore
+!/storage/framework/.gitignore
+
 .env
-vite.config.js
 /node_modules/
-/storage/logs/
+vite.config.js
