@@ -74,7 +74,7 @@ onMounted(() => {
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <span>Edit transaction {{ transaction.id }}</span>
+                            <span>Edit transaction</span>
                         </h5>
                         <span class="close" @click="closeModal">&times;</span>
                     </div>
@@ -103,7 +103,7 @@ onMounted(() => {
                         <div class="form-group">
                             <input type="file" class="form-control-file" id="document_file" name="document_file"
                                 @change="getFile" />
-                            <span>{{ formData.document_file }}</span>
+                            <!-- <span>{{ formData.document_file }}</span> -->
                         </div>
                     </div>
 

@@ -143,6 +143,7 @@ const getAdditionalFiles = () => {
     axios.get(`/api/documents/getAdditionalFiles/${route.params.id}`)
         .then((response) => {
             additionalFiles.value = response.data;
+            console.log("Additional files", additionalFiles.value)
         })
 }
 const previewFile = (document_path, document_file) => {
@@ -172,6 +173,7 @@ const openModal = (transaction) => {
 }
 
 const closeModal = () => {
+    getTransactions()
     modalVisible.value = false;
 }
 
@@ -211,6 +213,97 @@ const docIdAttach = ref();
 const attachFile = (id) => {
     docIdAttach.value = id;
     $('#attachFileModal').modal('show');
+}
+
+const removeFile = async (documentId) => {
+    const result = await Swal.fire({
+        title: 'This will permanently delete the file. Continue?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.delete(`/api/documentFile/${documentId}`);
+            doc.document_file = null;
+            await Swal.fire({
+                title: 'Deleted!',
+                text: 'The document file has been deleted.',
+                icon: 'success',
+            });
+        } catch (error) {
+            console.error(error);
+            await Swal.fire({
+                title: 'Failed!',
+                text: 'Failed to delete document file.',
+                icon: 'error',
+            });
+        }
+    }
+}
+
+
+const removeAdditionalFile = async (documentId) => {
+    const result = await Swal.fire({
+        title: 'This will permanently delete the file. Continue?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.delete(`/api/additionalFile/${documentId}`)
+            additionalFiles.value = additionalFiles.value.filter(file => file.id !== documentId)
+            await Swal.fire({
+                title: 'Deleted!',
+                text: 'The document file has been deleted.',
+                icon: 'success',
+            });
+        } catch (error) {
+            console.error(error);
+            await Swal.fire({
+                title: 'Failed!',
+                text: 'Failed to delete document file.',
+                icon: 'error',
+            });
+        }
+    }
+}
+
+const removeTransactionFile = async (transactionId) => {
+    const result = await Swal.fire({
+        title: 'This will permanently delete the file. Continue?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await axios.delete(`/api/transactionFile/${transactionId}`)
+            transaction_attachments.value.data = transaction_attachments.value.data.filter(file => file.id !== transactionId)
+            await Swal.fire({
+                title: 'Deleted!',
+                text: 'The document file has been deleted.',
+                icon: 'success',
+            });
+        } catch (error) {
+            console.error(error);
+            await Swal.fire({
+                title: 'Failed!',
+                text: 'Failed to delete document file.',
+                icon: 'error',
+            });
+        }
+    }
 }
 
 
@@ -307,6 +400,7 @@ const createAttachFile = () => {
     axios.post(`/api/documents/attachfile`, formData)
         .then((response) => {
             $('#attachFileModal').modal('hide');
+            getAdditionalFiles()
         })
 }
 
@@ -390,14 +484,14 @@ function rotatePdf() {
 
 const scale = ref(2.0)
 
-function zoomIn(){
+function zoomIn() {
     console.log(scale.value)
     scale.value += 0.1
 }
 
-function zoomOut(){
+function zoomOut() {
     console.log(scale.value)
-    if(scale.value > 0.2) scale.value -= 0.1
+    if (scale.value > 0.2) scale.value -= 0.1
 }
 onMounted(() => {
     getDocument();
@@ -447,17 +541,24 @@ onMounted(() => {
                                 <a href="#" @click.prevent="previewFile(main_document_path, doc.document_file)">
                                     {{ doc.document_file }}
                                 </a>
+                                <button v-if="doc.document_file" type="button" class="btn btn-sm btn-danger ml-2"
+                                    @click="removeFile(doc.id)">Remove</button>
                             </p>
                             <p v-for="additionalFile in additionalFiles">
                                 <a href="#"
                                     @click.prevent="previewFile(main_document_path, additionalFile.document_file)">
                                     {{ additionalFile.document_file }}
                                 </a>
+                                <button v-if="additionalFile.document_file" type="button"
+                                    class="btn btn-sm btn-danger ml-2"
+                                    @click="removeAdditionalFile(additionalFile.id)">Remove</button>
                             </p>
                             <p v-for="file in transaction_attachments.data">
                                 <a href="#" @click.prevent="previewFile(transaction_path, file.attachment)">
                                     {{ file.attachment }}
                                 </a>
+                                <button v-if="file.attachment" type="button" class="btn btn-sm btn-danger ml-2"
+                                    @click="removeTransactionFile(file.id)">Remove</button>
                             </p>
 
                         </div>
@@ -465,7 +566,7 @@ onMounted(() => {
                 </div>
                 <div v-if="previewSource" class="col-lg-6">
                     <div class="card">
-                        <div class="card-body document-div" >
+                        <div class="card-body document-div">
 
                             <a @click.prevent="rotatePdf">
                                 <font-awesome-icon icon="fa-solid fa-rotate-right" class="mr-2" />
@@ -482,9 +583,10 @@ onMounted(() => {
                             <!-- <vue-pdf-embed :source="previewSource" :rotation="rotateLeft" :downloadable="true" /> -->
                             <!-- <VuePdf :src="previewSource" :allPages="true" /> -->
                             <div :style="rotationStyle">
-                                <VuePdf v-for="page in numOfPages" :key="previewSource" :src="previewSource" :page="page"/>
+                                <VuePdf v-for="page in numOfPages" :key="previewSource" :src="previewSource"
+                                    :page="page" />
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>

@@ -285,18 +285,7 @@ class DocumentController extends Controller
                 });
 
         });
-
-        //STATUS FILTER
-        $status_filter = request('status_filter');
-
-        $query->when($status_filter, function ($query) use ($status_filter) {
-            if ($status_filter == 1) {
-                $query->active();
-            } elseif ($status_filter == 2) {
-                $query->archive();
-            }
-        });
-        $query->orderBy('updated_at', 'desc');
+        $query->orderBy('created_at', 'desc');
 
         $paginator = $query->paginate($perPage);
 
@@ -549,7 +538,7 @@ class DocumentController extends Controller
 
     public function getAdditionalFiles(Document $document)
     {
-        $additional_files = DB::table('document_attachments')->select('document_file')->where('document_id', $document->id)->get();
+        $additional_files = DB::table('document_attachments')->select('id', 'document_file')->where('document_id', $document->id)->get();
 
         return $additional_files;
     }
@@ -683,5 +672,52 @@ class DocumentController extends Controller
         return $paginator;
     }
 
+    public function deleteAdditionalFile($fileId)
+    {
+        $attachment = DocumentAttachment::where('id', $fileId)->first();
+
+        if (!$attachment) {
+            return response()->json([
+                'message' => 'Attachment not found'
+            ], 404);
+        }
+
+        $filePath = 'uploads/documents/' . $attachment->document_file;
+        if (
+            $attachment->document_file &&
+            Storage::disk('public')->exists($filePath)
+        ) {
+
+            Storage::disk('public')->delete($filePath);
+        }
+
+        $attachment->delete();
+
+        return response()->json([
+            'message' => 'Attachment deleted successfully'
+        ]);
+    }
+
+    public function deleteDocumentFile($documentId)
+    {
+        $document = Document::where('id', $documentId)->first();
+
+        if ($document->document_file) {
+
+            $filePath = 'uploads/documents/' . $document->document_file;
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+
+            $document->update([
+                'document_file' => null
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Document file removed successfully'
+        ]);
+    }
 
 }

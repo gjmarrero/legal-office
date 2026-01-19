@@ -63,7 +63,7 @@ class TransactionController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ','_',$original_filename);
+            $sanitized_filename = str_replace(' ', '_', $original_filename);
             $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
             $path = 'uploads/transaction_documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
@@ -83,7 +83,7 @@ class TransactionController extends Controller
             $type = null;
         }
 
-        $update_last_transaction = Transaction::where('document_id',request('document_id'))->orderBy('id', 'desc')->first();
+        $update_last_transaction = Transaction::where('document_id', request('document_id'))->orderBy('id', 'desc')->first();
         $update_last_transaction->update([
             'status' => TransactionStatus::COMPLETED,
             'type' => TransactionType::RELEASED,
@@ -100,7 +100,7 @@ class TransactionController extends Controller
         ]);
 
         // $update_last_transaction = Transaction::where([['document_id', request('document_id')], ['type', TransactionType::RECEIVED], ['status', TransactionStatus::PENDING], ['employee_id', Auth::user()->employee_id]]);
-        
+
 
         // return Document::find($validated['document_id']);
 
@@ -138,7 +138,7 @@ class TransactionController extends Controller
         if (request()->hasFile('document_file')) {
             $file = request()->file('document_file');
             $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ','-',$original_filename);
+            $sanitized_filename = str_replace(' ', '-', $original_filename);
             $file_name = time() . '_' . 'document_file' . '' . $sanitized_filename;
             $path = 'uploads/transaction_documents/' . $file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
@@ -174,5 +174,27 @@ class TransactionController extends Controller
         $downloadpath = Storage::disk('public')->path('uploads/transaction_documents/' . $transaction->document_file);
         // ob_end_clean();
         return response()->download($downloadpath);
+    }
+
+    public function deleteTransactionFile($transactionId)
+    {
+        $transaction = Transaction::where('id', $transactionId)->first();
+
+        if ($transaction->document_file) {
+
+            $filePath = 'uploads/transaction_documents/' . $transaction->document_file;
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+
+            $transaction->update([
+                'document_file' => null
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Document file removed successfully'
+        ]);
     }
 }
