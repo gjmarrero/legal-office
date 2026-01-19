@@ -113,6 +113,10 @@ Route::middleware('auth')->group(function() {
     Route::get('/api/documents/getAttachedFiles/{document}', [DocumentController::class, 'getAttachedFiles']);
     Route::get('/api/documents/getAdditionalFiles/{document}', [DocumentController::class, 'getAdditionalFiles']);
 
+    Route::delete('/api/additionalFile/{documentId}', [DocumentController::class, 'deleteAdditionalFile']);
+    Route::delete('/api/documentFile/{documentId}', [DocumentController::class, 'deleteDocumentFile']);
+    Route::delete('/api/transactionFile/{transactionId}', [TransactionController::class, 'deleteTransactionFile']);
+
     Route::get('/api/documents/file/{document}', [DocumentController::class, 'getDocumentFile']);
 
     Route::get('/api/documents/transactions/file/{transaction}', [TransactionController::class, 'getTransactionFile']);
