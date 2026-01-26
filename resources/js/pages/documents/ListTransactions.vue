@@ -99,8 +99,40 @@ const getFile = (event) => {
     form.file = event.target.files[0];
 }
 
-const getFileAttachment = (event) => {
-    file_form.file = event.target.files[0];
+const getFileAttachment = async(event) => {
+    const file = event.target.files[0]
+
+    resetFile()
+
+    if (!file) return
+    if (file.type !== 'application/pdf') {
+        fileStatus.value = 'error'
+        return
+    }
+
+    try {
+        await verifyReadable(file)
+        file_form.file = file
+        fileReady.value = true
+        fileStatus.value = 'ready'
+    } catch {
+        fileStatus.value = 'error'
+    }
+}
+
+const verifyReadable = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(true)
+        reader.onerror = () => reject(false)
+        reader.readAsArrayBuffer(file)
+    })
+}
+
+const resetFile = () => {
+    file_form.file = null
+    fileReady.value = false
+    fileStatus.value = ''
 }
 
 const getTransaction_File = (transaction) => {
@@ -187,10 +219,6 @@ const form = reactive({
     action: '',
     file: null,
     remarks: '',
-});
-
-const file_form = reactive({
-    file: null,
 });
 
 const employees = ref();
@@ -392,16 +420,42 @@ const createRouteDocument = () => {
 
 const attachedFiles = ref({ 'data': [] });
 
-const createAttachFile = () => {
+const file_form = reactive({
+    file: null,
+});
+const fileReady = ref(false)
+const uploading = ref(false)
+const fileStatus = ref('')
+
+const createAttachFile = async () => {
+    if (!fileReady.value || uploading.value) return
+
     const formData = new FormData();
     formData.append('document_id', docIdAttach.value);
-    formData.append('document_file', file_form.file);
 
-    axios.post(`/api/documents/attachfile`, formData)
-        .then((response) => {
-            $('#attachFileModal').modal('hide');
-            getAdditionalFiles()
+    if (file_form.file) {
+        formData.append('document_file', file_form.file);
+    }
+
+    uploading.value = true
+
+    try {
+        await axios.post('/api/documents/attachfile', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 60000,
         })
+
+        resetFile()
+        $('#attachFileModal').modal('hide')
+        getAdditionalFiles()
+    } finally {
+        uploading.value = false
+    }
+    // axios.post(`/api/documents/attachfile`, formData)
+    //     .then((response) => {
+    //         $('#attachFileModal').modal('hide');
+    //         getAdditionalFiles()
+    //     })
 }
 
 
@@ -727,9 +781,16 @@ onMounted(() => {
                         <Form @submit="createAttachFile()">
                             <div class="form-group">
                                 <input type="file" class="form-control-file" id="document_file" name="document_file"
-                                    @change="getFileAttachment" />
+                                    accept="application/file" @change="getFileAttachment" />
+                                <small v-if="fileStatus === 'ready'" class="text-success">
+                                    ✔ File ready
+                                </small>
+                                <small v-if="fileStatus === 'error'" class="text-danger">
+                                    ✖ File cannot be read
+                                </small>
                             </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" :disabled="!fileReady || uploading">{{
+                                uploading ? 'Uploading...' : 'Submit' }}</button>
                         </Form>
                     </div>
                 </div>

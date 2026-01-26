@@ -46,31 +46,65 @@ const getEmployees = () => {
         })
 }
 
+const fileReady = ref(false)
+const fileError = ref(null)
 const selectedFile = ref(null);
 const selectedFileName = ref('');
 const fileInput = ref(null);
 
-const getFile = (event) => {
+const getFile = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-        selectedFile.value = file;
-        selectedFileName.value = file.name;
-        form.file = file;
+
+    fileError.value = null
+    fileReady.value = false
+
+    if (!file) return
+
+    if (file.type !== 'application/pdf') {
+        fileError.value = 'Only PDF files allowed'
+        return
     }
+
+    try {
+        await verifyReadable(file)
+        selectedFile.value = file
+        selectedFileName.value = file.name
+        form.file = file;
+        fileReady.value = true
+    } catch {
+        fileError.value = 'File could not be read'
+    }
+
+
 }
 
 const removeFile = () => {
-    selectedFile.value = null;
-    selectedFileName.value = '';
-    form.file = null;
+    selectedFile.value = null
+    selectedFileName.value = ''
+    form.file = null
+    fileReady.value = false
     if (fileInput.value) {
-        fileInput.value.value = '';
+        fileInput.value.value = ''
     }
 }
 
+const verifyReadable = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(true)
+        reader.onerror = () => reject(false)
+        reader.readAsArrayBuffer(file)
+    })
+}
 
 
 const createDocument = (values, actions) => {
+
+    if (!form.file) {
+        toastr.error('Please attach a file before submitting')
+        return
+    }
+
     const formData = new FormData();
     formData.append('document_file', form.file);
     formData.append('client_id', form.client_id);
@@ -105,7 +139,9 @@ const handleSubmit = (values, actions) => {
 
 const editDocument = (values, actions) => {
     const formData = new FormData();
-    formData.append('document_file', form.file);
+    if (form.file) {
+        formData.append('document_file', form.file);
+    }
     formData.append('client_id', form.client_id);
     formData.append('type', form.document_type);
     formData.append('date_received', form.date_received);
@@ -239,8 +275,8 @@ onMounted(() => {
                                         <div class="form-group">
                                             <label for="document_type">Employee Assigned</label>
                                             <select v-model="form.employee_id" class="form-control" id="employee_id">
-                                                <option v-for="employee in employees"
-                                                    :key="employee.id" :value="employee.id">{{
+                                                <option v-for="employee in employees" :key="employee.id"
+                                                    :value="employee.id">{{
                                                         employee.emp_name }}</option>
                                             </select>
                                         </div>
@@ -266,6 +302,29 @@ onMounted(() => {
                                 </div>
                                 <div class="form-group">
                                     <label for="document_file">Attach File</label>
+
+                                    <div v-if="selectedFile">
+                                        <span>{{ selectedFileName }}</span>
+                                        <button type="button" class="btn btn-sm btn-danger ml-2" @click="removeFile">
+                                            Remove
+                                        </button>
+                                    </div>
+
+                                    <div v-else>
+                                        <input ref="fileInput" type="file" class="form-control-file" id="document_file"
+                                            accept="application/pdf" name="document_file" @change="getFile" />
+                                    </div>
+                                    <p v-if="fileReady" class="text-success text-sm mt-1">
+                                        ✔ File ready to upload
+                                    </p>
+
+                                    <p v-if="fileError" class="text-danger text-sm mt-1">
+                                        ✖ {{ fileError }}
+                                    </p>
+                                </div>
+
+                                <!-- <div class="form-group">
+                                    <label for="document_file">Attach File</label>
                                     <div v-if="selectedFile">
                                         <span>{{ selectedFileName }}</span>
                                         <button type="button" class="btn btn-sm btn-danger ml-2"
@@ -273,10 +332,18 @@ onMounted(() => {
                                     </div>
                                     <div v-else>
                                         <input type="file" class="form-control-file" id="document_file"
-                                            name="document_file" @change="getFile" />
+                                            accept="application/file" name="document_file" @change="getFile" />
+                                        <p v-if="fileReady" class="text-success text-sm">
+                                            ✔ File ready to upload
+                                        </p>
+                                        <p v-if="fileError" class="text-danger text-sm">
+                                            ✖ {{ fileError }}
+                                        </p>
+
                                     </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary" :disabled="saving">
+                                </div> -->
+                                <button type="submit" class="btn btn-primary"
+                                    :disabled="saving || (!editMode && !fileReady)">
                                     <div v-if="saving" class="spinner-grow" style="width: 3rem; height: 3rem;"
                                         role="status">
                                         <span class="sr-only">Saving...</span>
