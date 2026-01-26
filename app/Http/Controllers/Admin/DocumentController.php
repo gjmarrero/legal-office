@@ -341,14 +341,37 @@ class DocumentController extends Controller
 
         ]);
 
-        if (request()->hasFile('document_file')) {
+        if (
+            request()->hasFile('document_file') &&
+            request()->file('document_file')->isValid() &&
+            request()->file('document_file')->getSize() > 0
+        ) {
             $file = request()->file('document_file');
-            $original_filename = $file->getClientOriginalName();
-            $sanitized_filename = str_replace(' ', '_', $original_filename);
-            $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
-            $path = 'uploads/documents/' . $file_name;
-            Storage::disk('public')->put($path, file_get_contents($file));
+
+            $original = $file->getClientOriginalName();
+            $sanitized = str_replace(' ', '_', $original);
+
+            $fileName = time() . '_document_file_' . $sanitized;
+            $path = 'uploads/documents/' . $fileName;
+
+            Storage::disk('public')->putFileAs(
+                'uploads/documents',
+                $file,
+                $fileName
+            );
+        } else {
+            return response()->json([
+                'message' => 'File upload incomplete or empty'
+            ], 422);
         }
+        // if (request()->hasFile('document_file')) {
+        //     $file = request()->file('document_file');
+        //     $original_filename = $file->getClientOriginalName();
+        //     $sanitized_filename = str_replace(' ', '_', $original_filename);
+        //     $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
+        //     $path = 'uploads/documents/' . $file_name;
+        //     Storage::disk('public')->put($path, file_get_contents($file));
+        // }
 
         $created_document = Document::create([
             'date_received' => $validated['date_received'],
