@@ -325,9 +325,79 @@ class DocumentController extends Controller
     //         ]);
     // }
 
+    // public function store()
+    // {
+    //     $file_name = '';
+
+    //     $validated = request()->validate([
+    //         'client_id' => 'required',
+    //         'document_type' => 'required',
+    //         'title' => 'required',
+    //         'description' => 'required',
+    //         'date_received' => 'required',
+    //         'employee_id' => 'nullable'
+    //     ], [
+    //         'client_id.required' => "Client name is required",
+
+    //     ]);
+
+    //     if (
+    //         request()->hasFile('document_file') &&
+    //         request()->file('document_file')->isValid() &&
+    //         request()->file('document_file')->getSize() > 0
+    //     ) {
+    //         $file = request()->file('document_file');
+
+    //         $original = $file->getClientOriginalName();
+    //         $sanitized = str_replace(' ', '_', $original);
+
+    //         $fileName = time() . '_document_file_' . $sanitized;
+    //         $path = 'uploads/documents/' . $fileName;
+
+    //         Storage::disk('public')->putFileAs(
+    //             'uploads/documents',
+    //             $file,
+    //             $fileName
+    //         );
+    //     } else {
+    //         return response()->json([
+    //             'message' => 'File upload incomplete or empty'
+    //         ], 422);
+    //     }
+    //     // if (request()->hasFile('document_file')) {
+    //     //     $file = request()->file('document_file');
+    //     //     $original_filename = $file->getClientOriginalName();
+    //     //     $sanitized_filename = str_replace(' ', '_', $original_filename);
+    //     //     $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
+    //     //     $path = 'uploads/documents/' . $file_name;
+    //     //     Storage::disk('public')->put($path, file_get_contents($file));
+    //     // }
+
+    //     $created_document = Document::create([
+    //         'date_received' => $validated['date_received'],
+    //         'type' => $validated['document_type'],
+    //         'title' => $validated['title'],
+    //         'client_id' => $validated['client_id'],
+    //         'description' => $validated['description'],
+    //         'remarks' => request('remarks'),
+    //         'document_file' => $file_name,
+    //         'status' => DocumentStatus::ACTIVE,
+    //         'employee_id' => $validated['employee_id'],
+    //     ]);
+
+    //     Transaction::create([
+    //         'document_id' => $created_document->id,
+    //         'employee_id' => Auth::user()->employee_id,
+    //         'action' => 'Received',
+    //         'status' => TransactionStatus::PENDING,
+    //         'user_id' => Auth::user()->id,
+    //         'type' => TransactionType::RECEIVED,
+    //     ]);
+    // }
+
     public function store()
     {
-        $file_name = '';
+        $file_name = null;
 
         $validated = request()->validate([
             'client_id' => 'required',
@@ -335,43 +405,34 @@ class DocumentController extends Controller
             'title' => 'required',
             'description' => 'required',
             'date_received' => 'required',
-            'employee_id' => 'nullable'
+            'employee_id' => 'nullable',
+            'document_file' => 'nullable|file|mimes:pdf'
         ], [
-            'client_id.required' => "Client name is required",
-
+            'client_id.required' => 'Client name is required',
         ]);
 
-        if (
-            request()->hasFile('document_file') &&
-            request()->file('document_file')->isValid() &&
-            request()->file('document_file')->getSize() > 0
-        ) {
+        // ✅ ONLY handle file if it exists
+        if (request()->hasFile('document_file')) {
+
             $file = request()->file('document_file');
+
+            if (!$file->isValid() || $file->getSize() === 0) {
+                return response()->json([
+                    'message' => 'Uploaded file is invalid or empty'
+                ], 422);
+            }
 
             $original = $file->getClientOriginalName();
             $sanitized = str_replace(' ', '_', $original);
 
-            $fileName = time() . '_document_file_' . $sanitized;
-            $path = 'uploads/documents/' . $fileName;
+            $file_name = Str::uuid() . '_document_file_' . $sanitized;
 
             Storage::disk('public')->putFileAs(
                 'uploads/documents',
                 $file,
-                $fileName
+                $file_name
             );
-        } else {
-            return response()->json([
-                'message' => 'File upload incomplete or empty'
-            ], 422);
         }
-        // if (request()->hasFile('document_file')) {
-        //     $file = request()->file('document_file');
-        //     $original_filename = $file->getClientOriginalName();
-        //     $sanitized_filename = str_replace(' ', '_', $original_filename);
-        //     $file_name = time() . '_' . 'document_file' . '_' . $sanitized_filename;
-        //     $path = 'uploads/documents/' . $file_name;
-        //     Storage::disk('public')->put($path, file_get_contents($file));
-        // }
 
         $created_document = Document::create([
             'date_received' => $validated['date_received'],
@@ -380,7 +441,7 @@ class DocumentController extends Controller
             'client_id' => $validated['client_id'],
             'description' => $validated['description'],
             'remarks' => request('remarks'),
-            'document_file' => $file_name,
+            'document_file' => $file_name, // null if no file
             'status' => DocumentStatus::ACTIVE,
             'employee_id' => $validated['employee_id'],
         ]);
@@ -393,7 +454,12 @@ class DocumentController extends Controller
             'user_id' => Auth::user()->id,
             'type' => TransactionType::RECEIVED,
         ]);
+
+        return response()->json([
+            'message' => 'Document created successfully'
+        ]);
     }
+
 
     public function edit(Document $document)
     {

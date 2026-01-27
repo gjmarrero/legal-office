@@ -99,14 +99,12 @@ const verifyReadable = (file) => {
 
 
 const createDocument = (values, actions) => {
+    const formData = new FormData();
 
-    if (!form.file) {
-        toastr.error('Please attach a file before submitting')
-        return
+    if (form.file) {
+        formData.append('document_file', form.file);
     }
 
-    const formData = new FormData();
-    formData.append('document_file', form.file);
     formData.append('client_id', form.client_id);
     formData.append('document_type', form.document_type);
     formData.append('date_received', form.date_received);
@@ -343,7 +341,7 @@ onMounted(() => {
                                     </div>
                                 </div> -->
                                 <button type="submit" class="btn btn-primary"
-                                    :disabled="saving || (!editMode && !fileReady)">
+                                    :disabled="saving">
                                     <div v-if="saving" class="spinner-grow" style="width: 3rem; height: 3rem;"
                                         role="status">
                                         <span class="sr-only">Saving...</span>
