@@ -92,7 +92,7 @@ class OutgoingDocumentController extends Controller
         if(request()->hasFile('document_file')){
             $file = request()->file('document_file');
             $file_name = time().'_'.$file->getClientOriginalName();
-            $path = 'public/uploads/outgoing/'.$file_name;
+            $path = 'uploads/outgoing_documents/'.$file_name;
             Storage::disk('public')->put($path, file_get_contents($file));
         }
 

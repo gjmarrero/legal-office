@@ -35,27 +35,27 @@ Route::get('/', function () {
 //    return view('dashboard');
 //});
 
-Route::middleware('auth')->group(function() {
+Route::middleware('auth')->group(function () {
     Route::get('/api/stats/documents', [DashboardStatController::class, 'documents']);
 
     Route::get('/api/stats/users', [DashboardStatController::class, 'users']);
 
-    Route::get('/api/users',[UserController::class, 'index']);
+    Route::get('/api/users', [UserController::class, 'index']);
     Route::post('/api/users', [UserController::class, 'store']);
     Route::put('/api/users/{user}', [UserController::class, 'update']);
     Route::delete('/api/users/{user}', [UserController::class, 'delete']);
     Route::delete('/api/users', [UserController::class, 'bulkDelete']);
 
-    Route::get('/api/clients',[ClientController::class, 'index']);
-    Route::post('/api/clients', [ClientController::class,'store']);
-    Route::put('/api/clients/{client}', [ClientController::class,'update']);
+    Route::get('/api/clients', [ClientController::class, 'index']);
+    Route::post('/api/clients', [ClientController::class, 'store']);
+    Route::put('/api/clients/{client}', [ClientController::class, 'update']);
     Route::delete('/api/clients/{client}', [ClientController::class, 'delete']);
-    Route::delete('/api/clients', [ClientController::class,'bulkDelete']);
+    Route::delete('/api/clients', [ClientController::class, 'bulkDelete']);
 
     Route::get('/api/users/getUser', [UserController::class, 'getCurrentUser']);
     Route::patch('/api/users/{user}/change-role', [UserController::class, 'changeRole']);
 
-    Route::get('/api/employees/getCurrentEmployee', [EmployeeController::class, 'getCurrentEmployee']);   
+    Route::get('/api/employees/getCurrentEmployee', [EmployeeController::class, 'getCurrentEmployee']);
 
     Route::get('/api/stats/filtered_documents', [DashboardStatController::class, 'getFilteredDocuments']);
     Route::get('/api/stats/referrals/{referral_type}', [DashboardStatController::class, 'getReferralNearDueCount']);
@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function() {
 
     Route::get('/api/stats/to-do', [DashboardStatController::class, 'to_do']);
 
-    Route::get('/api/dashboard/stats/totals', [DashboardStatController::class,'totals']);
+    Route::get('/api/dashboard/stats/totals', [DashboardStatController::class, 'totals']);
 
     Route::get('/api/profile/employee_counter', [ProfileController::class, 'getEmployeeCounters']);
     Route::get('/api/profile/employee_counter_cases', [ProfileController::class, 'getEmployeeCountCases']);
@@ -74,7 +74,7 @@ Route::middleware('auth')->group(function() {
 
     Route::get('/api/documents', [DocumentController::class, 'index']);
 
-    Route::get('/api/documents/overdue',[DocumentController::class, 'getOverdueDocuments']);
+    Route::get('/api/documents/overdue', [DocumentController::class, 'getOverdueDocuments']);
 
     Route::get('/api/documents/all', [DocumentController::class, 'index']);
 
@@ -84,7 +84,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/documents/create', [DocumentController::class, 'store']);
 
     Route::get('/api/clients', [ClientController::class, 'index']);
-    Route::get('/api/clients/get_clients', [ClientController::class,'get_clients']);
+    Route::get('/api/clients/get_clients', [ClientController::class, 'get_clients']);
 
     Route::get('/api/documents/{document}/edit', [DocumentController::class, 'edit']);
 
@@ -92,7 +92,7 @@ Route::middleware('auth')->group(function() {
 
     Route::delete('/api/documents/{document}', [DocumentController::class, 'destroy']);
 
-    Route::get('/api/document/file_location', [DocumentController::class,'file_location']);
+    Route::get('/api/document/file_location', [DocumentController::class, 'file_location']);
 
     Route::get('/api/outgoing_documents', [OutgoingDocumentController::class, 'index']);
     Route::post('/api/outgoing/create', [OutgoingDocumentController::class, 'store']);
@@ -137,4 +137,8 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/change-user-password', [ProfileController::class, 'changePassword']);
 });
 
-Route::get('{view}', ApplicationController::class)->where('view','(.*)')->middleware('auth');
+// Route::get('{view}', ApplicationController::class)->where('view','(.*)')->middleware('auth');
+Route::get('{view}', ApplicationController::class)
+    ->where('view', '^(?!storage).*')
+    ->middleware('auth');
+

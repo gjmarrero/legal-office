@@ -27,10 +27,7 @@ const searchQuery = ref(null);
 
 const searchbyQuery = ref('all');
 
-// const document_path = ref('http://192.168.6.221:8000/storage/uploads/outgoing/');
-// const document_path = ref(`${import.meta.env.VITE_APP_URL}/storage/uploads/outgoing/`)
-
-const main_document_path = '/storage/uploads/outgoing/';
+const main_document_path = '/storage/uploads/outgoing_documents/';
 const additional_path = '/storage/uploads/outgoing_documents/';
 
 const document_source = ref(null);
@@ -42,9 +39,10 @@ const handleValue = (value) => {
 };
 
 const getFile = (document_path,document_attachment) => {
-    
+    console.log("Get file")
     document_source.value = document_path+document_attachment;
     show.value = true;
+    console.log("Source additional file", document_source.value)
 }
 
 const getDocuments = (page = 1) => {
